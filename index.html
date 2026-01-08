@@ -1,819 +1,193 @@
 <!doctype html>
 <html lang="de">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Gesundheit Routine – Niyazi</title>
-  <style>
-    :root { --border:#ddd; --muted:#666; --bg:#fafafa; --card:#fff; }
-    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; max-width: 1150px; margin: 26px auto; padding: 0 14px; color:#111; }
-    header { display:flex; gap:12px; align-items:flex-end; justify-content:space-between; flex-wrap:wrap; }
-    h1 { margin:0; font-size: 28px; letter-spacing: -0.2px; }
-    h2 { margin:0 0 8px 0; font-size: 18px; }
-    .muted { color: var(--muted); }
-    .small { font-size: 12px; color: var(--muted); }
-    .card { border:1px solid var(--border); border-radius:14px; padding:14px; background: var(--card); }
-    .row { display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
-    button { border:1px solid var(--border); background:white; border-radius:10px; padding:8px 10px; cursor:pointer; }
-    button:hover { background: #f3f3f3; }
-    input, select, textarea {
-      border:1px solid var(--border); border-radius:10px; padding:8px 10px; font: inherit; background:white;
-    }
-    textarea { width: 100%; min-height: 70px; resize: vertical; }
-    table { width:100%; border-collapse:separate; border-spacing:0; overflow:hidden; border-radius:12px; border:1px solid var(--border); }
-    th, td { padding:10px; border-bottom:1px solid var(--border); vertical-align:top; }
-    th { text-align:left; background: var(--bg); }
-    tr:last-child td { border-bottom:none; }
-    .pill { display:inline-block; padding:4px 8px; border:1px solid var(--border); border-radius:999px; font-size:12px; color:var(--muted); background: #fff; }
-    .day { white-space:nowrap; width: 96px; }
-    .danger { color:#b00020; }
-    .twoCol { display:grid; grid-template-columns: 1fr; gap:12px; }
-    @media (min-width: 980px) { .twoCol { grid-template-columns: 1fr 1fr; } }
-    .hidden { display:none !important; }
+<meta charset="utf-8">
+<title>Ottoman Power Routinen</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
 
-    .stretchGrid { display:grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap:10px; margin-top:10px; }
-    @media (min-width: 980px) { .stretchGrid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
-    .stretchItem { border:1px solid var(--border); border-radius:12px; padding:10px; background:#fff; display:flex; gap:10px; align-items:center; }
-    .stretchItem strong { display:block; font-size: 13px; line-height: 1.2; }
-    .stretchItem .meta { font-size: 12px; color: var(--muted); }
-    .stretchAnim { width:56px; height:56px; border-radius:12px; border:1px solid var(--border); background: var(--bg); display:grid; place-items:center; overflow:hidden; }
-    .stretchAnim img { width:56px; height:56px; display:block; }
+<style>
+body {
+  background:#000;
+  color:#fff;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  max-width: 900px;
+  margin: 40px auto;
+  padding: 0 16px;
+}
 
-    .statGrid { display:grid; grid-template-columns: 1fr; gap:10px; }
-    @media (min-width: 980px) { .statGrid { grid-template-columns: 1fr 1fr; } }
-    .statBox { border:1px solid var(--border); border-radius:12px; padding:12px; background:#fff; }
-    .statBox h3 { margin:0 0 8px 0; font-size: 15px; }
-    .kpiRow { display:flex; gap:10px; flex-wrap:wrap; }
-    .kpi { border:1px solid var(--border); border-radius:12px; padding:10px; background: var(--bg); min-width: 170px; }
-    .kpi .num { font-size: 20px; font-weight: 700; }
-    .kpi .lbl { font-size: 12px; color: var(--muted); }
+h1, h2, h3 {
+  margin: 0 0 12px 0;
+}
 
-    .checklist { display:grid; gap:8px; }
-    .checkRow { display:flex; gap:10px; align-items:flex-start; }
-    .checkRow label { line-height: 1.25; }
-    .noteInline { width: 100%; }
+hr {
+  border: none;
+  border-top: 1px solid #333;
+  margin: 30px 0;
+}
 
-    .sectionTitle { display:flex; align-items:flex-end; justify-content:space-between; gap:10px; flex-wrap:wrap; }
-  </style>
+.card {
+  border: 1px solid #333;
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 24px;
+}
+
+label {
+  display: block;
+  margin-bottom: 6px;
+}
+
+input, select {
+  background: #111;
+  color: #fff;
+  border: 1px solid #333;
+  border-radius: 8px;
+  padding: 6px 8px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th, td {
+  border-bottom: 1px solid #333;
+  padding: 8px;
+}
+
+th {
+  text-align: left;
+  color:#aaa;
+}
+
+.total {
+  font-weight: bold;
+  color:#0f0;
+}
+</style>
 </head>
 
 <body>
-  <header class="card">
-    <div>
-      <h1>Gesundheit Routine – Niyazi</h1>
-      <div class="muted">Woche: <span id="weekLabel"></span></div>
-      <div class="small">Speicherung lokal im Browser (localStorage). Rückblick zählt alles, was du je eingetragen hast (auf diesem Gerät).</div>
-    </div>
-    <div class="row">
-      <button id="prevWeek">◀ Vorherige Woche</button>
-      <button id="todayWeek">Diese Woche</button>
-      <button id="nextWeek">Nächste Woche ▶</button>
-      <button id="resetWeek" class="danger" title="Setzt nur die aktuelle Woche zurück">Woche zurücksetzen</button>
-    </div>
-  </header>
 
-  <section class="card" style="margin-top:12px;">
-    <div class="sectionTitle">
-      <div>
-        <h2>📊 Rückblick & Statistik</h2>
-        <div class="small">Aktuelle Woche + Gesamt über alle Wochen (auf diesem Gerät).</div>
-      </div>
-      <button id="refreshStats">Statistik aktualisieren</button>
-    </div>
+<h1>Niazi Tunjai</h1>
+<h2>Ottoman Power Routinen</h2>
 
-    <div class="statGrid" style="margin-top:10px;">
-      <div class="statBox">
-        <h3>Diese Woche</h3>
-        <div class="kpiRow" id="statsWeek"></div>
-      </div>
-      <div class="statBox">
-        <h3>Gesamt</h3>
-        <div class="kpiRow" id="statsAll"></div>
-      </div>
-    </div>
-  </section>
+<hr>
 
-  <div class="twoCol" style="margin-top:12px;">
-    <section class="card">
-      <div class="sectionTitle">
-        <div>
-          <h2>💊 Supplements (Mittwoch & Samstag)</h2>
-          <div class="small">Jede Position einzeln abhaken – pro Tag separat.</div>
-        </div>
-      </div>
+<div class="card">
+<h3>💊 Gesundheitsroutine – Supplements</h3>
+<p>Taktung: <b>Alle 3 Tage</b></p>
 
-      <div style="margin-top:10px;">
-        <table>
-          <thead>
-            <tr>
-              <th class="day">Tag</th>
-              <th>Checkliste</th>
-              <th>Notiz</th>
-            </tr>
-          </thead>
-          <tbody id="suppBody"></tbody>
-        </table>
-      </div>
-    </section>
+<label><input type="checkbox"> Vitamin D3 / K2 (pro 10kg – 1000 IE)</label>
+<label><input type="checkbox"> Omega 3 – 4 Kapseln</label>
+<label><input type="checkbox"> Kurkuma + Piperin – 4 Kapseln</label>
+<label><input type="checkbox"> Cellagon Multivitamin – 25 ml</label>
+<label><input type="checkbox"> Magnesiumkapseln</label>
+<label><input type="checkbox"> Granatapfelsaft – 300–400 ml</label>
+</div>
 
-    <section class="card">
-      <div class="sectionTitle">
-        <div>
-          <h2>🤸 Stretching (täglich)</h2>
-          <div class="small">Oben: Übungen + Mini-Animation. Unten: pro Tag abhaken.</div>
-        </div>
-        <button id="editStretch">Übungen bearbeiten</button>
-      </div>
+<hr>
 
-      <div class="stretchGrid" id="stretchGrid"></div>
+<div class="card">
+<h3>🏋️ Wochen-Sportplan</h3>
 
-      <div id="stretchEditor" class="card hidden" style="margin-top:10px; background:var(--bg);">
-        <div class="small">Eine Übung pro Zeile (Reihenfolge = Zeilenreihenfolge). Du kannst Texte frei ändern.</div>
-        <textarea id="stretchInput"></textarea>
-        <div class="row" style="margin-top:10px;">
-          <button id="saveStretch">Speichern</button>
-          <button id="cancelStretch">Abbrechen</button>
-        </div>
-      </div>
+<table id="sportTable">
+<thead>
+<tr>
+<th>Tag</th>
+<th>Sport</th>
+<th>Dauer (min)</th>
+<th>Kalorien</th>
+<th>KM</th>
+<th>Pace</th>
+</tr>
+</thead>
+<tbody>
+</tbody>
+</table>
+</div>
 
-      <div style="margin-top:10px;">
-        <table>
-          <thead>
-            <tr>
-              <th class="day">Tag</th>
-              <th>Erledigt</th>
-              <th>Notiz</th>
-            </tr>
-          </thead>
-          <tbody id="stretchBody"></tbody>
-        </table>
-      </div>
-    </section>
-  </div>
+<div class="card">
+<h3>📊 Wochenbilanz</h3>
+<p>Gesamtdauer: <span class="total" id="totalMinutes">0</span> min</p>
+<p>Gesamtkalorien: <span class="total" id="totalCalories">0</span></p>
+<p>Joggen KM gesamt: <span class="total" id="totalKm">0</span></p>
+<p>Ø Pace: <span class="total" id="avgPace">–</span></p>
+</div>
 
-  <section class="card" style="margin-top:12px;">
-    <div class="sectionTitle">
-      <div>
-        <h2>🏃 Sport Planner (Mo–Fr)</h2>
-        <div class="small">Bei Joggen: km & Pace aktiv. Bei Gym: nur Dauer & Kalorien.</div>
-      </div>
-    </div>
+<hr>
 
-    <div style="margin-top:10px;">
-      <table>
-        <thead>
-          <tr>
-            <th class="day">Tag</th>
-            <th>Sportart</th>
-            <th>Dauer (min)</th>
-            <th>Kalorien</th>
-            <th class="jogCol">KM</th>
-            <th class="jogCol">Pace (min/km)</th>
-            <th>Notiz</th>
-          </tr>
-        </thead>
-        <tbody id="sportBody"></tbody>
-      </table>
-    </div>
-  </section>
+<div class="card">
+<h3>🤸 Stretching-Routine</h3>
+<ul>
+<li>Dynamisch diagonal zu den Füßen</li>
+<li>Lateral Spin</li>
+<li>Full Spine Stretch</li>
+<li>Nacken kreisen</li>
+<li>Das Kind</li>
+<li>Cobra</li>
+<li>Katze & Hund</li>
+<li>Hero Pose</li>
+<li>Schneidersitz + Rotation</li>
+<li>Schneidersitz nach vorne</li>
+<li>Ausfallschritte Hüftbeuger</li>
+<li>Bridge Pose</li>
+<li>Quad Stretch</li>
+<li>Spagat</li>
+</ul>
+</div>
 
 <script>
-(() => {
-  const days = [
-    {key:"mon", label:"Montag"},
-    {key:"tue", label:"Dienstag"},
-    {key:"wed", label:"Mittwoch"},
-    {key:"thu", label:"Donnerstag"},
-    {key:"fri", label:"Freitag"},
-    {key:"sat", label:"Samstag"},
-    {key:"sun", label:"Sonntag"},
-  ];
-  const weekDaysSport = ["mon","tue","wed","thu","fri"];
-  const supplementDays = ["wed","sat"];
+const days = ["Montag","Dienstag","Mittwoch","Donnerstag","Freitag","Samstag","Sonntag"];
+const sports = ["","Krafttraining","Joggen","Stretching","Ringen","Schwimmen","Tennis"];
+const tbody = document.querySelector("#sportTable tbody");
 
-  const pad2 = n => String(n).padStart(2, "0");
-  function startOfWeekMonday(date) {
-    const d = new Date(date);
-    const day = d.getDay();
-    const diff = (day === 0 ? -6 : 1 - day);
-    d.setDate(d.getDate() + diff);
-    d.setHours(0,0,0,0);
-    return d;
-  }
-  function fmtDate(d) {
-    return `${pad2(d.getDate())}.${pad2(d.getMonth()+1)}.${d.getFullYear()}`;
-  }
-  function weekKey(mondayDate) {
-    const y = mondayDate.getFullYear();
-    const m = pad2(mondayDate.getMonth()+1);
-    const da = pad2(mondayDate.getDate());
-    return `${y}-${m}-${da}`;
-  }
-  function lsGet(key, fallback) {
-    try { const raw = localStorage.getItem(key); return raw ? JSON.parse(raw) : fallback; }
-    catch { return fallback; }
-  }
-  function lsSet(key, value) { localStorage.setItem(key, JSON.stringify(value)); }
+days.forEach(d=>{
+  const tr = document.createElement("tr");
+  tr.innerHTML = `
+    <td>${d}</td>
+    <td>
+      <select>
+        ${sports.map(s=>`<option>${s}</option>`).join("")}
+      </select>
+    </td>
+    <td><input type="number"></td>
+    <td><input type="number"></td>
+    <td><input type="number"></td>
+    <td><input type="text"></td>
+  `;
+  tbody.appendChild(tr);
+});
 
-  const SETTINGS_KEY = "rp_settings_v2";
-  const defaultStretch = [
-    "Dynamisch diagonal zu den Füßen",
-    "Lateral Spin",
-    "Full Spine Stretch",
-    "Nacken stretchen & kreisen (rechts/links)",
-    "Das Kind",
-    "Cobra",
-    "Katze und Hund",
-    "Hero Pose",
-    "Schneidersitz + Drehung",
-    "Schneidersitz nach vorne beugen",
-    "Ausfallschritte Hüftbeuger",
-    "Bridge Pose",
-    "Quad Stretch",
-    "Spagat"
-  ];
-  const settings = lsGet(SETTINGS_KEY, { stretchSequence: defaultStretch });
+function calcTotals(){
+  let min=0, cal=0, km=0, paceSum=0, paceCount=0;
 
-  const supplements = [
-    { id:"d3k2", text:"Vitamin D3/K2 pro 10kg – 1000 IE" },
-    { id:"omega3", text:"Omega 3 – 4× Kapseln" },
-    { id:"kurkuma", text:"Kurkuma + Piperin – 4× Kapseln" },
-    { id:"cellagon", text:"Cellagon Multivitamin – 25 ml" },
-    { id:"cellagon_water", text:"Cellagon: mit Wasser" },
-    { id:"cellagon_olive", text:"Cellagon: + 1–2 EL Olivenöl" },
-    { id:"cellagon_black", text:"Cellagon: + Schwarzkümmelöl" },
-    { id:"granatapfel", text:"Granatapfelsaft – 300–400 ml" },
-  ];
+  tbody.querySelectorAll("tr").forEach(tr=>{
+    const sport = tr.children[1].querySelector("select").value;
+    const m = Number(tr.children[2].querySelector("input").value||0);
+    const c = Number(tr.children[3].querySelector("input").value||0);
+    const k = Number(tr.children[4].querySelector("input").value||0);
+    const p = tr.children[5].querySelector("input").value;
 
-  let currentMonday = startOfWeekMonday(new Date());
-
-  function emptyWeek() {
-    const supp = {};
-    supplementDays.forEach(day => {
-      supp[day] = { note: "", items: Object.fromEntries(supplements.map(s => [s.id, false])) };
-    });
-    const stretching = Object.fromEntries(days.map(d => [d.key, {done:false, note:""}]));
-    const sport = Object.fromEntries(weekDaysSport.map(k => [k, {type:"", minutes:"", calories:"", km:"", pace:"", note:""}]));
-    return { supplements: supp, stretching, sport };
-  }
-
-  function loadWeekData() {
-    const key = "rp_week_v2_" + weekKey(currentMonday);
-    return lsGet(key, emptyWeek());
-  }
-  function saveWeekData(data) {
-    const key = "rp_week_v2_" + weekKey(currentMonday);
-    lsSet(key, data);
-  }
-
-  let weekData = loadWeekData();
-
-  const weekLabel = document.getElementById("weekLabel");
-  function renderWeekLabel() {
-    const end = new Date(currentMonday);
-    end.setDate(end.getDate() + 6);
-    weekLabel.textContent = `${fmtDate(currentMonday)} – ${fmtDate(end)}`;
-  }
-
-  function svgDataUrl(svg) {
-    return "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg);
-  }
-
-  function animSvg(kind) {
-    const base = `
-      <svg xmlns="http://www.w3.org/2000/svg" width="56" height="56" viewBox="0 0 56 56">
-        <rect x="0" y="0" width="56" height="56" rx="12" fill="#fafafa"/>
-        <g stroke="#111" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none">
-          <path d="M10 44 H46" opacity="0.25"/>
-        </g>
-        {{BODY}}
-      </svg>
-    `;
-    const head = (cx, cy) => `<circle cx="${cx}" cy="${cy}" r="5.2" stroke="#111" stroke-width="2.2" fill="none"/>`;
-
-    const kinds = {
-      fold: `
-        <g stroke="#111" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none">
-          ${head(20,18)}
-          <path d="M20 23 L20 34" />
-          <path d="M20 28 L30 30" />
-          <path d="M20 34 L16 44" />
-          <path d="M20 34 L26 44" />
-          <g><path d="M20 23 L28 32" /><animateTransform attributeName="transform" type="rotate" values="0 20 23; 20 20 23; 0 20 23" dur="1.3s" repeatCount="indefinite"/></g>
-        </g>
-      `,
-      twist: `
-        <g stroke="#111" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none">
-          ${head(28,14)}
-          <path d="M28 19 L28 32" />
-          <path d="M28 24 L18 28" />
-          <path d="M28 24 L38 28" />
-          <path d="M28 32 L22 44" />
-          <path d="M28 32 L34 44" />
-          <g><path d="M28 19 L28 32" /><animateTransform attributeName="transform" type="rotate" values="-18 28 24; 18 28 24; -18 28 24" dur="1.4s" repeatCount="indefinite"/></g>
-        </g>
-      `,
-      neck: `
-        <g stroke="#111" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none">
-          ${head(28,16)}
-          <path d="M28 22 L28 34" />
-          <path d="M28 28 L18 34" />
-          <path d="M28 28 L38 34" />
-          <path d="M28 34 L24 44" />
-          <path d="M28 34 L32 44" />
-          <g><animateTransform attributeName="transform" type="rotate" values="0 28 22; 25 28 22; 0 28 22; -25 28 22; 0 28 22" dur="1.6s" repeatCount="indefinite"/></g>
-        </g>
-      `,
-      child: `
-        <g stroke="#111" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none">
-          <path d="M18 42 Q28 34 38 42" />
-          <path d="M22 42 Q28 30 34 42" />
-          <circle cx="28" cy="32" r="4.6"/>
-          <path d="M20 38 L14 34" />
-          <path d="M36 38 L42 34" />
-          <g><animate attributeName="opacity" values="1;0.65;1" dur="1.2s" repeatCount="indefinite"/></g>
-        </g>
-      `,
-      cobra: `
-        <g stroke="#111" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none">
-          <path d="M14 44 Q22 38 28 38 Q34 38 42 44" />
-          <path d="M22 44 Q26 30 30 26" />
-          ${head(32,20)}
-          <path d="M24 44 L22 36" />
-          <path d="M32 44 L34 36" />
-          <g><animateTransform attributeName="transform" type="translate" values="0 0; 0 -2; 0 0" dur="1.4s" repeatCount="indefinite"/></g>
-        </g>
-      `,
-      catcow: `
-        <g stroke="#111" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none">
-          <path d="M18 44 L18 34" />
-          <path d="M38 44 L38 34" />
-          <path d="M18 34 Q28 26 38 34">
-            <animate attributeName="d"
-              values="M18 34 Q28 26 38 34; M18 34 Q28 38 38 34; M18 34 Q28 26 38 34"
-              dur="1.4s" repeatCount="indefinite"/>
-          </path>
-          <circle cx="16" cy="32" r="3.6"/>
-        </g>
-      `,
-      lunge: `
-        <g stroke="#111" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none">
-          ${head(30,14)}
-          <path d="M30 19 L30 28" />
-          <path d="M30 22 L22 28" />
-          <path d="M30 22 L38 28" />
-          <path d="M30 28 L18 44" />
-          <path d="M30 28 L38 44" />
-          <g><animateTransform attributeName="transform" type="translate" values="0 0; 1 0; 0 0" dur="1.2s" repeatCount="indefinite"/></g>
-        </g>
-      `,
-      bridge: `
-        <g stroke="#111" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none">
-          <path d="M14 44 Q28 26 42 44">
-            <animate attributeName="d"
-              values="M14 44 Q28 30 42 44; M14 44 Q28 24 42 44; M14 44 Q28 30 42 44"
-              dur="1.4s" repeatCount="indefinite"/>
-          </path>
-          <circle cx="16" cy="41" r="3.4"/>
-          <path d="M14 44 L10 44" />
-          <path d="M42 44 L46 44" />
-        </g>
-      `,
-      quad: `
-        <g stroke="#111" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none">
-          ${head(24,16)}
-          <path d="M24 21 L24 32" />
-          <path d="M24 26 L14 30" />
-          <path d="M24 26 L34 30" />
-          <path d="M24 32 L22 44" />
-          <path d="M24 32 L32 40" />
-          <path d="M32 40 L30 30" />
-          <g><animateTransform attributeName="transform" type="rotate" values="0 24 32; 8 24 32; 0 24 32" dur="1.3s" repeatCount="indefinite"/></g>
-        </g>
-      `,
-      split: `
-        <g stroke="#111" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none">
-          <circle cx="28" cy="22" r="4.8"/>
-          <path d="M28 27 L28 34" />
-          <path d="M28 34 L16 44" />
-          <path d="M28 34 L40 44" />
-          <path d="M20 44 H36" opacity="0.35"/>
-          <g><animateTransform attributeName="transform" type="translate" values="0 0; 0 -1; 0 0" dur="1.3s" repeatCount="indefinite"/></g>
-        </g>
-      `,
-      spine: `
-        <g stroke="#111" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none">
-          ${head(28,14)}
-          <path d="M28 19 L28 34" />
-          <path d="M28 24 L18 28" />
-          <path d="M28 24 L38 28" />
-          <path d="M28 34 L24 44" />
-          <path d="M28 34 L32 44" />
-          <g><animateTransform attributeName="transform" type="scale" values="1 1; 1 1.05; 1 1" dur="1.5s" repeatCount="indefinite"/></g>
-        </g>
-      `
-    };
-    const body = kinds[kind] || kinds.spine;
-    return svgDataUrl(base.replace("{{BODY}}", body));
-  }
-
-  function kindForExercise(name) {
-    const n = name.toLowerCase();
-    if (n.includes("nacken")) return "neck";
-    if (n.includes("cobra")) return "cobra";
-    if (n.includes("katze") || n.includes("hund")) return "catcow";
-    if (n.includes("kind")) return "child";
-    if (n.includes("ausfallschritt") || n.includes("hüftbeuger") || n.includes("huftbeuger")) return "lunge";
-    if (n.includes("bridge")) return "bridge";
-    if (n.includes("quad")) return "quad";
-    if (n.includes("spagat")) return "split";
-    if (n.includes("dreh") || n.includes("rotation") || n.includes("lateral spin")) return "twist";
-    if (n.includes("vor") || n.includes("füße") || n.includes("fuesse") || n.includes("beugen")) return "fold";
-    if (n.includes("spine")) return "spine";
-    return "spine";
-  }
-
-  function kindLabel(kind) {
-    const map = { fold:"Beuge / Toe Touch", twist:"Rotation", spine:"Wirbelsäule", neck:"Nacken", child:"Entspannung",
-      cobra:"Rückbeuge", catcow:"Mobilisation", lunge:"Hüftbeuger", bridge:"Bridge", quad:"Quadrizeps", split:"Spagat" };
-    return map[kind] || "Stretch";
-  }
-
-  const suppBody = document.getElementById("suppBody");
-  function renderSupplements() {
-    suppBody.innerHTML = "";
-    days.forEach(d => {
-      const tr = document.createElement("tr");
-      const tdDay = document.createElement("td");
-      tdDay.className = "day";
-      tdDay.textContent = d.label;
-
-      const tdList = document.createElement("td");
-      const tdNote = document.createElement("td");
-
-      if (!supplementDays.includes(d.key)) {
-        tdList.innerHTML = `<span class="pill">kein Supplement-Tag</span>`;
-        tdNote.innerHTML = `<span class="muted">—</span>`;
-      } else {
-        if (!weekData.supplements[d.key]) {
-          weekData.supplements[d.key] = { note: "", items: Object.fromEntries(supplements.map(s => [s.id, false])) };
-          saveWeekData(weekData);
-        }
-        const wrap = document.createElement("div");
-        wrap.className = "checklist";
-
-        supplements.forEach(s => {
-          const row = document.createElement("div");
-          row.className = "checkRow";
-
-          const cb = document.createElement("input");
-          cb.type = "checkbox";
-          cb.checked = !!weekData.supplements[d.key].items[s.id];
-          cb.addEventListener("change", () => {
-            weekData.supplements[d.key].items[s.id] = cb.checked;
-            saveWeekData(weekData);
-            renderStats();
-          });
-
-          const label = document.createElement("label");
-          label.textContent = s.text;
-
-          row.appendChild(cb);
-          row.appendChild(label);
-          wrap.appendChild(row);
-        });
-
-        tdList.appendChild(wrap);
-
-        const note = document.createElement("input");
-        note.className = "noteInline";
-        note.placeholder = "Notiz (optional)";
-        note.value = weekData.supplements[d.key].note || "";
-        note.addEventListener("input", () => {
-          weekData.supplements[d.key].note = note.value;
-          saveWeekData(weekData);
-        });
-        tdNote.appendChild(note);
+    min+=m; cal+=c;
+    if(sport==="Joggen" && k){
+      km+=k;
+      if(p && p.includes(":")){
+        const [mm,ss]=p.split(":").map(Number);
+        paceSum+=mm*60+ss;
+        paceCount++;
       }
-
-      tr.appendChild(tdDay);
-      tr.appendChild(tdList);
-      tr.appendChild(tdNote);
-      suppBody.appendChild(tr);
-    });
-  }
-
-  const stretchGrid = document.getElementById("stretchGrid");
-  const stretchBody = document.getElementById("stretchBody");
-
-  function renderStretchGrid() {
-    stretchGrid.innerHTML = "";
-    settings.stretchSequence.forEach((name, i) => {
-      const kind = kindForExercise(name);
-      const el = document.createElement("div");
-      el.className = "stretchItem";
-
-      const anim = document.createElement("div");
-      anim.className = "stretchAnim";
-      const img = document.createElement("img");
-      img.alt = "Animation";
-      img.src = animSvg(kind);
-      anim.appendChild(img);
-
-      const txt = document.createElement("div");
-      txt.innerHTML = `<strong>${i+1}. ${escapeHtml(name)}</strong><div class="meta">${kindLabel(kind)}</div>`;
-
-      el.appendChild(anim);
-      el.appendChild(txt);
-      stretchGrid.appendChild(el);
-    });
-  }
-
-  function renderStretchingTable() {
-    stretchBody.innerHTML = "";
-    days.forEach(d => {
-      const tr = document.createElement("tr");
-      const tdDay = document.createElement("td");
-      tdDay.className = "day";
-      tdDay.textContent = d.label;
-
-      const tdDone = document.createElement("td");
-      const cb = document.createElement("input");
-      cb.type = "checkbox";
-      cb.checked = !!weekData.stretching[d.key]?.done;
-      cb.addEventListener("change", () => {
-        weekData.stretching[d.key].done = cb.checked;
-        saveWeekData(weekData);
-        renderStats();
-      });
-      tdDone.appendChild(cb);
-
-      const tdNote = document.createElement("td");
-      const note = document.createElement("input");
-      note.placeholder = "Notiz (optional)";
-      note.value = weekData.stretching[d.key]?.note ?? "";
-      note.addEventListener("input", () => {
-        weekData.stretching[d.key].note = note.value;
-        saveWeekData(weekData);
-      });
-      tdNote.appendChild(note);
-
-      tr.appendChild(tdDay);
-      tr.appendChild(tdDone);
-      tr.appendChild(tdNote);
-      stretchBody.appendChild(tr);
-    });
-  }
-
-  const editStretchBtn = document.getElementById("editStretch");
-  const stretchEditor = document.getElementById("stretchEditor");
-  const stretchInput = document.getElementById("stretchInput");
-  const saveStretchBtn = document.getElementById("saveStretch");
-  const cancelStretchBtn = document.getElementById("cancelStretch");
-
-  editStretchBtn.addEventListener("click", () => {
-    stretchInput.value = settings.stretchSequence.join("\n");
-    stretchEditor.classList.remove("hidden");
-    stretchInput.focus();
-  });
-  cancelStretchBtn.addEventListener("click", () => stretchEditor.classList.add("hidden"));
-  saveStretchBtn.addEventListener("click", () => {
-    const lines = stretchInput.value.split("\n").map(s => s.trim()).filter(Boolean);
-    if (lines.length) {
-      settings.stretchSequence = lines;
-      lsSet(SETTINGS_KEY, settings);
-      renderStretchGrid();
     }
-    stretchEditor.classList.add("hidden");
   });
 
-  const sportBody = document.getElementById("sportBody");
-  function renderSport() {
-    sportBody.innerHTML = "";
-    const weekdays = days.filter(d => weekDaysSport.includes(d.key));
+  document.getElementById("totalMinutes").textContent=min;
+  document.getElementById("totalCalories").textContent=cal;
+  document.getElementById("totalKm").textContent=km.toFixed(1);
+  document.getElementById("avgPace").textContent=paceCount?Math.floor(paceSum/paceCount/60)+":"+String(Math.round((paceSum/paceCount)%60)).padStart(2,"0"):"–";
+}
 
-    weekdays.forEach(d => {
-      const tr = document.createElement("tr");
-
-      const tdDay = document.createElement("td");
-      tdDay.className = "day";
-      tdDay.textContent = d.label;
-
-      const tdType = document.createElement("td");
-      const sel = document.createElement("select");
-      const opts = ["", "Joggen", "Gym", "Radfahren", "Spazieren", "Sonstiges"];
-      opts.forEach(o => {
-        const op = document.createElement("option");
-        op.value = o;
-        op.textContent = o === "" ? "— auswählen —" : o;
-        sel.appendChild(op);
-      });
-      sel.value = weekData.sport[d.key]?.type ?? "";
-      tdType.appendChild(sel);
-
-      const tdMin = document.createElement("td");
-      const minutes = document.createElement("input");
-      minutes.type = "number";
-      minutes.min = "0";
-      minutes.placeholder = "z.B. 45";
-      minutes.value = weekData.sport[d.key]?.minutes ?? "";
-      tdMin.appendChild(minutes);
-
-      const tdCal = document.createElement("td");
-      const calories = document.createElement("input");
-      calories.type = "number";
-      calories.min = "0";
-      calories.placeholder = "z.B. 350";
-      calories.value = weekData.sport[d.key]?.calories ?? "";
-      tdCal.appendChild(calories);
-
-      const tdKm = document.createElement("td");
-      tdKm.className = "jogCol";
-      const km = document.createElement("input");
-      km.type = "number";
-      km.min = "0";
-      km.step = "0.1";
-      km.placeholder = "z.B. 5.0";
-      km.value = weekData.sport[d.key]?.km ?? "";
-      tdKm.appendChild(km);
-
-      const tdPace = document.createElement("td");
-      tdPace.className = "jogCol";
-      const pace = document.createElement("input");
-      pace.placeholder = "z.B. 5:30";
-      pace.value = weekData.sport[d.key]?.pace ?? "";
-      tdPace.appendChild(pace);
-
-      const tdNote = document.createElement("td");
-      const note = document.createElement("input");
-      note.placeholder = "Notiz (optional)";
-      note.value = weekData.sport[d.key]?.note ?? "";
-      tdNote.appendChild(note);
-
-      function updateJogVisibilityForRow() {
-        const isJog = sel.value === "Joggen";
-        tdKm.style.opacity = isJog ? "1" : "0.35";
-        tdPace.style.opacity = isJog ? "1" : "0.35";
-        km.disabled = !isJog;
-        pace.disabled = !isJog;
-      }
-
-      function persist() {
-        weekData.sport[d.key] = { type: sel.value, minutes: minutes.value, calories: calories.value, km: km.value, pace: pace.value, note: note.value };
-        saveWeekData(weekData);
-        updateJogVisibilityForRow();
-        renderStats();
-      }
-
-      [sel, minutes, calories, km, pace, note].forEach(el => el.addEventListener("input", persist));
-      sel.addEventListener("change", persist);
-
-      updateJogVisibilityForRow();
-
-      tr.appendChild(tdDay);
-      tr.appendChild(tdType);
-      tr.appendChild(tdMin);
-      tr.appendChild(tdCal);
-      tr.appendChild(tdKm);
-      tr.appendChild(tdPace);
-      tr.appendChild(tdNote);
-      sportBody.appendChild(tr);
-    });
-  }
-
-  const statsWeek = document.getElementById("statsWeek");
-  const statsAll  = document.getElementById("statsAll");
-
-  function kpiBox(num, lbl) {
-    const el = document.createElement("div");
-    el.className = "kpi";
-    el.innerHTML = `<div class="num">${num}</div><div class="lbl">${escapeHtml(lbl)}</div>`;
-    return el;
-  }
-
-  function countWeek(weekObj) {
-    let suppChecked = 0;
-    let suppTotal = supplementDays.length * supplements.length;
-    let suppDayPerfect = 0;
-
-    supplementDays.forEach(day => {
-      const items = weekObj.supplements?.[day]?.items || {};
-      let dayChecked = 0;
-      supplements.forEach(s => { if (items[s.id]) { suppChecked++; dayChecked++; } });
-      if (dayChecked === supplements.length) suppDayPerfect++;
-    });
-
-    let stretchDone = 0;
-    days.forEach(d => { if (weekObj.stretching?.[d.key]?.done) stretchDone++; });
-
-    let sportSessions = 0;
-    let jogSessions = 0;
-    let totalMinutes = 0;
-    let totalCalories = 0;
-
-    weekDaysSport.forEach(k => {
-      const s = weekObj.sport?.[k];
-      if (!s) return;
-      const hasSession = (s.type && s.type.trim() !== "") || (s.minutes && s.minutes !== "") || (s.calories && s.calories !== "");
-      if (hasSession) sportSessions++;
-      if (s.type === "Joggen") jogSessions++;
-      totalMinutes += Number(s.minutes || 0);
-      totalCalories += Number(s.calories || 0);
-    });
-
-    return { suppChecked, suppTotal, suppDayPerfect, suppDays: supplementDays.length, stretchDone, stretchDays: 7,
-      sportSessions, sportDays: 5, jogSessions, totalMinutes, totalCalories };
-  }
-
-  function scanAllWeeks() {
-    const prefix = "rp_week_v2_";
-    const keys = Object.keys(localStorage).filter(k => k.startsWith(prefix));
-    const weeks = [];
-    keys.forEach(k => {
-      try {
-        const obj = JSON.parse(localStorage.getItem(k));
-        if (obj && typeof obj === "object") weeks.push(obj);
-      } catch {}
-    });
-    return weeks;
-  }
-
-  function renderStats() {
-    const wk = countWeek(weekData);
-    statsWeek.innerHTML = "";
-    statsWeek.appendChild(kpiBox(`${wk.suppChecked}/${wk.suppTotal}`, "Supplements: abgehakte Items"));
-    statsWeek.appendChild(kpiBox(`${wk.suppDayPerfect}/${wk.suppDays}`, "Supplements: Tage komplett"));
-    statsWeek.appendChild(kpiBox(`${wk.stretchDone}/${wk.stretchDays}`, "Stretching: Tage erledigt"));
-    statsWeek.appendChild(kpiBox(`${wk.sportSessions}/${wk.sportDays}`, "Sport: Tage mit Eintrag"));
-    statsWeek.appendChild(kpiBox(`${wk.totalMinutes}`, "Sport: Minuten gesamt"));
-    statsWeek.appendChild(kpiBox(`${wk.totalCalories}`, "Sport: Kalorien gesamt"));
-    statsWeek.appendChild(kpiBox(`${wk.jogSessions}`, "Joggen-Sessions"));
-
-    const allWeeks = scanAllWeeks();
-    const sum = { suppChecked:0, suppTotal:0, suppDayPerfect:0, suppDays:0, stretchDone:0, stretchDays:0, sportSessions:0, sportDays:0, jogSessions:0, totalMinutes:0, totalCalories:0 };
-    allWeeks.forEach(w => {
-      const c = countWeek(w);
-      sum.suppChecked += c.suppChecked; sum.suppTotal += c.suppTotal;
-      sum.suppDayPerfect += c.suppDayPerfect; sum.suppDays += c.suppDays;
-      sum.stretchDone += c.stretchDone; sum.stretchDays += c.stretchDays;
-      sum.sportSessions += c.sportSessions; sum.sportDays += c.sportDays;
-      sum.jogSessions += c.jogSessions; sum.totalMinutes += c.totalMinutes; sum.totalCalories += c.totalCalories;
-    });
-
-    statsAll.innerHTML = "";
-    statsAll.appendChild(kpiBox(`${sum.suppChecked}/${sum.suppTotal || 0}`, "Supplements: abgehakte Items (gesamt)"));
-    statsAll.appendChild(kpiBox(`${sum.suppDayPerfect}/${sum.suppDays || 0}`, "Supplements: Tage komplett (gesamt)"));
-    statsAll.appendChild(kpiBox(`${sum.stretchDone}/${sum.stretchDays || 0}`, "Stretching: Tage erledigt (gesamt)"));
-    statsAll.appendChild(kpiBox(`${sum.sportSessions}/${sum.sportDays || 0}`, "Sport: Tage mit Eintrag (gesamt)"));
-    statsAll.appendChild(kpiBox(`${sum.totalMinutes}`, "Sport: Minuten gesamt (gesamt)"));
-    statsAll.appendChild(kpiBox(`${sum.totalCalories}`, "Sport: Kalorien gesamt (gesamt)"));
-    statsAll.appendChild(kpiBox(`${sum.jogSessions}`, "Joggen-Sessions (gesamt)"));
-  }
-
-  document.getElementById("refreshStats").addEventListener("click", renderStats);
-
-  document.getElementById("prevWeek").addEventListener("click", () => {
-    currentMonday.setDate(currentMonday.getDate() - 7);
-    weekData = loadWeekData();
-    rerenderAll();
-  });
-  document.getElementById("nextWeek").addEventListener("click", () => {
-    currentMonday.setDate(currentMonday.getDate() + 7);
-    weekData = loadWeekData();
-    rerenderAll();
-  });
-  document.getElementById("todayWeek").addEventListener("click", () => {
-    currentMonday = startOfWeekMonday(new Date());
-    weekData = loadWeekData();
-    rerenderAll();
-  });
-  document.getElementById("resetWeek").addEventListener("click", () => {
-    const key = "rp_week_v2_" + weekKey(currentMonday);
-    localStorage.removeItem(key);
-    weekData = loadWeekData();
-    rerenderAll();
-  });
-
-  function escapeHtml(s) {
-    return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-  }
-
-  function rerenderAll() {
-    renderWeekLabel();
-    renderSupplements();
-    renderStretchGrid();
-    renderStretchingTable();
-    renderSport();
-    renderStats();
-  }
-
-  renderWeekLabel();
-  renderSupplements();
-  renderStretchGrid();
-  renderStretchingTable();
-  renderSport();
-  renderStats();
-})();
+document.addEventListener("input",calcTotals);
 </script>
+
 </body>
 </html>
