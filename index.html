@@ -5,23 +5,490 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Routine Planner</title>
   <style>
-    body { font-family: system-ui, Arial, sans-serif; max-width: 900px; margin: 40px auto; padding: 0 16px; }
-    h1 { margin-bottom: 0.2rem; }
-    .muted { color: #666; }
-    .card { border: 1px solid #ddd; border-radius: 12px; padding: 16px; margin-top: 16px; }
+    :root { --border:#ddd; --muted:#666; --bg:#fafafa; }
+    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; max-width: 1100px; margin: 28px auto; padding: 0 14px; }
+    header { display:flex; gap:12px; align-items:flex-end; justify-content:space-between; flex-wrap:wrap; }
+    h1 { margin:0; font-size: 28px; }
+    .muted { color: var(--muted); }
+    .grid { display:grid; gap:12px; }
+    .card { border:1px solid var(--border); border-radius:14px; padding:14px; background:white; }
+    .row { display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+    .row > * { flex: 0 0 auto; }
+    button { border:1px solid var(--border); background:white; border-radius:10px; padding:8px 10px; cursor:pointer; }
+    button:hover { background: #f3f3f3; }
+    input, select, textarea {
+      border:1px solid var(--border); border-radius:10px; padding:8px 10px; font: inherit; background:white;
+    }
+    textarea { width: 100%; min-height: 44px; resize: vertical; }
+    table { width:100%; border-collapse:separate; border-spacing:0; overflow:hidden; border-radius:12px; border:1px solid var(--border); }
+    th, td { padding:10px; border-bottom:1px solid var(--border); vertical-align:top; }
+    th { text-align:left; background: var(--bg); }
+    tr:last-child td { border-bottom:none; }
+    .pill { display:inline-block; padding:4px 8px; border:1px solid var(--border); border-radius:999px; font-size:12px; color:var(--muted); }
+    .day { white-space:nowrap; width: 92px; }
+    .ok { font-weight: 600; }
+    .twoCol { display:grid; grid-template-columns: 1fr; gap:12px; }
+    @media (min-width: 900px) { .twoCol { grid-template-columns: 1fr 1fr; } }
+    .hidden { display:none !important; }
+    .small { font-size: 12px; color: var(--muted); }
+    .danger { color:#b00020; }
+    .stretchHeader { display:flex; gap:10px; align-items:center; justify-content:space-between; flex-wrap:wrap; }
+    .stretchList { display:flex; gap:8px; flex-wrap:wrap; }
   </style>
 </head>
-<body>
-  <h1>Routine Planner</h1>
-  <p class="muted">Startseite – als Nächstes bauen wir Kalender pro Themengebiet.</p>
 
-  <div class="card">
-    <h2>Meine Themen</h2>
-    <ul>
-      <li>Beispiel: Sport</li>
-      <li>Beispiel: Haushalt</li>
-      <li>Beispiel: Lernen</li>
-    </ul>
+<body>
+  <header class="card">
+    <div>
+      <h1>Routine Planner</h1>
+      <div class="muted">Woche: <span id="weekLabel"></span></div>
+      <div class="small">Alles wird lokal im Browser gespeichert (localStorage).</div>
+    </div>
+    <div class="row">
+      <button id="prevWeek">◀ Vorherige Woche</button>
+      <button id="todayWeek">Diese Woche</button>
+      <button id="nextWeek">Nächste Woche ▶</button>
+      <button id="resetWeek" class="danger" title="Setzt nur die aktuelle Woche zurück">Woche zurücksetzen</button>
+    </div>
+  </header>
+
+  <div class="twoCol">
+    <!-- Supplements -->
+    <section class="card">
+      <h2>💊 Supplements (Mo & Sa)</h2>
+      <div class="small">Hake an, ob du deine Supplements genommen hast.</div>
+      <div style="margin-top:10px;">
+        <table>
+          <thead>
+            <tr>
+              <th class="day">Tag</th>
+              <th>Erledigt</th>
+              <th>Notiz</th>
+            </tr>
+          </thead>
+          <tbody id="suppBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Stretching -->
+    <section class="card">
+      <div class="stretchHeader">
+        <div>
+          <h2 style="margin:0;">🤸 Stretching (täglich)</h2>
+          <div class="small">Übungen-Reihenfolge oben – pro Tag abhaken + optional Notiz.</div>
+        </div>
+        <button id="editStretch">Übungen bearbeiten</button>
+      </div>
+
+      <div class="card" style="background:var(--bg); margin-top:10px;">
+        <div class="small" style="margin-bottom:6px;">Reihenfolge:</div>
+        <div class="stretchList" id="stretchSequence"></div>
+      </div>
+
+      <div id="stretchEditor" class="card hidden" style="margin-top:10px;">
+        <div class="small">Eine Übung pro Zeile (so wie du sie ausführen willst – Reihenfolge = Zeilenreihenfolge).</div>
+        <textarea id="stretchInput" placeholder="z.B. 1) Neck circles – 30s&#10;2) Shoulder rolls – 30s&#10;..."></textarea>
+        <div class="row" style="margin-top:10px;">
+          <button id="saveStretch">Speichern</button>
+          <button id="cancelStretch">Abbrechen</button>
+        </div>
+      </div>
+
+      <div style="margin-top:10px;">
+        <table>
+          <thead>
+            <tr>
+              <th class="day">Tag</th>
+              <th>Erledigt</th>
+              <th>Notiz</th>
+            </tr>
+          </thead>
+          <tbody id="stretchBody"></tbody>
+        </table>
+      </div>
+    </section>
   </div>
+
+  <!-- Sport -->
+  <section class="card" style="margin-top:12px;">
+    <h2>🏃 Sport Planner (Mo–Fr)</h2>
+    <div class="small">Wähle Sportart. Bei Joggen kommen km & Pace dazu. Bei Gym nur Dauer & Kalorien.</div>
+    <div style="margin-top:10px;">
+      <table>
+        <thead>
+          <tr>
+            <th class="day">Tag</th>
+            <th>Sportart</th>
+            <th>Dauer (min)</th>
+            <th>Kalorien</th>
+            <th class="jogCol">KM</th>
+            <th class="jogCol">Pace (min/km)</th>
+            <th>Notiz</th>
+          </tr>
+        </thead>
+        <tbody id="sportBody"></tbody>
+      </table>
+    </div>
+  </section>
+
+<script>
+(() => {
+  // ---------- helpers ----------
+  const days = [
+    {key:"mon", label:"Montag"},
+    {key:"tue", label:"Dienstag"},
+    {key:"wed", label:"Mittwoch"},
+    {key:"thu", label:"Donnerstag"},
+    {key:"fri", label:"Freitag"},
+    {key:"sat", label:"Samstag"},
+    {key:"sun", label:"Sonntag"},
+  ];
+
+  const pad2 = n => String(n).padStart(2, "0");
+
+  function startOfWeekMonday(date) {
+    const d = new Date(date);
+    const day = d.getDay(); // 0 Sun .. 6 Sat
+    const diff = (day === 0 ? -6 : 1 - day); // move to Monday
+    d.setDate(d.getDate() + diff);
+    d.setHours(0,0,0,0);
+    return d;
+  }
+
+  function fmtDate(d) {
+    return `${pad2(d.getDate())}.${pad2(d.getMonth()+1)}.${d.getFullYear()}`;
+  }
+
+  function weekKey(mondayDate) {
+    const y = mondayDate.getFullYear();
+    const m = pad2(mondayDate.getMonth()+1);
+    const da = pad2(mondayDate.getDate());
+    return `${y}-${m}-${da}`; // unique per week start
+  }
+
+  function lsGet(key, fallback) {
+    try {
+      const raw = localStorage.getItem(key);
+      return raw ? JSON.parse(raw) : fallback;
+    } catch { return fallback; }
+  }
+  function lsSet(key, value) {
+    localStorage.setItem(key, JSON.stringify(value));
+  }
+
+  // ---------- state ----------
+  let currentMonday = startOfWeekMonday(new Date());
+
+  // global settings (not per week)
+  const SETTINGS_KEY = "rp_settings_v1";
+  const settings = lsGet(SETTINGS_KEY, {
+    stretchSequence: [
+      "Neck circles – 30s",
+      "Shoulder rolls – 30s",
+      "Cat-Cow – 8 reps",
+      "Hip flexor stretch – 30s/Seite",
+      "Hamstring stretch – 30s/Seite",
+      "Calf stretch – 30s/Seite"
+    ]
+  });
+
+  // per week data
+  function loadWeekData() {
+    const key = "rp_week_v1_" + weekKey(currentMonday);
+    return lsGet(key, {
+      supplements: { mon:{done:false,note:""}, sat:{done:false,note:""} },
+      stretching:  { mon:{done:false,note:""}, tue:{done:false,note:""}, wed:{done:false,note:""}, thu:{done:false,note:""}, fri:{done:false,note:""}, sat:{done:false,note:""}, sun:{done:false,note:""} },
+      sport:       { mon:{type:"", minutes:"", calories:"", km:"", pace:"", note:""},
+                    tue:{type:"", minutes:"", calories:"", km:"", pace:"", note:""},
+                    wed:{type:"", minutes:"", calories:"", km:"", pace:"", note:""},
+                    thu:{type:"", minutes:"", calories:"", km:"", pace:"", note:""},
+                    fri:{type:"", minutes:"", calories:"", km:"", pace:"", note:""} }
+    });
+  }
+  function saveWeekData(data) {
+    const key = "rp_week_v1_" + weekKey(currentMonday);
+    lsSet(key, data);
+  }
+
+  let weekData = loadWeekData();
+
+  // ---------- render header ----------
+  const weekLabel = document.getElementById("weekLabel");
+  function renderWeekLabel() {
+    const end = new Date(currentMonday);
+    end.setDate(end.getDate() + 6);
+    weekLabel.textContent = `${fmtDate(currentMonday)} – ${fmtDate(end)}`;
+  }
+
+  // ---------- Supplements ----------
+  const suppBody = document.getElementById("suppBody");
+  function renderSupplements() {
+    suppBody.innerHTML = "";
+    const allowed = new Set(["mon","sat"]);
+    days.forEach(d => {
+      const tr = document.createElement("tr");
+      const tdDay = document.createElement("td");
+      tdDay.className = "day";
+      tdDay.textContent = d.label;
+
+      const tdDone = document.createElement("td");
+      const tdNote = document.createElement("td");
+
+      if (!allowed.has(d.key)) {
+        tdDone.innerHTML = `<span class="pill">kein Supplement-Tag</span>`;
+        tdNote.innerHTML = `<span class="muted">—</span>`;
+      } else {
+        const checkbox = document.createElement("input");
+        checkbox.type = "checkbox";
+        checkbox.checked = !!weekData.supplements[d.key]?.done;
+        checkbox.addEventListener("change", () => {
+          weekData.supplements[d.key].done = checkbox.checked;
+          saveWeekData(weekData);
+        });
+        tdDone.appendChild(checkbox);
+
+        const note = document.createElement("input");
+        note.placeholder = "optional";
+        note.value = weekData.supplements[d.key]?.note ?? "";
+        note.addEventListener("input", () => {
+          weekData.supplements[d.key].note = note.value;
+          saveWeekData(weekData);
+        });
+        tdNote.appendChild(note);
+      }
+
+      tr.appendChild(tdDay);
+      tr.appendChild(tdDone);
+      tr.appendChild(tdNote);
+      suppBody.appendChild(tr);
+    });
+  }
+
+  // ---------- Stretching ----------
+  const stretchSequence = document.getElementById("stretchSequence");
+  const stretchBody = document.getElementById("stretchBody");
+  function renderStretchSequence() {
+    stretchSequence.innerHTML = "";
+    settings.stretchSequence.forEach((s, i) => {
+      const el = document.createElement("span");
+      el.className = "pill";
+      el.textContent = `${i+1}. ${s}`;
+      stretchSequence.appendChild(el);
+    });
+  }
+  function renderStretchingTable() {
+    stretchBody.innerHTML = "";
+    days.forEach(d => {
+      const tr = document.createElement("tr");
+      const tdDay = document.createElement("td");
+      tdDay.className = "day";
+      tdDay.textContent = d.label;
+
+      const tdDone = document.createElement("td");
+      const cb = document.createElement("input");
+      cb.type = "checkbox";
+      cb.checked = !!weekData.stretching[d.key]?.done;
+      cb.addEventListener("change", () => {
+        weekData.stretching[d.key].done = cb.checked;
+        saveWeekData(weekData);
+      });
+      tdDone.appendChild(cb);
+
+      const tdNote = document.createElement("td");
+      const note = document.createElement("input");
+      note.placeholder = "optional";
+      note.value = weekData.stretching[d.key]?.note ?? "";
+      note.addEventListener("input", () => {
+        weekData.stretching[d.key].note = note.value;
+        saveWeekData(weekData);
+      });
+      tdNote.appendChild(note);
+
+      tr.appendChild(tdDay);
+      tr.appendChild(tdDone);
+      tr.appendChild(tdNote);
+      stretchBody.appendChild(tr);
+    });
+  }
+
+  // Stretch editor
+  const editStretchBtn = document.getElementById("editStretch");
+  const stretchEditor = document.getElementById("stretchEditor");
+  const stretchInput = document.getElementById("stretchInput");
+  const saveStretchBtn = document.getElementById("saveStretch");
+  const cancelStretchBtn = document.getElementById("cancelStretch");
+
+  editStretchBtn.addEventListener("click", () => {
+    stretchInput.value = settings.stretchSequence.join("\n");
+    stretchEditor.classList.remove("hidden");
+    stretchInput.focus();
+  });
+  cancelStretchBtn.addEventListener("click", () => {
+    stretchEditor.classList.add("hidden");
+  });
+  saveStretchBtn.addEventListener("click", () => {
+    const lines = stretchInput.value
+      .split("\n")
+      .map(s => s.trim())
+      .filter(Boolean);
+
+    settings.stretchSequence = lines.length ? lines : settings.stretchSequence;
+    lsSet(SETTINGS_KEY, settings);
+    stretchEditor.classList.add("hidden");
+    renderStretchSequence();
+  });
+
+  // ---------- Sport ----------
+  const sportBody = document.getElementById("sportBody");
+  function renderSport() {
+    sportBody.innerHTML = "";
+
+    const weekdays = days.filter(d => ["mon","tue","wed","thu","fri"].includes(d.key));
+
+    weekdays.forEach(d => {
+      const tr = document.createElement("tr");
+
+      const tdDay = document.createElement("td");
+      tdDay.className = "day";
+      tdDay.textContent = d.label;
+
+      // Type
+      const tdType = document.createElement("td");
+      const sel = document.createElement("select");
+      const opts = ["", "Joggen", "Gym", "Radfahren", "Spazieren", "Sonstiges"];
+      opts.forEach(o => {
+        const op = document.createElement("option");
+        op.value = o;
+        op.textContent = o === "" ? "— auswählen —" : o;
+        sel.appendChild(op);
+      });
+      sel.value = weekData.sport[d.key]?.type ?? "";
+      tdType.appendChild(sel);
+
+      // Minutes
+      const tdMin = document.createElement("td");
+      const minutes = document.createElement("input");
+      minutes.type = "number";
+      minutes.min = "0";
+      minutes.placeholder = "z.B. 45";
+      minutes.value = weekData.sport[d.key]?.minutes ?? "";
+      tdMin.appendChild(minutes);
+
+      // Calories
+      const tdCal = document.createElement("td");
+      const calories = document.createElement("input");
+      calories.type = "number";
+      calories.min = "0";
+      calories.placeholder = "z.B. 350";
+      calories.value = weekData.sport[d.key]?.calories ?? "";
+      tdCal.appendChild(calories);
+
+      // Jog only
+      const tdKm = document.createElement("td");
+      tdKm.className = "jogCol";
+      const km = document.createElement("input");
+      km.type = "number";
+      km.min = "0";
+      km.step = "0.1";
+      km.placeholder = "z.B. 5.0";
+      km.value = weekData.sport[d.key]?.km ?? "";
+      tdKm.appendChild(km);
+
+      const tdPace = document.createElement("td");
+      tdPace.className = "jogCol";
+      const pace = document.createElement("input");
+      pace.placeholder = "z.B. 5:30";
+      pace.value = weekData.sport[d.key]?.pace ?? "";
+      tdPace.appendChild(pace);
+
+      // Note
+      const tdNote = document.createElement("td");
+      const note = document.createElement("input");
+      note.placeholder = "optional";
+      note.value = weekData.sport[d.key]?.note ?? "";
+      tdNote.appendChild(note);
+
+      function persist() {
+        weekData.sport[d.key] = {
+          type: sel.value,
+          minutes: minutes.value,
+          calories: calories.value,
+          km: km.value,
+          pace: pace.value,
+          note: note.value
+        };
+        saveWeekData(weekData);
+        updateJogVisibilityForRow();
+      }
+
+      function updateJogVisibilityForRow() {
+        const isJog = sel.value === "Joggen";
+        tdKm.style.opacity = isJog ? "1" : "0.35";
+        tdPace.style.opacity = isJog ? "1" : "0.35";
+        km.disabled = !isJog;
+        pace.disabled = !isJog;
+
+        // Wenn Gym ausgewählt: km/pace ausgrauen & leeren optional lassen wir stehen,
+        // aber disabled verhindert Eingabe.
+      }
+
+      [sel, minutes, calories, km, pace, note].forEach(el => el.addEventListener("input", persist));
+      sel.addEventListener("change", persist);
+
+      updateJogVisibilityForRow();
+
+      tr.appendChild(tdDay);
+      tr.appendChild(tdType);
+      tr.appendChild(tdMin);
+      tr.appendChild(tdCal);
+      tr.appendChild(tdKm);
+      tr.appendChild(tdPace);
+      tr.appendChild(tdNote);
+      sportBody.appendChild(tr);
+    });
+  }
+
+  // ---------- week navigation ----------
+  document.getElementById("prevWeek").addEventListener("click", () => {
+    currentMonday.setDate(currentMonday.getDate() - 7);
+    weekData = loadWeekData();
+    rerenderAll();
+  });
+  document.getElementById("nextWeek").addEventListener("click", () => {
+    currentMonday.setDate(currentMonday.getDate() + 7);
+    weekData = loadWeekData();
+    rerenderAll();
+  });
+  document.getElementById("todayWeek").addEventListener("click", () => {
+    currentMonday = startOfWeekMonday(new Date());
+    weekData = loadWeekData();
+    rerenderAll();
+  });
+
+  document.getElementById("resetWeek").addEventListener("click", () => {
+    // clear only the current week key
+    const key = "rp_week_v1_" + weekKey(currentMonday);
+    localStorage.removeItem(key);
+    weekData = loadWeekData();
+    rerenderAll();
+  });
+
+  function rerenderAll() {
+    renderWeekLabel();
+    renderSupplements();
+    renderStretchSequence();
+    renderStretchingTable();
+    renderSport();
+  }
+
+  // init
+  renderWeekLabel();
+  renderStretchSequence();
+  renderSupplements();
+  renderStretchingTable();
+  renderSport();
+})();
+</script>
 </body>
 </html>
