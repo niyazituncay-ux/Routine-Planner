@@ -1,192 +1,932 @@
 <!doctype html>
 <html lang="de">
 <head>
-<meta charset="utf-8">
-<title>Ottoman Power Routinen</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Ottoman Power Routinen – Niyazi Tuncay</title>
 
 <style>
-body {
-  background:#000;
-  color:#fff;
-  font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-  max-width: 900px;
-  margin: 40px auto;
-  padding: 0 16px;
-}
+  :root{
+    --bg:#000;
+    --fg:#fff;
+    --muted:#aaa;
+    --line:#2a2a2a;
+    --panel:#0c0c0c;
+    --panel2:#101010;
+    --accent:#00ff6a;
+  }
+  body{
+    background:var(--bg);
+    color:var(--fg);
+    font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+    max-width: 980px;
+    margin: 38px auto;
+    padding: 0 16px;
+  }
+  h1{ margin:0; font-size: 30px; letter-spacing:-0.3px; }
+  h2{ margin:6px 0 0 0; font-size: 18px; color:var(--muted); font-weight:600; }
+  h3{ margin:0 0 10px 0; font-size: 16px; }
+  .muted{ color:var(--muted); }
+  .small{ font-size: 12px; color:var(--muted); }
+  hr{ border:none; border-top:1px solid var(--line); margin: 22px 0; }
 
-h1, h2, h3 {
-  margin: 0 0 12px 0;
-}
+  .topbar{
+    border:1px solid var(--line);
+    border-radius: 14px;
+    padding: 14px;
+    background: var(--panel);
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-end;
+    gap:12px;
+    flex-wrap:wrap;
+  }
+  .buttons{ display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+  button{
+    border:1px solid var(--line);
+    background: var(--panel2);
+    color: var(--fg);
+    border-radius: 10px;
+    padding: 8px 10px;
+    cursor:pointer;
+  }
+  button:hover{ background:#151515; }
+  .danger{ color:#ff5b5b; }
 
-hr {
-  border: none;
-  border-top: 1px solid #333;
-  margin: 30px 0;
-}
+  .card{
+    border:1px solid var(--line);
+    border-radius: 14px;
+    padding: 14px;
+    background: var(--panel);
+    margin-bottom: 14px;
+  }
 
-.card {
-  border: 1px solid #333;
-  border-radius: 12px;
-  padding: 16px;
-  margin-bottom: 24px;
-}
+  table{ width:100%; border-collapse: collapse; }
+  th, td{ border-bottom:1px solid var(--line); padding:8px; vertical-align:top; }
+  th{ text-align:left; color: var(--muted); font-weight:600; }
+  tr:last-child td{ border-bottom:none; }
 
-label {
-  display: block;
-  margin-bottom: 6px;
-}
+  input, select{
+    width: 100%;
+    box-sizing:border-box;
+    background: var(--panel2);
+    color: var(--fg);
+    border:1px solid var(--line);
+    border-radius: 10px;
+    padding: 7px 9px;
+  }
+  input[type="checkbox"]{ width:auto; }
+  .row{ display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+  .kpiRow{ display:flex; gap:10px; flex-wrap:wrap; }
+  .kpi{
+    border:1px solid var(--line);
+    background: var(--panel2);
+    border-radius: 12px;
+    padding: 10px 12px;
+    min-width: 190px;
+  }
+  .kpi .num{ font-size: 20px; font-weight:800; color: var(--accent); }
+  .kpi .lbl{ font-size: 12px; color: var(--muted); margin-top:4px; }
 
-input, select {
-  background: #111;
-  color: #fff;
-  border: 1px solid #333;
-  border-radius: 8px;
-  padding: 6px 8px;
-}
+  .checklist{ display:grid; gap:8px; }
+  .checkRow{ display:flex; gap:10px; align-items:flex-start; }
+  .checkRow label{ line-height: 1.2; }
 
-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-th, td {
-  border-bottom: 1px solid #333;
-  padding: 8px;
-}
-
-th {
-  text-align: left;
-  color:#aaa;
-}
-
-.total {
-  font-weight: bold;
-  color:#0f0;
-}
+  .chartWrap{
+    border:1px solid var(--line);
+    border-radius: 14px;
+    padding: 12px;
+    background: var(--panel2);
+  }
+  canvas{ width:100%; height:260px; display:block; }
 </style>
 </head>
 
 <body>
 
-<h1>Niazi Tunjai</h1>
-<h2>Ottoman Power Routinen</h2>
-
-<hr>
-
-<div class="card">
-<h3>💊 Gesundheitsroutine – Supplements</h3>
-<p>Taktung: <b>Alle 3 Tage</b></p>
-
-<label><input type="checkbox"> Vitamin D3 / K2 (pro 10kg – 1000 IE)</label>
-<label><input type="checkbox"> Omega 3 – 4 Kapseln</label>
-<label><input type="checkbox"> Kurkuma + Piperin – 4 Kapseln</label>
-<label><input type="checkbox"> Cellagon Multivitamin – 25 ml</label>
-<label><input type="checkbox"> Magnesiumkapseln</label>
-<label><input type="checkbox"> Granatapfelsaft – 300–400 ml</label>
+<div class="topbar">
+  <div>
+    <h1>Niyazi Tuncay</h1>
+    <h2>Ottoman Power Routinen</h2>
+    <div class="small">Woche: <span id="weekLabel"></span> · Speicherung lokal im Browser (pro Woche).</div>
+  </div>
+  <div class="buttons">
+    <button id="prevWeek">◀ Vorherige Woche</button>
+    <button id="todayWeek">Diese Woche</button>
+    <button id="nextWeek">Nächste Woche ▶</button>
+    <button id="resetWeek" class="danger" title="Setzt nur die aktuelle Woche zurück">Woche zurücksetzen</button>
+  </div>
 </div>
 
 <hr>
 
 <div class="card">
-<h3>🏋️ Wochen-Sportplan</h3>
+  <div class="row" style="justify-content:space-between;">
+    <div>
+      <h3>📊 Wochenbilanz</h3>
+      <div class="small">Summen dieser Woche (Sport, Lesen, Affirmationen, Joggen).</div>
+    </div>
+    <button id="refreshAll">Bilanz aktualisieren</button>
+  </div>
 
-<table id="sportTable">
-<thead>
-<tr>
-<th>Tag</th>
-<th>Sport</th>
-<th>Dauer (min)</th>
-<th>Kalorien</th>
-<th>KM</th>
-<th>Pace</th>
-</tr>
-</thead>
-<tbody>
-</tbody>
-</table>
+  <div class="kpiRow" id="weekKpis"></div>
 </div>
 
 <div class="card">
-<h3>📊 Wochenbilanz</h3>
-<p>Gesamtdauer: <span class="total" id="totalMinutes">0</span> min</p>
-<p>Gesamtkalorien: <span class="total" id="totalCalories">0</span></p>
-<p>Joggen KM gesamt: <span class="total" id="totalKm">0</span></p>
-<p>Ø Pace: <span class="total" id="avgPace">–</span></p>
+  <div class="row" style="justify-content:space-between;">
+    <div>
+      <h3>📈 Jahresbilanz (Balkendiagramm)</h3>
+      <div class="small">Aggregiert aus allen gespeicherten Wochen im aktuellen Jahr.</div>
+    </div>
+    <div class="row">
+      <label class="small" style="margin-right:6px;">Metrik</label>
+      <select id="metricSelect" style="min-width:250px;">
+        <option value="sport_minutes">Sport – Minuten</option>
+        <option value="sport_calories">Sport – Kalorien</option>
+        <option value="jog_km">Joggen – Kilometer</option>
+        <option value="read_minutes">Lesen – Minuten</option>
+        <option value="read_pages">Lesen – Seiten</option>
+        <option value="aff_morning">Affirmationen – morgens (Tage)</option>
+        <option value="aff_evening">Affirmationen – abends (Tage)</option>
+        <option value="supp_items">Supplements – abgehakte Items</option>
+      </select>
+      <button id="refreshChart">Chart aktualisieren</button>
+    </div>
+  </div>
+
+  <div class="chartWrap" style="margin-top:10px;">
+    <canvas id="barChart" width="900" height="260"></canvas>
+  </div>
 </div>
 
 <hr>
 
 <div class="card">
-<h3>🤸 Stretching-Routine</h3>
-<ul>
-<li>Dynamisch diagonal zu den Füßen</li>
-<li>Lateral Spin</li>
-<li>Full Spine Stretch</li>
-<li>Nacken kreisen</li>
-<li>Das Kind</li>
-<li>Cobra</li>
-<li>Katze & Hund</li>
-<li>Hero Pose</li>
-<li>Schneidersitz + Rotation</li>
-<li>Schneidersitz nach vorne</li>
-<li>Ausfallschritte Hüftbeuger</li>
-<li>Bridge Pose</li>
-<li>Quad Stretch</li>
-<li>Spagat</li>
-</ul>
+  <h3>💊 Gesundheitsroutine – Supplements</h3>
+  <p class="small">Taktung: <b>alle 3 Tage</b> (du hakst einfach ab, wenn du sie genommen hast).</p>
+
+  <table>
+    <thead>
+      <tr>
+        <th style="width:120px;">Tag</th>
+        <th>Supplements</th>
+        <th style="width:240px;">Notiz</th>
+      </tr>
+    </thead>
+    <tbody id="suppBody"></tbody>
+  </table>
+</div>
+
+<div class="card">
+  <h3>🏋️ Wochen-Sportplan</h3>
+  <div class="small">Sportarten: Krafttraining, Joggen, Stretching, Ringen, Schwimmen, Tennis. Joggen → km & Pace.</div>
+
+  <table id="sportTable" style="margin-top:10px;">
+    <thead>
+      <tr>
+        <th style="width:120px;">Tag</th>
+        <th style="width:220px;">Sport</th>
+        <th style="width:130px;">Dauer (min)</th>
+        <th style="width:130px;">Kalorien</th>
+        <th style="width:120px;">KM (Joggen)</th>
+        <th style="width:130px;">Pace (m:ss)</th>
+        <th>Notiz</th>
+      </tr>
+    </thead>
+    <tbody id="sportBody"></tbody>
+  </table>
+</div>
+
+<div class="card">
+  <h3>📚 Buchlesen – Wochenplan</h3>
+  <div class="small">Pro Tag: Titel + Seiten + Minuten. (Wenn du mehrere Bücher liest, trag das wichtigste ein.)</div>
+
+  <table id="readTable" style="margin-top:10px;">
+    <thead>
+      <tr>
+        <th style="width:120px;">Tag</th>
+        <th>Titel</th>
+        <th style="width:130px;">Seiten</th>
+        <th style="width:130px;">Minuten</th>
+      </tr>
+    </thead>
+    <tbody id="readBody"></tbody>
+  </table>
+</div>
+
+<div class="card">
+  <h3>🧠 Affirmationen – morgens & abends</h3>
+  <div class="small">Hake ab, ob du deine Affirmationen gemacht hast.</div>
+
+  <table id="affTable" style="margin-top:10px;">
+    <thead>
+      <tr>
+        <th style="width:120px;">Tag</th>
+        <th style="width:120px;">Morgens</th>
+        <th style="width:120px;">Abends</th>
+        <th>Notiz</th>
+      </tr>
+    </thead>
+    <tbody id="affBody"></tbody>
+  </table>
+</div>
+
+<div class="card">
+  <h3>🤸 Stretching-Routine (Liste)</h3>
+  <div class="small">Bilder kommen später – du schickst sie, dann baue ich sie ein.</div>
+  <ul class="small" style="line-height:1.6; margin:10px 0 0 18px;">
+    <li>Dynamisch diagonal zu den Füßen</li>
+    <li>Lateral Spin</li>
+    <li>Full Spine Stretch</li>
+    <li>Nacken stretchen, kreisen, rechts/links</li>
+    <li>Das Kind</li>
+    <li>Cobra</li>
+    <li>Katze und Hund</li>
+    <li>Hero Pose</li>
+    <li>Schneidersitz + Drehung</li>
+    <li>Schneidersitz nach vorne zu den Füßen beugen</li>
+    <li>Ausfallschritte Hüftbeuger</li>
+    <li>Bridge Pose</li>
+    <li>Quad Stretch</li>
+    <li>Spagat</li>
+  </ul>
 </div>
 
 <script>
-const days = ["Montag","Dienstag","Mittwoch","Donnerstag","Freitag","Samstag","Sonntag"];
-const sports = ["","Krafttraining","Joggen","Stretching","Ringen","Schwimmen","Tennis"];
-const tbody = document.querySelector("#sportTable tbody");
+(() => {
+  // ---------- constants ----------
+  const DAYS = [
+    {key:"mon", label:"Montag"},
+    {key:"tue", label:"Dienstag"},
+    {key:"wed", label:"Mittwoch"},
+    {key:"thu", label:"Donnerstag"},
+    {key:"fri", label:"Freitag"},
+    {key:"sat", label:"Samstag"},
+    {key:"sun", label:"Sonntag"},
+  ];
 
-days.forEach(d=>{
-  const tr = document.createElement("tr");
-  tr.innerHTML = `
-    <td>${d}</td>
-    <td>
-      <select>
-        ${sports.map(s=>`<option>${s}</option>`).join("")}
-      </select>
-    </td>
-    <td><input type="number"></td>
-    <td><input type="number"></td>
-    <td><input type="number"></td>
-    <td><input type="text"></td>
-  `;
-  tbody.appendChild(tr);
-});
+  const SUPP_DAYS = ["wed","sat"]; // alle 3 Tage (einfach als Routine-Tage)
+  const SUPPLEMENTS = [
+    { id:"d3k2", text:"Vitamin D3 / K2 (pro 10kg – 1000 IE)" },
+    { id:"omega3", text:"Omega 3 – 4 Kapseln" },
+    { id:"kurkuma", text:"Kurkuma + Piperin – 4 Kapseln" },
+    { id:"cellagon", text:"Cellagon Multivitamin – 25 ml" },
+    { id:"magnesium", text:"Magnesiumkapseln" },
+    { id:"granatapfel", text:"Granatapfelsaft – 300–400 ml" },
+  ];
 
-function calcTotals(){
-  let min=0, cal=0, km=0, paceSum=0, paceCount=0;
+  const SPORTS = ["", "Krafttraining", "Joggen", "Stretching", "Ringen", "Schwimmen", "Tennis"];
 
-  tbody.querySelectorAll("tr").forEach(tr=>{
-    const sport = tr.children[1].querySelector("select").value;
-    const m = Number(tr.children[2].querySelector("input").value||0);
-    const c = Number(tr.children[3].querySelector("input").value||0);
-    const k = Number(tr.children[4].querySelector("input").value||0);
-    const p = tr.children[5].querySelector("input").value;
+  // ---------- helpers ----------
+  const pad2 = n => String(n).padStart(2,"0");
 
-    min+=m; cal+=c;
-    if(sport==="Joggen" && k){
-      km+=k;
-      if(p && p.includes(":")){
-        const [mm,ss]=p.split(":").map(Number);
-        paceSum+=mm*60+ss;
-        paceCount++;
+  function startOfWeekMonday(date){
+    const d = new Date(date);
+    const day = d.getDay(); // 0=So
+    const diff = (day === 0 ? -6 : 1 - day);
+    d.setDate(d.getDate() + diff);
+    d.setHours(0,0,0,0);
+    return d;
+  }
+  function fmtDate(d){ return `${pad2(d.getDate())}.${pad2(d.getMonth()+1)}.${d.getFullYear()}`; }
+  function weekKey(monday){
+    return `${monday.getFullYear()}-${pad2(monday.getMonth()+1)}-${pad2(monday.getDate())}`;
+  }
+
+  function lsGet(key, fallback){
+    try { const raw = localStorage.getItem(key); return raw ? JSON.parse(raw) : fallback; }
+    catch { return fallback; }
+  }
+  function lsSet(key, value){ localStorage.setItem(key, JSON.stringify(value)); }
+
+  // ---------- state ----------
+  let currentMonday = startOfWeekMonday(new Date());
+  const weekLabelEl = document.getElementById("weekLabel");
+
+  function emptyWeek(){
+    const supplements = {};
+    SUPP_DAYS.forEach(day => {
+      supplements[day] = {
+        note: "",
+        items: Object.fromEntries(SUPPLEMENTS.map(s => [s.id, false]))
+      };
+    });
+
+    const sport = Object.fromEntries(DAYS.map(d => [d.key, {
+      type:"",
+      minutes:"",
+      calories:"",
+      km:"",
+      pace:"",
+      note:""
+    }]));
+
+    const reading = Object.fromEntries(DAYS.map(d => [d.key, {
+      title:"",
+      pages:"",
+      minutes:""
+    }]));
+
+    const affirm = Object.fromEntries(DAYS.map(d => [d.key, {
+      morning:false,
+      evening:false,
+      note:""
+    }]));
+
+    return { supplements, sport, reading, affirm };
+  }
+
+  function weekStorageKey(){
+    return "op_week_v1_" + weekKey(currentMonday);
+  }
+
+  let weekData = lsGet(weekStorageKey(), emptyWeek());
+
+  function saveWeek(){
+    lsSet(weekStorageKey(), weekData);
+  }
+
+  function renderWeekLabel(){
+    const end = new Date(currentMonday);
+    end.setDate(end.getDate()+6);
+    weekLabelEl.textContent = `${fmtDate(currentMonday)} – ${fmtDate(end)}`;
+  }
+
+  // ---------- supplements ----------
+  const suppBody = document.getElementById("suppBody");
+
+  function renderSupplements(){
+    suppBody.innerHTML = "";
+    DAYS.forEach(d => {
+      const tr = document.createElement("tr");
+
+      const tdDay = document.createElement("td");
+      tdDay.textContent = d.label;
+
+      const tdList = document.createElement("td");
+      const tdNote = document.createElement("td");
+
+      if (!SUPP_DAYS.includes(d.key)){
+        tdList.innerHTML = `<span class="muted">—</span>`;
+        tdNote.innerHTML = `<span class="muted">—</span>`;
+      } else {
+        if (!weekData.supplements[d.key]) {
+          weekData.supplements[d.key] = {
+            note:"",
+            items: Object.fromEntries(SUPPLEMENTS.map(s => [s.id, false]))
+          };
+        }
+
+        const wrap = document.createElement("div");
+        wrap.className = "checklist";
+
+        SUPPLEMENTS.forEach(s => {
+          const row = document.createElement("div");
+          row.className = "checkRow";
+
+          const cb = document.createElement("input");
+          cb.type = "checkbox";
+          cb.checked = !!weekData.supplements[d.key].items[s.id];
+          cb.addEventListener("change", () => {
+            weekData.supplements[d.key].items[s.id] = cb.checked;
+            saveWeek();
+            renderWeekKpis();
+            drawYearChart();
+          });
+
+          const label = document.createElement("label");
+          label.textContent = s.text;
+
+          row.appendChild(cb);
+          row.appendChild(label);
+          wrap.appendChild(row);
+        });
+
+        tdList.appendChild(wrap);
+
+        const note = document.createElement("input");
+        note.placeholder = "Notiz (optional)";
+        note.value = weekData.supplements[d.key].note || "";
+        note.addEventListener("input", () => {
+          weekData.supplements[d.key].note = note.value;
+          saveWeek();
+        });
+        tdNote.appendChild(note);
       }
+
+      tr.appendChild(tdDay);
+      tr.appendChild(tdList);
+      tr.appendChild(tdNote);
+      suppBody.appendChild(tr);
+    });
+
+    saveWeek();
+  }
+
+  // ---------- sport ----------
+  const sportBody = document.getElementById("sportBody");
+
+  function renderSport(){
+    sportBody.innerHTML = "";
+
+    DAYS.forEach(d => {
+      const tr = document.createElement("tr");
+      const s = weekData.sport[d.key] || (weekData.sport[d.key] = {type:"",minutes:"",calories:"",km:"",pace:"",note:""});
+
+      const tdDay = document.createElement("td");
+      tdDay.textContent = d.label;
+
+      const tdType = document.createElement("td");
+      const sel = document.createElement("select");
+      SPORTS.forEach(opt => {
+        const o = document.createElement("option");
+        o.value = opt; o.textContent = opt === "" ? "— auswählen —" : opt;
+        sel.appendChild(o);
+      });
+      sel.value = s.type || "";
+      tdType.appendChild(sel);
+
+      const tdMin = document.createElement("td");
+      const inpMin = document.createElement("input");
+      inpMin.type = "number"; inpMin.min = "0"; inpMin.placeholder="z.B. 60";
+      inpMin.value = s.minutes ?? "";
+      tdMin.appendChild(inpMin);
+
+      const tdCal = document.createElement("td");
+      const inpCal = document.createElement("input");
+      inpCal.type = "number"; inpCal.min = "0"; inpCal.placeholder="z.B. 500";
+      inpCal.value = s.calories ?? "";
+      tdCal.appendChild(inpCal);
+
+      const tdKm = document.createElement("td");
+      const inpKm = document.createElement("input");
+      inpKm.type = "number"; inpKm.min="0"; inpKm.step="0.1"; inpKm.placeholder="z.B. 5.0";
+      inpKm.value = s.km ?? "";
+      tdKm.appendChild(inpKm);
+
+      const tdPace = document.createElement("td");
+      const inpPace = document.createElement("input");
+      inpPace.placeholder="z.B. 5:30";
+      inpPace.value = s.pace ?? "";
+      tdPace.appendChild(inpPace);
+
+      const tdNote = document.createElement("td");
+      const inpNote = document.createElement("input");
+      inpNote.placeholder="Notiz";
+      inpNote.value = s.note ?? "";
+      tdNote.appendChild(inpNote);
+
+      function updateJogFields(){
+        const isJog = sel.value === "Joggen";
+        inpKm.disabled = !isJog;
+        inpPace.disabled = !isJog;
+        inpKm.style.opacity = isJog ? "1" : "0.35";
+        inpPace.style.opacity = isJog ? "1" : "0.35";
+        if (!isJog){
+          // optional: leave values; disabled prevents editing
+        }
+      }
+
+      function persist(){
+        weekData.sport[d.key] = {
+          type: sel.value,
+          minutes: inpMin.value,
+          calories: inpCal.value,
+          km: inpKm.value,
+          pace: inpPace.value,
+          note: inpNote.value
+        };
+        saveWeek();
+        updateJogFields();
+        renderWeekKpis();
+        drawYearChart();
+      }
+
+      [sel, inpMin, inpCal, inpKm, inpPace, inpNote].forEach(el => el.addEventListener("input", persist));
+      sel.addEventListener("change", persist);
+
+      updateJogFields();
+
+      tr.appendChild(tdDay);
+      tr.appendChild(tdType);
+      tr.appendChild(tdMin);
+      tr.appendChild(tdCal);
+      tr.appendChild(tdKm);
+      tr.appendChild(tdPace);
+      tr.appendChild(tdNote);
+
+      sportBody.appendChild(tr);
+    });
+
+    saveWeek();
+  }
+
+  // ---------- reading ----------
+  const readBody = document.getElementById("readBody");
+
+  function renderReading(){
+    readBody.innerHTML = "";
+
+    DAYS.forEach(d => {
+      const tr = document.createElement("tr");
+      const r = weekData.reading[d.key] || (weekData.reading[d.key] = {title:"", pages:"", minutes:""});
+
+      const tdDay = document.createElement("td"); tdDay.textContent = d.label;
+
+      const tdTitle = document.createElement("td");
+      const inpTitle = document.createElement("input");
+      inpTitle.placeholder="Buchtitel";
+      inpTitle.value = r.title ?? "";
+      tdTitle.appendChild(inpTitle);
+
+      const tdPages = document.createElement("td");
+      const inpPages = document.createElement("input");
+      inpPages.type="number"; inpPages.min="0"; inpPages.placeholder="z.B. 20";
+      inpPages.value = r.pages ?? "";
+      tdPages.appendChild(inpPages);
+
+      const tdMin = document.createElement("td");
+      const inpMin = document.createElement("input");
+      inpMin.type="number"; inpMin.min="0"; inpMin.placeholder="z.B. 30";
+      inpMin.value = r.minutes ?? "";
+      tdMin.appendChild(inpMin);
+
+      function persist(){
+        weekData.reading[d.key] = {
+          title: inpTitle.value,
+          pages: inpPages.value,
+          minutes: inpMin.value
+        };
+        saveWeek();
+        renderWeekKpis();
+        drawYearChart();
+      }
+
+      [inpTitle, inpPages, inpMin].forEach(el => el.addEventListener("input", persist));
+
+      tr.appendChild(tdDay);
+      tr.appendChild(tdTitle);
+      tr.appendChild(tdPages);
+      tr.appendChild(tdMin);
+      readBody.appendChild(tr);
+    });
+
+    saveWeek();
+  }
+
+  // ---------- affirmations ----------
+  const affBody = document.getElementById("affBody");
+
+  function renderAffirmations(){
+    affBody.innerHTML = "";
+
+    DAYS.forEach(d => {
+      const tr = document.createElement("tr");
+      const a = weekData.affirm[d.key] || (weekData.affirm[d.key] = {morning:false, evening:false, note:""});
+
+      const tdDay = document.createElement("td"); tdDay.textContent = d.label;
+
+      const tdM = document.createElement("td");
+      const cbM = document.createElement("input");
+      cbM.type="checkbox";
+      cbM.checked = !!a.morning;
+      tdM.appendChild(cbM);
+
+      const tdE = document.createElement("td");
+      const cbE = document.createElement("input");
+      cbE.type="checkbox";
+      cbE.checked = !!a.evening;
+      tdE.appendChild(cbE);
+
+      const tdN = document.createElement("td");
+      const inpN = document.createElement("input");
+      inpN.placeholder="Notiz";
+      inpN.value = a.note ?? "";
+      tdN.appendChild(inpN);
+
+      function persist(){
+        weekData.affirm[d.key] = {
+          morning: cbM.checked,
+          evening: cbE.checked,
+          note: inpN.value
+        };
+        saveWeek();
+        renderWeekKpis();
+        drawYearChart();
+      }
+
+      [cbM, cbE].forEach(el => el.addEventListener("change", persist));
+      inpN.addEventListener("input", persist);
+
+      tr.appendChild(tdDay);
+      tr.appendChild(tdM);
+      tr.appendChild(tdE);
+      tr.appendChild(tdN);
+      affBody.appendChild(tr);
+    });
+
+    saveWeek();
+  }
+
+  // ---------- KPIs (weekly) ----------
+  const weekKpis = document.getElementById("weekKpis");
+
+  function parsePaceToSeconds(paceStr){
+    // "m:ss"
+    if (!paceStr || !paceStr.includes(":")) return null;
+    const [m, s] = paceStr.split(":").map(x => Number(x));
+    if (!Number.isFinite(m) || !Number.isFinite(s)) return null;
+    return m*60 + s;
+  }
+  function secondsToPace(sec){
+    const m = Math.floor(sec/60);
+    const s = Math.round(sec%60);
+    return `${m}:${String(s).padStart(2,"0")}`;
+  }
+
+  function countThisWeek(){
+    // Sport
+    let sportMinutes = 0;
+    let sportCalories = 0;
+    let jogKm = 0;
+    let jogPaceSum = 0;
+    let jogPaceCount = 0;
+
+    DAYS.forEach(d => {
+      const s = weekData.sport?.[d.key];
+      if (!s) return;
+      sportMinutes += Number(s.minutes || 0);
+      sportCalories += Number(s.calories || 0);
+
+      if (s.type === "Joggen"){
+        const km = Number(s.km || 0);
+        if (km) jogKm += km;
+        const p = parsePaceToSeconds(s.pace);
+        if (p != null){ jogPaceSum += p; jogPaceCount++; }
+      }
+    });
+
+    // Reading
+    let readMinutes = 0;
+    let readPages = 0;
+    DAYS.forEach(d => {
+      const r = weekData.reading?.[d.key];
+      if (!r) return;
+      readMinutes += Number(r.minutes || 0);
+      readPages += Number(r.pages || 0);
+    });
+
+    // Affirmations
+    let affM = 0, affE = 0;
+    DAYS.forEach(d => {
+      const a = weekData.affirm?.[d.key];
+      if (!a) return;
+      if (a.morning) affM++;
+      if (a.evening) affE++;
+    });
+
+    // Supplements checked items
+    let suppItemsChecked = 0;
+    SUPP_DAYS.forEach(day => {
+      const items = weekData.supplements?.[day]?.items || {};
+      Object.values(items).forEach(v => { if (v) suppItemsChecked++; });
+    });
+
+    const avgPace = jogPaceCount ? secondsToPace(jogPaceSum / jogPaceCount) : "–";
+
+    return {
+      sportMinutes, sportCalories,
+      jogKm: Number(jogKm.toFixed(1)),
+      avgPace,
+      readMinutes, readPages,
+      affM, affE,
+      suppItemsChecked
+    };
+  }
+
+  function kpi(num, label){
+    const el = document.createElement("div");
+    el.className = "kpi";
+    el.innerHTML = `<div class="num">${num}</div><div class="lbl">${label}</div>`;
+    return el;
+  }
+
+  function renderWeekKpis(){
+    const c = countThisWeek();
+    weekKpis.innerHTML = "";
+    weekKpis.appendChild(kpi(`${c.sportMinutes}`, "Sport-Minuten (Woche)"));
+    weekKpis.appendChild(kpi(`${c.sportCalories}`, "Sport-Kalorien (Woche)"));
+    weekKpis.appendChild(kpi(`${c.jogKm}`, "Joggen-Kilometer (Woche)"));
+    weekKpis.appendChild(kpi(`${c.avgPace}`, "Ø Pace (Joggen)"));
+    weekKpis.appendChild(kpi(`${c.readMinutes}`, "Lesen-Minuten (Woche)"));
+    weekKpis.appendChild(kpi(`${c.readPages}`, "Lesen-Seiten (Woche)"));
+    weekKpis.appendChild(kpi(`${c.affM}/7`, "Affirmationen morgens"));
+    weekKpis.appendChild(kpi(`${c.affE}/7`, "Affirmationen abends"));
+    weekKpis.appendChild(kpi(`${c.suppItemsChecked}`, "Supplements abgehakt (Items)"));
+  }
+
+  // ---------- yearly chart ----------
+  const metricSelect = document.getElementById("metricSelect");
+  const canvas = document.getElementById("barChart");
+  const ctx = canvas.getContext("2d");
+
+  function getCurrentYear(){ return new Date().getFullYear(); }
+
+  function listAllWeeks(){
+    const prefix = "op_week_v1_";
+    const keys = Object.keys(localStorage).filter(k => k.startsWith(prefix));
+    return keys.map(k => ({ key:k, data: safeParse(localStorage.getItem(k)) }))
+              .filter(x => x.data && typeof x.data === "object");
+  }
+
+  function safeParse(raw){
+    try { return JSON.parse(raw); } catch { return null; }
+  }
+
+  function weekKeyToDate(key){
+    // key format: op_week_v1_YYYY-MM-DD
+    const part = key.replace("op_week_v1_","");
+    const [y,m,d] = part.split("-").map(Number);
+    if (!y || !m || !d) return null;
+    return new Date(y, m-1, d);
+  }
+
+  function aggregateYear(metric){
+    const year = getCurrentYear();
+    const buckets = Array.from({length:12}, () => 0);
+
+    listAllWeeks().forEach(w => {
+      const date = weekKeyToDate(w.key);
+      if (!date) return;
+      if (date.getFullYear() !== year) return;
+      const month = date.getMonth();
+
+      const data = w.data;
+
+      // compute this-week metric from stored week object
+      const val = computeMetricFromWeek(data, metric);
+      buckets[month] += val;
+    });
+
+    return buckets;
+  }
+
+  function computeMetricFromWeek(weekObj, metric){
+    // sport minutes, calories, jog km
+    const sport = weekObj.sport || {};
+    const reading = weekObj.reading || {};
+    const affirm = weekObj.affirm || {};
+    const supplements = weekObj.supplements || {};
+
+    if (metric === "sport_minutes"){
+      return DAYS.reduce((sum,d)=> sum + Number(sport[d.key]?.minutes || 0), 0);
     }
+    if (metric === "sport_calories"){
+      return DAYS.reduce((sum,d)=> sum + Number(sport[d.key]?.calories || 0), 0);
+    }
+    if (metric === "jog_km"){
+      return DAYS.reduce((sum,d)=> sum + (sport[d.key]?.type === "Joggen" ? Number(sport[d.key]?.km || 0) : 0), 0);
+    }
+    if (metric === "read_minutes"){
+      return DAYS.reduce((sum,d)=> sum + Number(reading[d.key]?.minutes || 0), 0);
+    }
+    if (metric === "read_pages"){
+      return DAYS.reduce((sum,d)=> sum + Number(reading[d.key]?.pages || 0), 0);
+    }
+    if (metric === "aff_morning"){
+      return DAYS.reduce((sum,d)=> sum + (affirm[d.key]?.morning ? 1 : 0), 0);
+    }
+    if (metric === "aff_evening"){
+      return DAYS.reduce((sum,d)=> sum + (affirm[d.key]?.evening ? 1 : 0), 0);
+    }
+    if (metric === "supp_items"){
+      let count = 0;
+      SUPP_DAYS.forEach(day => {
+        const items = supplements?.[day]?.items || {};
+        Object.values(items).forEach(v => { if (v) count++; });
+      });
+      return count;
+    }
+    return 0;
+  }
+
+  function drawBars(values, title){
+    // clear
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+
+    // layout
+    const W = canvas.width, H = canvas.height;
+    const pad = 36;
+    const chartH = H - pad*2;
+    const chartW = W - pad*2;
+
+    const max = Math.max(1, ...values.map(v => Number(v || 0)));
+    const months = ["Jan","Feb","Mär","Apr","Mai","Jun","Jul","Aug","Sep","Okt","Nov","Dez"];
+
+    // title
+    ctx.fillStyle = "#fff";
+    ctx.font = "14px system-ui";
+    ctx.fillText(`${title} (${new Date().getFullYear()})`, pad, 20);
+
+    // axis line
+    ctx.strokeStyle = "#2a2a2a";
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(pad, H - pad);
+    ctx.lineTo(W - pad, H - pad);
+    ctx.stroke();
+
+    // bars
+    const barGap = 8;
+    const barW = (chartW - barGap*11) / 12;
+
+    values.forEach((v, i) => {
+      const val = Number(v || 0);
+      const h = (val / max) * chartH;
+      const x = pad + i*(barW + barGap);
+      const y = (H - pad) - h;
+
+      // bar
+      ctx.fillStyle = "#00ff6a";
+      ctx.fillRect(x, y, barW, h);
+
+      // label month
+      ctx.fillStyle = "#aaa";
+      ctx.font = "12px system-ui";
+      ctx.fillText(months[i], x + 2, H - pad + 16);
+
+      // value (small)
+      ctx.fillStyle = "#fff";
+      ctx.font = "11px system-ui";
+      const text = (Math.round(val*10)/10).toString();
+      ctx.fillText(text, x + 2, y - 4);
+    });
+  }
+
+  function metricTitle(metric){
+    const map = {
+      sport_minutes: "Sport – Minuten",
+      sport_calories: "Sport – Kalorien",
+      jog_km: "Joggen – Kilometer",
+      read_minutes: "Lesen – Minuten",
+      read_pages: "Lesen – Seiten",
+      aff_morning: "Affirmationen – morgens (Tage)",
+      aff_evening: "Affirmationen – abends (Tage)",
+      supp_items: "Supplements – abgehakte Items"
+    };
+    return map[metric] || metric;
+  }
+
+  function drawYearChart(){
+    const metric = metricSelect.value;
+    const vals = aggregateYear(metric);
+    drawBars(vals, metricTitle(metric));
+  }
+
+  // ---------- navigation ----------
+  document.getElementById("prevWeek").addEventListener("click", () => {
+    currentMonday.setDate(currentMonday.getDate() - 7);
+    weekData = lsGet(weekStorageKey(), emptyWeek());
+    rerender();
+  });
+  document.getElementById("nextWeek").addEventListener("click", () => {
+    currentMonday.setDate(currentMonday.getDate() + 7);
+    weekData = lsGet(weekStorageKey(), emptyWeek());
+    rerender();
+  });
+  document.getElementById("todayWeek").addEventListener("click", () => {
+    currentMonday = startOfWeekMonday(new Date());
+    weekData = lsGet(weekStorageKey(), emptyWeek());
+    rerender();
+  });
+  document.getElementById("resetWeek").addEventListener("click", () => {
+    localStorage.removeItem(weekStorageKey());
+    weekData = emptyWeek();
+    saveWeek();
+    rerender();
   });
 
-  document.getElementById("totalMinutes").textContent=min;
-  document.getElementById("totalCalories").textContent=cal;
-  document.getElementById("totalKm").textContent=km.toFixed(1);
-  document.getElementById("avgPace").textContent=paceCount?Math.floor(paceSum/paceCount/60)+":"+String(Math.round((paceSum/paceCount)%60)).padStart(2,"0"):"–";
-}
+  document.getElementById("refreshAll").addEventListener("click", () => {
+    renderWeekKpis();
+    drawYearChart();
+  });
+  document.getElementById("refreshChart").addEventListener("click", drawYearChart);
+  metricSelect.addEventListener("change", drawYearChart);
 
-document.addEventListener("input",calcTotals);
+  // ---------- render all ----------
+  function rerender(){
+    renderWeekLabel();
+    renderSupplements();
+    renderSport();
+    renderReading();
+    renderAffirmations();
+    renderWeekKpis();
+    drawYearChart();
+  }
+
+  // init
+  rerender();
+})();
 </script>
 
 </body>
