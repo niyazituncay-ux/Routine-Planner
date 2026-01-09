@@ -1477,4 +1477,47 @@
     renderNamazTotals();
     renderDashboard();
   }
-  
+    // ===================== READING / SPORT / NAMAZ / SUPP INIT HELPERS =====================
+
+  // Reading table exists already in HTML; we already render it in renderReading()
+  // Sport multi exists already in HTML; we already render it in renderSportMulti()
+  // Supplements selector + weekly tracker exists already
+  // Namaz calendar + day editor exists already
+
+  // ---------------- INIT NAMAZ DEFAULTS ----------------
+  ensureNamazDay(selectedIso);
+  saveNamaz();
+
+  // ---------------- FIRST RENDER ----------------
+  function initAll(){
+    loadPlannerName();
+    renderWeekLabel();
+
+    // Supplements UI
+    renderSuppCatalog();
+    renderSuppActivePills();
+    renderSuppDays();
+
+    // Sport + Reading
+    renderSportMulti();
+    renderReading();
+
+    // Finished books + Namaz
+    renderFinishedBooksList();
+    renderNamazTotals();
+    renderCalendar();
+
+    // Dashboard overview
+    renderDashboard();
+
+    // Persist week after ensuring structures
+    saveWeek();
+  }
+
+  initAll();
+
+})();
+</script>
+
+</body>
+</html>
