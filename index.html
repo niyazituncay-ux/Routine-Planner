@@ -14,12 +14,14 @@
     --panel:#0c0c0c;
     --panel2:#101010;
     --accent:#00ff6a;
+    --warn:#ffcc00;
+    --bad:#ff5b5b;
   }
   body{
     background:var(--bg);
     color:var(--fg);
     font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-    max-width: 980px;
+    max-width: 1100px;
     margin: 38px auto;
     padding: 0 16px;
   }
@@ -51,7 +53,7 @@
     cursor:pointer;
   }
   button:hover{ background:#151515; }
-  .danger{ color:#ff5b5b; }
+  .danger{ color:var(--bad); }
 
   .card{
     border:1px solid var(--line);
@@ -60,11 +62,6 @@
     background: var(--panel);
     margin-bottom: 14px;
   }
-
-  table{ width:100%; border-collapse: collapse; }
-  th, td{ border-bottom:1px solid var(--line); padding:8px; vertical-align:top; }
-  th{ text-align:left; color: var(--muted); font-weight:600; }
-  tr:last-child td{ border-bottom:none; }
 
   input, select{
     width: 100%;
@@ -84,7 +81,7 @@
     background: var(--panel2);
     border-radius: 12px;
     padding: 10px 12px;
-    min-width: 190px;
+    min-width: 200px;
   }
   .kpi .num{ font-size: 20px; font-weight:800; color: var(--accent); }
   .kpi .lbl{ font-size: 12px; color: var(--muted); margin-top:4px; }
@@ -93,15 +90,6 @@
   .checkRow{ display:flex; gap:10px; align-items:flex-start; }
   .checkRow label{ line-height: 1.2; }
 
-  .chartWrap{
-    border:1px solid var(--line);
-    border-radius: 14px;
-    padding: 12px;
-    background: var(--panel2);
-  }
-  canvas{ width:100%; height:260px; display:block; }
-
-  /* multi-sport day UI */
   .dayBlock{
     border:1px solid var(--line);
     border-radius: 14px;
@@ -126,7 +114,7 @@
   }
   .sessionGrid{
     display:grid;
-    grid-template-columns: 1.2fr 0.6fr 0.6fr 0.6fr 0.6fr 1fr auto;
+    grid-template-columns: 1.1fr 0.6fr 0.6fr 0.6fr 0.6fr 1fr auto;
     gap:8px;
     align-items:start;
   }
@@ -138,10 +126,74 @@
   .miniBtn.danger{ border-color:#3a1a1a; }
   .disabledLook{ opacity:0.35; }
 
-  /* supplements day blocks */
   .suppDayBlock{ border:1px solid var(--line); border-radius:14px; padding:12px; background: var(--panel2); margin-top:10px; }
   .suppHeader{ display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap; }
   .suppList{ margin-top:10px; display:grid; gap:8px; }
+
+  .namazGrid{
+    display:grid;
+    grid-template-columns: 1fr;
+    gap:12px;
+  }
+  @media (min-width: 980px){
+    .namazGrid{ grid-template-columns: 1.2fr 0.8fr; }
+  }
+  .calHeader{ display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap; }
+  .calendar{
+    width:100%;
+    border-collapse: collapse;
+    overflow:hidden;
+    border-radius: 12px;
+    border:1px solid var(--line);
+    background: #0b0b0b;
+  }
+  .calendar th, .calendar td{
+    border-bottom:1px solid var(--line);
+    border-right:1px solid var(--line);
+    padding:8px;
+    vertical-align:top;
+  }
+  .calendar th:last-child, .calendar td:last-child{ border-right:none; }
+  .calendar tr:last-child td{ border-bottom:none; }
+  .calDayBtn{
+    width:100%;
+    border:1px solid var(--line);
+    background:#101010;
+    color:#fff;
+    border-radius:10px;
+    padding:8px;
+    text-align:left;
+    cursor:pointer;
+  }
+  .calDayBtn:hover{ background:#151515; }
+  .badge{
+    display:inline-block;
+    font-size:11px;
+    padding:2px 8px;
+    border:1px solid var(--line);
+    border-radius:999px;
+    margin-left:6px;
+    color: var(--muted);
+  }
+  .badge.ok{ color: var(--accent); border-color:#164b2a; }
+  .badge.warn{ color: var(--warn); border-color:#5a4b12; }
+  .badge.bad{ color: var(--bad); border-color:#5a1b1b; }
+
+  .panel{
+    border:1px solid var(--line);
+    border-radius: 14px;
+    padding: 12px;
+    background: var(--panel2);
+  }
+
+  .bookList{
+    border:1px solid var(--line);
+    border-radius:12px;
+    padding:10px;
+    background:#0b0b0b;
+    margin-top:10px;
+  }
+  .bookList ul{ margin:8px 0 0 18px; }
 </style>
 </head>
 
@@ -151,7 +203,7 @@
   <div>
     <h1>Niyazi Tuncay</h1>
     <h2>Ottoman Power Routinen</h2>
-    <div class="small">Woche: <span id="weekLabel"></span> · Speicherung lokal im Browser (pro Woche).</div>
+    <div class="small">Woche: <span id="weekLabel"></span> · Speicherung lokal im Browser (Wochen + Namaz pro Datum).</div>
   </div>
   <div class="buttons">
     <button id="prevWeek">◀ Vorherige Woche</button>
@@ -166,10 +218,30 @@
 <div class="card">
   <div class="row" style="justify-content:space-between;">
     <div>
-      <h3>📊 Wochenbilanz</h3>
-      <div class="small">Summen dieser Woche (Sport, Lesen, Affirmationen, Supplements, Joggen).</div>
+      <h3>🏆 Gesamtbilanz (bis heute)</h3>
+      <div class="small">Summiert über alle gespeicherten Wochen + Namaz + fertige Bücher.</div>
     </div>
-    <button id="refreshAll">Bilanz aktualisieren</button>
+    <button id="refreshTotals">Gesamtbilanz aktualisieren</button>
+  </div>
+  <div class="kpiRow" id="totalKpis"></div>
+
+  <div class="bookList">
+    <div style="display:flex; justify-content:space-between; gap:10px; align-items:center; flex-wrap:wrap;">
+      <div style="font-weight:700;">📚 Fertige Bücher (Titel)</div>
+      <button id="clearFinishedBooks" class="danger">Liste leeren</button>
+    </div>
+    <div class="small muted">Wenn du „Buch fertig“ anhakst, wird der Titel einmalig gespeichert.</div>
+    <ul id="finishedBooksList"></ul>
+  </div>
+</div>
+
+<div class="card">
+  <div class="row" style="justify-content:space-between;">
+    <div>
+      <h3>📊 Wochenbilanz (diese Woche)</h3>
+      <div class="small">Sport / Lesen / Supplements / Joggen-Ø Pace.</div>
+    </div>
+    <button id="refreshWeek">Wochenbilanz aktualisieren</button>
   </div>
   <div class="kpiRow" id="weekKpis"></div>
 </div>
@@ -177,8 +249,60 @@
 <hr>
 
 <div class="card">
+  <h3>🕌 Namaz-Tracker (Datum, rückwirkend bis 2000)</h3>
+  <div class="small">Wähle Datum/Monat, hake Sabach/Öğle/İkindi/Akşam/Yatsı ab. Ein kompletter Tag zählt nur, wenn alle 5 abgehakt sind.</div>
+
+  <div class="namazGrid" style="margin-top:10px;">
+    <div class="panel">
+      <div class="calHeader">
+        <div class="row" style="gap:8px;">
+          <button id="calPrev">◀</button>
+          <button id="calToday">Heute</button>
+          <button id="calNext">▶</button>
+          <span class="small muted">Monat:</span>
+          <span id="calLabel" style="font-weight:700;"></span>
+        </div>
+        <div class="row" style="gap:8px;">
+          <input id="jumpDate" type="date" style="max-width:220px;">
+          <button id="jumpBtn">Zu Datum</button>
+        </div>
+      </div>
+
+      <div class="small" style="margin-top:8px;">
+        Legende: <span class="badge ok">5/5</span> komplett · <span class="badge warn">1–4/5</span> teilweise · <span class="badge bad">0/5</span> nichts
+      </div>
+
+      <div style="margin-top:10px; overflow:auto;">
+        <table class="calendar" id="calendar"></table>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h3 style="margin-bottom:8px;">Ausgewählter Tag: <span id="selDateLabel"></span></h3>
+      <div id="namazForm" class="checklist"></div>
+
+      <div style="margin-top:10px;">
+        <input id="namazNote" placeholder="Notiz (optional)" />
+      </div>
+
+      <div class="row" style="margin-top:10px; justify-content:space-between;">
+        <button id="clearDay" class="danger">Tag zurücksetzen</button>
+        <button id="closeDay">Schließen</button>
+      </div>
+
+      <hr style="margin:14px 0;">
+
+      <h3 style="margin-bottom:8px;">Namaz-Gesamtbilanz</h3>
+      <div class="kpiRow" id="namazTotals"></div>
+    </div>
+  </div>
+</div>
+
+<hr>
+
+<div class="card">
   <h3>💊 Supplements – täglich (Mo–So)</h3>
-  <div class="small">Jeden Tag abhaken. (Du kannst die Liste später erweitern.)</div>
+  <div class="small">Jeden Tag abhaken.</div>
   <div id="suppDays"></div>
 </div>
 
@@ -189,63 +313,28 @@
 </div>
 
 <div class="card">
-  <h3>📚 Buchlesen – Wochenplan</h3>
-  <div class="small">Pro Tag: Titel + Seiten + Minuten.</div>
+  <h3>📚 Lesen – Wochenplan</h3>
+  <div class="small">Pro Tag: Titel + Seiten + Minuten + „Buch fertig“.</div>
 
-  <table id="readTable" style="margin-top:10px;">
-    <thead>
-      <tr>
-        <th style="width:120px;">Tag</th>
-        <th>Titel</th>
-        <th style="width:130px;">Seiten</th>
-        <th style="width:130px;">Minuten</th>
-      </tr>
-    </thead>
-    <tbody id="readBody"></tbody>
-  </table>
-</div>
-
-<div class="card">
-  <h3>🧠 Affirmationen – morgens & abends</h3>
-  <div class="small">Hake ab, ob du deine Affirmationen gemacht hast.</div>
-
-  <table id="affTable" style="margin-top:10px;">
-    <thead>
-      <tr>
-        <th style="width:120px;">Tag</th>
-        <th style="width:120px;">Morgens</th>
-        <th style="width:120px;">Abends</th>
-        <th>Notiz</th>
-      </tr>
-    </thead>
-    <tbody id="affBody"></tbody>
-  </table>
-</div>
-
-<div class="card">
-  <h3>🤸 Stretching-Routine (Liste)</h3>
-  <div class="small">Bilder kommen später – du schickst sie, dann baue ich sie ein.</div>
-  <ul class="small" style="line-height:1.6; margin:10px 0 0 18px;">
-    <li>Dynamisch diagonal zu den Füßen</li>
-    <li>Lateral Spin</li>
-    <li>Full Spine Stretch</li>
-    <li>Nacken stretchen, kreisen, rechts/links</li>
-    <li>Das Kind</li>
-    <li>Cobra</li>
-    <li>Katze und Hund</li>
-    <li>Hero Pose</li>
-    <li>Schneidersitz + Drehung</li>
-    <li>Schneidersitz nach vorne zu den Füßen beugen</li>
-    <li>Ausfallschritte Hüftbeuger</li>
-    <li>Bridge Pose</li>
-    <li>Quad Stretch</li>
-    <li>Spagat</li>
-  </ul>
+  <div style="overflow:auto; margin-top:10px;">
+    <table style="width:100%; border-collapse:collapse;">
+      <thead>
+        <tr>
+          <th style="width:120px; text-align:left; color:var(--muted); padding:8px; border-bottom:1px solid var(--line);">Tag</th>
+          <th style="text-align:left; color:var(--muted); padding:8px; border-bottom:1px solid var(--line);">Titel</th>
+          <th style="width:130px; text-align:left; color:var(--muted); padding:8px; border-bottom:1px solid var(--line);">Seiten</th>
+          <th style="width:130px; text-align:left; color:var(--muted); padding:8px; border-bottom:1px solid var(--line);">Minuten</th>
+          <th style="width:130px; text-align:left; color:var(--muted); padding:8px; border-bottom:1px solid var(--line);">Buch fertig</th>
+        </tr>
+      </thead>
+      <tbody id="readBody"></tbody>
+    </table>
+  </div>
 </div>
 
 <script>
 (() => {
-  // ---------- constants ----------
+  // ---------------- CONSTANTS ----------------
   const DAYS = [
     {key:"mon", label:"Montag"},
     {key:"tue", label:"Dienstag"},
@@ -256,7 +345,6 @@
     {key:"sun", label:"Sonntag"},
   ];
 
-  // Supplements list (daily)
   const SUPPLEMENTS = [
     { id:"d3k2", text:"Vitamin D3 / K2 (pro 10kg – 1000 IE)" },
     { id:"omega3", text:"Omega 3 – 4 Kapseln" },
@@ -268,25 +356,51 @@
 
   const SPORTS = ["", "Krafttraining", "Joggen", "Stretching", "Ringen", "Schwimmen", "Tennis"];
 
-  // ---------- helpers ----------
+  const NAMAZ_PRAYERS = [
+    { id:"sabach", label:"Sabach" },
+    { id:"ogle", label:"Öğle" },
+    { id:"ikindi", label:"İkindi" },
+    { id:"aksam", label:"Akşam" },
+    { id:"yatsi", label:"Yatsı" },
+  ];
+
+  // localStorage keys
+  const WEEK_PREFIX = "op_week_v4_";
+  const NAMAZ_KEY = "op_namaz_v1"; // { "YYYY-MM-DD": { sabach:true, ..., note:"" } }
+  const FINISHED_BOOKS_KEY = "op_books_finished_v1"; // [{title, isoFinished, sourceWeekKey}]
+
+  // ---------------- HELPERS ----------------
   const pad2 = n => String(n).padStart(2,"0");
+
   function startOfWeekMonday(date){
     const d = new Date(date);
-    const day = d.getDay();
-    const diff = (day === 0 ? -6 : 1 - day);
+    const day = d.getDay(); // Sun=0
+    const diff = (day === 0 ? -6 : 1 - day); // Monday start
     d.setDate(d.getDate() + diff);
     d.setHours(0,0,0,0);
     return d;
   }
-  function fmtDate(d){ return `${pad2(d.getDate())}.${pad2(d.getMonth()+1)}.${d.getFullYear()}`; }
+
+  function fmtDate(d){
+    return `${pad2(d.getDate())}.${pad2(d.getMonth()+1)}.${d.getFullYear()}`;
+  }
+
   function weekKey(monday){
     return `${monday.getFullYear()}-${pad2(monday.getMonth()+1)}-${pad2(monday.getDate())}`;
   }
+
   function lsGet(key, fallback){
-    try { const raw = localStorage.getItem(key); return raw ? JSON.parse(raw) : fallback; }
-    catch { return fallback; }
+    try {
+      const raw = localStorage.getItem(key);
+      return raw ? JSON.parse(raw) : fallback;
+    } catch {
+      return fallback;
+    }
   }
-  function lsSet(key, value){ localStorage.setItem(key, JSON.stringify(value)); }
+
+  function lsSet(key, value){
+    localStorage.setItem(key, JSON.stringify(value));
+  }
 
   // Pace mm:ss per km
   function parsePaceToSeconds(paceStr){
@@ -295,39 +409,52 @@
     if (!Number.isFinite(m) || !Number.isFinite(s)) return null;
     return m*60 + s;
   }
+
   function secondsToPace(sec){
     const m = Math.floor(sec/60);
     const s = Math.round(sec%60);
     return `${m}:${String(s).padStart(2,"0")}`;
   }
 
-  // ---------- state ----------
+  function isoDate(d){
+    return `${d.getFullYear()}-${pad2(d.getMonth()+1)}-${pad2(d.getDate())}`;
+  }
+
+  function parseIso(iso){
+    const [y,m,da] = iso.split("-").map(Number);
+    return new Date(y, m-1, da);
+  }
+
+  function kpi(num, label){
+    const el = document.createElement("div");
+    el.className = "kpi";
+    el.innerHTML = `<div class="num">${num}</div><div class="lbl">${label}</div>`;
+    return el;
+  }
+
+  // ---------------- WEEK STATE ----------------
   let currentMonday = startOfWeekMonday(new Date());
   const weekLabelEl = document.getElementById("weekLabel");
 
   function emptyWeek(){
-    // daily supplements: per day -> items + note
     const supplements = Object.fromEntries(DAYS.map(d => [d.key, {
       note: "",
       items: Object.fromEntries(SUPPLEMENTS.map(s => [s.id, false]))
     }]));
-
-    // sport sessions per day
     const sport = Object.fromEntries(DAYS.map(d => [d.key, { sessions: [] }]));
-
-    const reading = Object.fromEntries(DAYS.map(d => [d.key, { title:"", pages:"", minutes:"" }]));
-    const affirm  = Object.fromEntries(DAYS.map(d => [d.key, { morning:false, evening:false, note:"" }]));
-
-    return { supplements, sport, reading, affirm };
+    const reading = Object.fromEntries(DAYS.map(d => [d.key, { title:"", pages:"", minutes:"", finished:false }]));
+    return { supplements, sport, reading };
   }
 
   function weekStorageKey(){
-    return "op_week_v3_" + weekKey(currentMonday);
+    return WEEK_PREFIX + weekKey(currentMonday);
   }
 
   let weekData = lsGet(weekStorageKey(), emptyWeek());
 
-  function saveWeek(){ lsSet(weekStorageKey(), weekData); }
+  function saveWeek(){
+    lsSet(weekStorageKey(), weekData);
+  }
 
   function renderWeekLabel(){
     const end = new Date(currentMonday);
@@ -335,15 +462,80 @@
     weekLabelEl.textContent = `${fmtDate(currentMonday)} – ${fmtDate(end)}`;
   }
 
-  // ---------- supplements (daily blocks) ----------
+  function listAllWeeks(){
+    const keys = Object.keys(localStorage).filter(k => k.startsWith(WEEK_PREFIX));
+    return keys
+      .map(k => ({ key:k, data: lsGet(k, null) }))
+      .filter(x => x.data && typeof x.data === "object");
+  }
+
+  // ---------------- FINISHED BOOKS ----------------
+  let finishedBooks = lsGet(FINISHED_BOOKS_KEY, []);
+
+  function saveFinishedBooks(){
+    lsSet(FINISHED_BOOKS_KEY, finishedBooks);
+  }
+
+  function normalizeTitle(t){
+    return (t || "").trim().replace(/\s+/g, " ");
+  }
+
+  function addFinishedBookOnce(title){
+    const clean = normalizeTitle(title);
+    if (!clean) return;
+
+    const exists = finishedBooks.some(b => normalizeTitle(b.title).toLowerCase() === clean.toLowerCase());
+    if (exists) return;
+
+    finishedBooks.push({
+      title: clean,
+      isoFinished: isoDate(new Date()),
+      sourceWeekKey: weekStorageKey()
+    });
+    saveFinishedBooks();
+  }
+
+  const finishedBooksListEl = document.getElementById("finishedBooksList");
+
+  function renderFinishedBooksList(){
+    finishedBooksListEl.innerHTML = "";
+    if (!finishedBooks.length){
+      const li = document.createElement("li");
+      li.className = "small muted";
+      li.textContent = "Noch keine fertigen Bücher.";
+      finishedBooksListEl.appendChild(li);
+      return;
+    }
+
+    finishedBooks
+      .slice()
+      .sort((a,b) => (a.isoFinished||"").localeCompare(b.isoFinished||""))
+      .forEach(b => {
+        const li = document.createElement("li");
+        li.textContent = `${b.title} (${b.isoFinished})`;
+        finishedBooksListEl.appendChild(li);
+      });
+  }
+
+  document.getElementById("clearFinishedBooks").addEventListener("click", () => {
+    finishedBooks = [];
+    saveFinishedBooks();
+    renderFinishedBooksList();
+    renderTotalKpis();
+  });
+
+  // ---------------- SUPPLEMENTS ----------------
   const suppDaysEl = document.getElementById("suppDays");
 
   function renderSupplementsDaily(){
     suppDaysEl.innerHTML = "";
 
     DAYS.forEach(d => {
-      if (!weekData.supplements[d.key]) {
-        weekData.supplements[d.key] = { note:"", items: Object.fromEntries(SUPPLEMENTS.map(s => [s.id, false])) };
+      if (!weekData.supplements[d.key]){
+        weekData.supplements[d.key] = {
+          note:"",
+          items: Object.fromEntries(SUPPLEMENTS.map(s => [s.id, false]))
+        };
       }
 
       const block = document.createElement("div");
@@ -368,6 +560,7 @@
           weekData.supplements[d.key].items[s.id] = cb.checked;
           saveWeek();
           renderWeekKpis();
+          renderTotalKpis();
         });
 
         const label = document.createElement("label");
@@ -387,7 +580,7 @@
       });
 
       block.appendChild(list);
-      block.appendChild(document.createElement("div")).style.height="8px";
+      block.appendChild(document.createElement("div")).style.height = "8px";
       block.appendChild(note);
 
       suppDaysEl.appendChild(block);
@@ -396,7 +589,7 @@
     saveWeek();
   }
 
-  // ---------- sport (multi sessions) ----------
+  // ---------------- SPORT (MULTI) ----------------
   const sportDaysEl = document.getElementById("sportDays");
 
   function newSession(){
@@ -426,6 +619,7 @@
         saveWeek();
         renderSportMulti();
         renderWeekKpis();
+        renderTotalKpis();
       });
 
       header.appendChild(addBtn);
@@ -460,17 +654,21 @@
           sel.value = sess.type || "";
 
           const inpMin = document.createElement("input");
-          inpMin.type = "number"; inpMin.min = "0";
+          inpMin.type = "number";
+          inpMin.min = "0";
           inpMin.placeholder = "Dauer (min)";
           inpMin.value = sess.minutes ?? "";
 
           const inpCal = document.createElement("input");
-          inpCal.type = "number"; inpCal.min="0";
+          inpCal.type = "number";
+          inpCal.min = "0";
           inpCal.placeholder = "Kalorien";
           inpCal.value = sess.calories ?? "";
 
           const inpKm = document.createElement("input");
-          inpKm.type = "number"; inpKm.min="0"; inpKm.step="0.1";
+          inpKm.type = "number";
+          inpKm.min = "0";
+          inpKm.step = "0.1";
           inpKm.placeholder = "KM (nur Joggen)";
           inpKm.value = sess.km ?? "";
 
@@ -493,6 +691,7 @@
             saveWeek();
             renderSportMulti();
             renderWeekKpis();
+            renderTotalKpis();
           });
           actions.appendChild(del);
 
@@ -516,6 +715,7 @@
             saveWeek();
             updateJog();
             renderWeekKpis();
+            renderTotalKpis();
           }
 
           [sel, inpMin, inpCal, inpKm, inpPace, inpNote].forEach(el => el.addEventListener("input", persist));
@@ -544,221 +744,527 @@
     saveWeek();
   }
 
-  // ---------- reading ----------
+  // ---------------- READING ----------------
   const readBody = document.getElementById("readBody");
 
   function renderReading(){
     readBody.innerHTML = "";
+
     DAYS.forEach(d => {
       const tr = document.createElement("tr");
-      const r = weekData.reading[d.key] || (weekData.reading[d.key] = { title:"", pages:"", minutes:"" });
+      const r = weekData.reading[d.key] || (weekData.reading[d.key] = { title:"", pages:"", minutes:"", finished:false });
 
-      const tdDay = document.createElement("td"); tdDay.textContent = d.label;
+      function tdBase(){
+        const td = document.createElement("td");
+        td.style.padding="8px";
+        td.style.borderBottom="1px solid var(--line)";
+        return td;
+      }
 
-      const tdTitle = document.createElement("td");
+      const tdDay = tdBase();
+      tdDay.textContent = d.label;
+
+      const tdTitle = tdBase();
       const inpTitle = document.createElement("input");
       inpTitle.placeholder="Buchtitel";
       inpTitle.value = r.title ?? "";
       tdTitle.appendChild(inpTitle);
 
-      const tdPages = document.createElement("td");
+      const tdPages = tdBase();
       const inpPages = document.createElement("input");
       inpPages.type="number"; inpPages.min="0"; inpPages.placeholder="Seiten";
       inpPages.value = r.pages ?? "";
       tdPages.appendChild(inpPages);
 
-      const tdMin = document.createElement("td");
+      const tdMin = tdBase();
       const inpMin = document.createElement("input");
       inpMin.type="number"; inpMin.min="0"; inpMin.placeholder="Minuten";
       inpMin.value = r.minutes ?? "";
       tdMin.appendChild(inpMin);
 
+      const tdDone = tdBase();
+      const cbDone = document.createElement("input");
+      cbDone.type="checkbox";
+      cbDone.checked = !!r.finished;
+      tdDone.appendChild(cbDone);
+
       function persist(){
-        weekData.reading[d.key] = { title: inpTitle.value, pages: inpPages.value, minutes: inpMin.value };
+        weekData.reading[d.key] = {
+          title: inpTitle.value,
+          pages: inpPages.value,
+          minutes: inpMin.value,
+          finished: cbDone.checked
+        };
         saveWeek();
+
+        if (cbDone.checked){
+          addFinishedBookOnce(inpTitle.value);
+          renderFinishedBooksList();
+        }
+
         renderWeekKpis();
+        renderTotalKpis();
       }
+
       [inpTitle, inpPages, inpMin].forEach(el => el.addEventListener("input", persist));
+      cbDone.addEventListener("change", persist);
 
       tr.appendChild(tdDay);
       tr.appendChild(tdTitle);
       tr.appendChild(tdPages);
       tr.appendChild(tdMin);
+      tr.appendChild(tdDone);
       readBody.appendChild(tr);
     });
+
     saveWeek();
   }
 
-  // ---------- affirmations ----------
-  const affBody = document.getElementById("affBody");
+  // ---------------- NAMAZ DB ----------------
+  let namazDB = lsGet(NAMAZ_KEY, {});
 
-  function renderAffirmations(){
-    affBody.innerHTML = "";
-    DAYS.forEach(d => {
-      const tr = document.createElement("tr");
-      const a = weekData.affirm[d.key] || (weekData.affirm[d.key] = { morning:false, evening:false, note:"" });
+  function ensureNamazDay(iso){
+    if (!namazDB[iso]){
+      namazDB[iso] = { sabach:false, ogle:false, ikindi:false, aksam:false, yatsi:false, note:"" };
+    } else {
+      NAMAZ_PRAYERS.forEach(p => {
+        if (typeof namazDB[iso][p.id] !== "boolean") namazDB[iso][p.id] = !!namazDB[iso][p.id];
+      });
+      if (typeof namazDB[iso].note !== "string") namazDB[iso].note = "";
+    }
+  }
 
-      const tdDay = document.createElement("td"); tdDay.textContent = d.label;
+  function saveNamaz(){ lsSet(NAMAZ_KEY, namazDB); }
 
-      const tdM = document.createElement("td");
-      const cbM = document.createElement("input");
-      cbM.type="checkbox";
-      cbM.checked = !!a.morning;
-      tdM.appendChild(cbM);
+  function countNamazTotals(){
+    let perPrayer = Object.fromEntries(NAMAZ_PRAYERS.map(p => [p.id, 0]));
+    let fullDays = 0;
+    const minDate = new Date(2000,0,1);
 
-      const tdE = document.createElement("td");
-      const cbE = document.createElement("input");
-      cbE.type="checkbox";
-      cbE.checked = !!a.evening;
-      tdE.appendChild(cbE);
+    Object.keys(namazDB).forEach(k => {
+      const d = parseIso(k);
+      if (d < minDate) return;
 
-      const tdN = document.createElement("td");
-      const inpN = document.createElement("input");
-      inpN.placeholder="Notiz";
-      inpN.value = a.note ?? "";
-      tdN.appendChild(inpN);
+      const day = namazDB[k];
+      let all5 = true;
 
-      function persist(){
-        weekData.affirm[d.key] = { morning: cbM.checked, evening: cbE.checked, note: inpN.value };
-        saveWeek();
-        renderWeekKpis();
-      }
-      [cbM, cbE].forEach(el => el.addEventListener("change", persist));
-      inpN.addEventListener("input", persist);
+      NAMAZ_PRAYERS.forEach(p => {
+        if (day[p.id]) perPrayer[p.id]++;
+        if (!day[p.id]) all5 = false;
+      });
 
-      tr.appendChild(tdDay);
-      tr.appendChild(tdM);
-      tr.appendChild(tdE);
-      tr.appendChild(tdN);
-      affBody.appendChild(tr);
+      if (all5) fullDays++;
     });
-    saveWeek();
+
+    return { perPrayer, fullDays, years: fullDays/365 };
   }
 
-  // ---------- weekly KPIs ----------
-  const weekKpis = document.getElementById("weekKpis");
+  // ---------------- NAMAZ UI ----------------
+  const calEl = document.getElementById("calendar");
+  const calLabelEl = document.getElementById("calLabel");
+  const selDateLabelEl = document.getElementById("selDateLabel");
+  const namazFormEl = document.getElementById("namazForm");
+  const namazNoteEl = document.getElementById("namazNote");
+  const jumpDateEl = document.getElementById("jumpDate");
+  const namazTotalsEl = document.getElementById("namazTotals");
+
+  let calMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+  let selectedIso = isoDate(new Date());
+
+  jumpDateEl.min = "2000-01-01";
+  jumpDateEl.max = "2099-12-31";
+  jumpDateEl.value = selectedIso;
+
+  function dayStatusBadge(iso){
+    ensureNamazDay(iso);
+    const day = namazDB[iso];
+    let count = 0;
+    NAMAZ_PRAYERS.forEach(p => { if (day[p.id]) count++; });
+
+    if (count === 5) return { txt:"5/5", cls:"ok" };
+    if (count === 0) return { txt:"0/5", cls:"bad" };
+    return { txt:`${count}/5`, cls:"warn" };
+  }
+
+  function renderNamazTotals(){
+    const t = countNamazTotals();
+    namazTotalsEl.innerHTML = "";
+    namazTotalsEl.appendChild(kpi(`${t.perPrayer.sabach}`, "Sabach (gesamt)"));
+    namazTotalsEl.appendChild(kpi(`${t.perPrayer.ogle}`, "Öğle (gesamt)"));
+    namazTotalsEl.appendChild(kpi(`${t.perPrayer.ikindi}`, "İkindi (gesamt)"));
+    namazTotalsEl.appendChild(kpi(`${t.perPrayer.aksam}`, "Akşam (gesamt)"));
+    namazTotalsEl.appendChild(kpi(`${t.perPrayer.yatsi}`, "Yatsı (gesamt)"));
+    namazTotalsEl.appendChild(kpi(`${t.fullDays}`, "Vollständige Tage (5/5)"));
+    namazTotalsEl.appendChild(kpi(`${t.years.toFixed(2)}`, "Jahre Namaz (≈ Tage/365)"));
+  }
+
+  function selectNamazDate(iso, silent=false){
+    const min = new Date(2000,0,1);
+    if (parseIso(iso) < min) return;
+
+    selectedIso = iso;
+    jumpDateEl.value = iso;
+
+    ensureNamazDay(iso);
+    const day = namazDB[iso];
+
+    selDateLabelEl.textContent = iso;
+    namazFormEl.innerHTML = "";
+
+    NAMAZ_PRAYERS.forEach(p => {
+      const row = document.createElement("div");
+      row.className = "checkRow";
+
+      const cb = document.createElement("input");
+      cb.type = "checkbox";
+      cb.checked = !!day[p.id];
+
+      cb.addEventListener("change", () => {
+        day[p.id] = cb.checked;
+        saveNamaz();
+        renderNamazTotals();
+        renderTotalKpis();
+        renderCalendar();
+      });
+
+      const label = document.createElement("label");
+      label.textContent = p.label;
+
+      row.appendChild(cb);
+      row.appendChild(label);
+      namazFormEl.appendChild(row);
+    });
+
+    namazNoteEl.value = day.note || "";
+    namazNoteEl.oninput = () => {
+      day.note = namazNoteEl.value;
+      saveNamaz();
+    };
+
+    if (!silent) renderCalendar();
+  }
+
+  function renderCalendar(){
+    const y = calMonth.getFullYear();
+    const m = calMonth.getMonth();
+
+    const monthNames = ["Januar","Februar","März","April","Mai","Juni","Juli","August","September","Oktober","November","Dezember"];
+    calLabelEl.textContent = `${monthNames[m]} ${y}`;
+
+    const first = new Date(y, m, 1);
+    const last = new Date(y, m+1, 0);
+    const daysInMonth = last.getDate();
+
+    const jsDay = first.getDay(); // Sun=0
+    const offset = (jsDay === 0 ? 6 : jsDay - 1); // Mon=0
+
+    const headers = ["Mo","Di","Mi","Do","Fr","Sa","So"];
+    let html = "<thead><tr>" + headers.map(h => `<th style="color:var(--muted); font-weight:600;">${h}</th>`).join("") + "</tr></thead><tbody>";
+
+    let dayNum = 1 - offset;
+    for (let row=0; row<6; row++){
+      html += "<tr>";
+      for (let col=0; col<7; col++){
+        if (dayNum < 1 || dayNum > daysInMonth){
+          html += `<td style="background:#070707; color:#333;">&nbsp;</td>`;
+        } else {
+          const d = new Date(y, m, dayNum);
+          const min = new Date(2000,0,1);
+          const disabled = d < min;
+          const iso = isoDate(d);
+
+          const badge = !disabled ? dayStatusBadge(iso) : {txt:"", cls:""};
+          const isSel = iso === selectedIso;
+
+          html += `<td style="background:${isSel ? "#111" : "#0b0b0b"};">
+            <button class="calDayBtn" data-iso="${iso}" ${disabled ? "disabled style='opacity:.25; cursor:not-allowed;'" : ""}>
+              <div style="font-weight:700;">${dayNum}
+                ${!disabled ? `<span class="badge ${badge.cls}">${badge.txt}</span>` : ""}
+              </div>
+              <div class="small muted" style="margin-top:4px;">${iso}</div>
+            </button>
+          </td>`;
+        }
+        dayNum++;
+      }
+      html += "</tr>";
+    }
+    html += "</tbody>";
+    calEl.innerHTML = html;
+
+    calEl.querySelectorAll("button[data-iso]").forEach(btn => {
+      btn.addEventListener("click", () => selectNamazDate(btn.getAttribute("data-iso")));
+    });
+
+    selectNamazDate(selectedIso, true);
+  }
+    // ---------------- WEEK KPIs ----------------
+  const weekKpisEl = document.getElementById("weekKpis");
 
   function countThisWeek(){
-    // SPORT totals from sessions
     let sportMinutes = 0;
     let sportCalories = 0;
+
+    let jogSessions = 0;
     let jogKm = 0;
-    let jogPaceSum = 0;
-    let jogPaceCount = 0;
+    let jogPaceWeightedSum = 0;
+
+    const sessionsByType = Object.fromEntries(SPORTS.filter(s=>s).map(s => [s, 0]));
 
     DAYS.forEach(d => {
       const sessions = weekData.sport?.[d.key]?.sessions || [];
       sessions.forEach(s => {
+        if (s.type && sessionsByType[s.type] != null) sessionsByType[s.type]++;
+
         sportMinutes += Number(s.minutes || 0);
         sportCalories += Number(s.calories || 0);
 
         if (s.type === "Joggen"){
+          jogSessions++;
           const km = Number(s.km || 0);
-          if (km) jogKm += km;
-
           const paceSec = parsePaceToSeconds(s.pace);
-          if (paceSec != null){
-            // average pace unweighted by distance (simple average)
-            jogPaceSum += paceSec;
-            jogPaceCount++;
+          if (km > 0){
+            jogKm += km;
+            if (paceSec != null) jogPaceWeightedSum += paceSec * km; // distance-weighted
           }
         }
       });
     });
 
-    // Reading
-    let readMinutes = 0, readPages = 0;
+    let readMinutes = 0, readPages = 0, finishedBooksWeek = 0;
     DAYS.forEach(d => {
       const r = weekData.reading?.[d.key];
       if (!r) return;
       readMinutes += Number(r.minutes || 0);
       readPages += Number(r.pages || 0);
+      if (r.finished) finishedBooksWeek++;
     });
 
-    // Affirmations
-    let affM = 0, affE = 0;
-    DAYS.forEach(d => {
-      const a = weekData.affirm?.[d.key];
-      if (!a) return;
-      if (a.morning) affM++;
-      if (a.evening) affE++;
-    });
-
-    // Supplements: total checked items across all days
     let suppItemsChecked = 0;
     DAYS.forEach(d => {
       const items = weekData.supplements?.[d.key]?.items || {};
       Object.values(items).forEach(v => { if (v) suppItemsChecked++; });
     });
 
-    const avgPace = jogPaceCount ? secondsToPace(jogPaceSum / jogPaceCount) : "–";
+    const avgPace = (jogKm > 0 && jogPaceWeightedSum > 0) ? secondsToPace(jogPaceWeightedSum / jogKm) : "–";
 
     return {
       sportMinutes, sportCalories,
+      jogSessions,
       jogKm: Number(jogKm.toFixed(1)),
       avgPace,
-      readMinutes, readPages,
-      affM, affE,
-      suppItemsChecked
+      suppItemsChecked,
+      readMinutes, readPages, finishedBooksWeek,
+      sessionsByType
     };
-  }
-
-  function kpi(num, label){
-    const el = document.createElement("div");
-    el.className = "kpi";
-    el.innerHTML = `<div class="num">${num}</div><div class="lbl">${label}</div>`;
-    return el;
   }
 
   function renderWeekKpis(){
     const c = countThisWeek();
-    weekKpis.innerHTML = "";
-    weekKpis.appendChild(kpi(`${c.sportMinutes}`, "Sport-Minuten (Woche)"));
-    weekKpis.appendChild(kpi(`${c.sportCalories}`, "Sport-Kalorien (Woche)"));
-    weekKpis.appendChild(kpi(`${c.jogKm}`, "Joggen-Kilometer (Woche)"));
-    weekKpis.appendChild(kpi(`${c.avgPace}`, "Ø Pace (Min/km)"));
-    weekKpis.appendChild(kpi(`${c.readMinutes}`, "Lesen-Minuten (Woche)"));
-    weekKpis.appendChild(kpi(`${c.readPages}`, "Lesen-Seiten (Woche)"));
-    weekKpis.appendChild(kpi(`${c.affM}/7`, "Affirmationen morgens"));
-    weekKpis.appendChild(kpi(`${c.affE}/7`, "Affirmationen abends"));
-    weekKpis.appendChild(kpi(`${c.suppItemsChecked}`, "Supplements abgehakt (Items)"));
+    weekKpisEl.innerHTML = "";
+    weekKpisEl.appendChild(kpi(`${c.sportMinutes}`, "Sport-Minuten (Woche)"));
+    weekKpisEl.appendChild(kpi(`${c.sportCalories}`, "Sport-Kalorien (Woche)"));
+    weekKpisEl.appendChild(kpi(`${c.jogSessions}`, "Joggen-Einheiten (Woche)"));
+    weekKpisEl.appendChild(kpi(`${c.jogKm}`, "Joggen-KM (Woche)"));
+    weekKpisEl.appendChild(kpi(`${c.avgPace}`, "Ø Pace (mm:ss / km)"));
+    weekKpisEl.appendChild(kpi(`${c.sessionsByType["Krafttraining"]||0}`, "Krafttraining (Woche)"));
+    weekKpisEl.appendChild(kpi(`${c.sessionsByType["Ringen"]||0}`, "Ringen (Woche)"));
+    weekKpisEl.appendChild(kpi(`${c.sessionsByType["Stretching"]||0}`, "Stretching (Woche)"));
+    weekKpisEl.appendChild(kpi(`${c.sessionsByType["Schwimmen"]||0}`, "Schwimmen (Woche)"));
+    weekKpisEl.appendChild(kpi(`${c.sessionsByType["Tennis"]||0}`, "Tennis (Woche)"));
+    weekKpisEl.appendChild(kpi(`${c.suppItemsChecked}`, "Supplements abgehakt (Items/Woche)"));
+    weekKpisEl.appendChild(kpi(`${c.readMinutes}`, "Lesen-Minuten (Woche)"));
+    weekKpisEl.appendChild(kpi(`${c.readPages}`, "Lesen-Seiten (Woche)"));
+    weekKpisEl.appendChild(kpi(`${c.finishedBooksWeek}`, "Bücher fertig (Woche)"));
   }
 
-  // ---------- navigation ----------
-  function rerenderAll(){
+  // ---------------- TOTAL KPIs ----------------
+  const totalKpisEl = document.getElementById("totalKpis");
+
+  function aggregateTotalsFromWeeks(){
+    let jogSessions = 0;
+    let jogKm = 0;
+    let jogPaceWeightedSum = 0;
+
+    const counts = { "Krafttraining":0, "Ringen":0, "Stretching":0, "Schwimmen":0, "Tennis":0 };
+    let sportMinutes = 0;
+    let sportCalories = 0;
+
+    let readMinutesTotal = 0;
+    let readPagesTotal = 0;
+
+    listAllWeeks().forEach(w => {
+      const sport = w.data.sport || {};
+      const reading = w.data.reading || {};
+
+      DAYS.forEach(d => {
+        const sessions = sport[d.key]?.sessions || [];
+        sessions.forEach(s => {
+          sportMinutes += Number(s.minutes || 0);
+          sportCalories += Number(s.calories || 0);
+
+          if (s.type === "Joggen"){
+            jogSessions++;
+            const km = Number(s.km || 0);
+            const paceSec = parsePaceToSeconds(s.pace);
+            if (km > 0){
+              jogKm += km;
+              if (paceSec != null) jogPaceWeightedSum += paceSec * km;
+            }
+          } else if (counts[s.type] != null){
+            counts[s.type]++;
+          }
+        });
+
+        const r = reading[d.key];
+        if (r){
+          readMinutesTotal += Number(r.minutes || 0);
+          readPagesTotal += Number(r.pages || 0);
+        }
+      });
+    });
+
+    const avgPace = (jogKm > 0 && jogPaceWeightedSum > 0) ? secondsToPace(jogPaceWeightedSum / jogKm) : "–";
+
+    return {
+      sportMinutes,
+      sportCalories,
+      jogSessions,
+      jogKm: Number(jogKm.toFixed(1)),
+      avgPace,
+      readMinutesTotal,
+      readPagesTotal,
+      ...counts
+    };
+  }
+
+  function renderTotalKpis(){
+    const totals = aggregateTotalsFromWeeks();
+    const namaz = countNamazTotals();
+
+    const totalNamazPrayers =
+      namaz.perPrayer.sabach + namaz.perPrayer.ogle + namaz.perPrayer.ikindi + namaz.perPrayer.aksam + namaz.perPrayer.yatsi;
+
+    totalKpisEl.innerHTML = "";
+    totalKpisEl.appendChild(kpi(`${totals.sportMinutes}`, "Sport-Minuten (gesamt)"));
+    totalKpisEl.appendChild(kpi(`${totals.sportCalories}`, "Sport-Kalorien (gesamt)"));
+    totalKpisEl.appendChild(kpi(`${totals.jogSessions}`, "Joggen-Einheiten (gesamt)"));
+    totalKpisEl.appendChild(kpi(`${totals.jogKm}`, "Joggen-KM (gesamt)"));
+    totalKpisEl.appendChild(kpi(`${totals.avgPace}`, "Ø Pace (gesamt, mm:ss/km)"));
+    totalKpisEl.appendChild(kpi(`${totals.Krafttraining}`, "Krafttraining (gesamt)"));
+    totalKpisEl.appendChild(kpi(`${totals.Ringen}`, "Ringen (gesamt)"));
+    totalKpisEl.appendChild(kpi(`${totals.Stretching}`, "Stretching (gesamt)"));
+    totalKpisEl.appendChild(kpi(`${totals.Schwimmen}`, "Schwimmen (gesamt)"));
+    totalKpisEl.appendChild(kpi(`${totals.Tennis}`, "Tennis (gesamt)"));
+    totalKpisEl.appendChild(kpi(`${totals.readMinutesTotal}`, "Lesen-Minuten (gesamt)"));
+    totalKpisEl.appendChild(kpi(`${totals.readPagesTotal}`, "Lesen-Seiten (gesamt)"));
+    totalKpisEl.appendChild(kpi(`${finishedBooks.length}`, "Bücher fertig (gesamt)"));
+    totalKpisEl.appendChild(kpi(`${totalNamazPrayers}`, "Namaz (Gebete gesamt)"));
+    totalKpisEl.appendChild(kpi(`${namaz.fullDays}`, "Namaz (vollständige Tage 5/5)"));
+    totalKpisEl.appendChild(kpi(`${namaz.years.toFixed(2)}`, "Namaz (Jahre ≈ Tage/365)"));
+  }
+
+  // ---------------- NAV + BUTTONS ----------------
+  function rerenderWeekParts(){
     renderWeekLabel();
     renderSupplementsDaily();
     renderSportMulti();
     renderReading();
-    renderAffirmations();
     renderWeekKpis();
+    renderTotalKpis();
+    renderFinishedBooksList();
+    renderNamazTotals();
   }
 
   document.getElementById("prevWeek").addEventListener("click", () => {
     currentMonday.setDate(currentMonday.getDate() - 7);
     weekData = lsGet(weekStorageKey(), emptyWeek());
-    rerenderAll();
+    rerenderWeekParts();
   });
+
   document.getElementById("nextWeek").addEventListener("click", () => {
     currentMonday.setDate(currentMonday.getDate() + 7);
     weekData = lsGet(weekStorageKey(), emptyWeek());
-    rerenderAll();
+    rerenderWeekParts();
   });
+
   document.getElementById("todayWeek").addEventListener("click", () => {
     currentMonday = startOfWeekMonday(new Date());
     weekData = lsGet(weekStorageKey(), emptyWeek());
-    rerenderAll();
+    rerenderWeekParts();
   });
+
   document.getElementById("resetWeek").addEventListener("click", () => {
     localStorage.removeItem(weekStorageKey());
     weekData = emptyWeek();
     saveWeek();
-    rerenderAll();
+    rerenderWeekParts();
   });
-  document.getElementById("refreshAll").addEventListener("click", renderWeekKpis);
 
-  // init
-  rerenderAll();
+  document.getElementById("refreshWeek").addEventListener("click", renderWeekKpis);
+
+  document.getElementById("refreshTotals").addEventListener("click", () => {
+    renderTotalKpis();
+    renderFinishedBooksList();
+    renderNamazTotals();
+  });
+
+  // Namaz nav buttons
+  document.getElementById("calPrev").addEventListener("click", () => {
+    calMonth = new Date(calMonth.getFullYear(), calMonth.getMonth()-1, 1);
+    renderCalendar();
+  });
+
+  document.getElementById("calNext").addEventListener("click", () => {
+    calMonth = new Date(calMonth.getFullYear(), calMonth.getMonth()+1, 1);
+    renderCalendar();
+  });
+
+  document.getElementById("calToday").addEventListener("click", () => {
+    const t = new Date();
+    calMonth = new Date(t.getFullYear(), t.getMonth(), 1);
+    selectNamazDate(isoDate(t));
+    renderCalendar();
+  });
+
+  document.getElementById("jumpBtn").addEventListener("click", () => {
+    const iso = jumpDateEl.value;
+    if (!iso) return;
+    const d = parseIso(iso);
+    calMonth = new Date(d.getFullYear(), d.getMonth(), 1);
+    selectNamazDate(iso);
+    renderCalendar();
+  });
+
+  document.getElementById("clearDay").addEventListener("click", () => {
+    ensureNamazDay(selectedIso);
+    NAMAZ_PRAYERS.forEach(p => namazDB[selectedIso][p.id] = false);
+    namazDB[selectedIso].note = "";
+    saveNamaz();
+    selectNamazDate(selectedIso, true);
+    renderNamazTotals();
+    renderTotalKpis();
+    renderCalendar();
+  });
+
+  document.getElementById("closeDay").addEventListener("click", () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  });
+
+  // ---------------- INIT ----------------
+  renderWeekLabel();
+  renderSupplementsDaily();
+  renderSportMulti();
+  renderReading();
+  renderWeekKpis();
+
+  ensureNamazDay(selectedIso);
+  saveNamaz();
+
+  renderNamazTotals();
+  renderTotalKpis();
+  renderFinishedBooksList();
+  renderCalendar();
 })();
 </script>
 
