@@ -292,7 +292,8 @@
       <button id="saveProfile">Speichern</button>
       <button id="exportBtn" class="ghost" title="Backup als JSON">Export</button>
       <button id="importBtn" class="ghost" title="Restore aus JSON">Import</button>
-      <input id="importFile" type="file" accept="application/json" style="display:none;" />
+    <input id="importFile" type="file" accept="application/json"
+       style="position:absolute; left:-9999px; width:1px; height:1px; opacity:0;" />
     </div>
   </div>
 </div>
@@ -364,7 +365,8 @@
         <button id="shotBtn">📷 Screenshot importieren (Test)</button>
         <div id="ocrStatus" class="small muted"></div>
       </div>
-      <input id="shotFile" type="file" accept="image/*" style="display:none;" />
+    <input id="shotFile" type="file" accept="image/*"
+       style="position:absolute; left:-9999px; width:1px; height:1px; opacity:0;" />
 
       <div id="ocrModal" class="card">
         <h3>Screenshot Import – Vorschlag</h3>
