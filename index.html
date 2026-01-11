@@ -17,21 +17,19 @@
     --warn:#ffcc00;
     --bad:#ff5b5b;
   }
-
   body{
     background:var(--bg);
     color:var(--fg);
     font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
     max-width: 1250px;
     margin: 34px auto;
-    padding: 0 16px 40px;
+    padding: 0 16px 44px;
   }
-
-  h1{ margin:0; font-size: 30px; letter-spacing:-0.3px; }
-  h2{ margin:6px 0 0; font-size: 16px; color: var(--muted); font-weight: 600; }
-  h3{ margin:0 0 10px; font-size: 16px; }
-  .small{ font-size: 12px; color: var(--muted); }
-  .muted{ color: var(--muted); }
+  h1{ margin:0; font-size:30px; letter-spacing:-0.3px; }
+  h2{ margin:6px 0 0; font-size:16px; color:var(--muted); font-weight:600; }
+  h3{ margin:0 0 10px; font-size:16px; }
+  .small{ font-size:12px; color:var(--muted); }
+  .muted{ color:var(--muted); }
   hr{ border:none; border-top:1px solid var(--line); margin: 18px 0; }
 
   .topbar{
@@ -69,8 +67,6 @@
     border-radius: 12px;
     padding: 8px 10px;
   }
-  input[type="checkbox"]{ width:auto; }
-
   button{
     border:1px solid var(--line);
     background: #111;
@@ -91,7 +87,7 @@
     margin-top: 12px;
   }
 
-  /* ============== DASHBOARD ============== */
+  /* ===== DASHBOARD ===== */
   .tabs{
     display:flex; gap:8px; flex-wrap:wrap;
     margin-top: 10px;
@@ -163,7 +159,7 @@
     border-radius: 16px;
   }
 
-  /* ============== ENTRY ============== */
+  /* ===== ENTRY ===== */
   .entryGrid{
     display:grid;
     grid-template-columns: 0.9fr 1.1fr;
@@ -188,21 +184,10 @@
     gap:10px;
     flex-wrap:wrap;
   }
-  .tag{
-    display:inline-flex;
-    align-items:center;
-    gap:8px;
-    border:1px solid var(--line);
-    background:#0f0f0f;
-    border-radius:999px;
-    padding:6px 10px;
-    font-size:12px;
-    color: var(--muted);
-  }
 
   .grid7{
     display:grid;
-    grid-template-columns: repeat(6, minmax(140px, 1fr)) auto;
+    grid-template-columns: repeat(5, minmax(140px, 1fr)) auto;
     gap:8px;
     align-items:start;
     margin-top: 10px;
@@ -210,14 +195,13 @@
   @media (max-width: 980px){
     .grid7{ grid-template-columns: 1fr 1fr; }
   }
-
   .hint{
     font-size:12px;
     color: var(--muted);
     margin-top: 8px;
   }
 
-  /* ============== WEEK STRIP ============== */
+  /* ===== WEEK STRIP ===== */
   .weekStrip{
     display:grid;
     grid-template-columns: repeat(7, 1fr);
@@ -236,7 +220,7 @@
   .dayCard .d{ font-weight: 800; }
   .dayCard .sub{ margin-top:6px; font-size:12px; color:var(--muted); display:flex; flex-direction:column; gap:4px; }
 
-  /* ============== MONTH CALENDAR ============== */
+  /* ===== MONTH CALENDAR ===== */
   .calHeader{
     display:flex;
     justify-content:space-between;
@@ -258,7 +242,7 @@
     border-right:1px solid var(--line);
     padding: 10px;
     vertical-align: top;
-    height: 70px;
+    height: 72px;
   }
   .calendar th:last-child, .calendar td:last-child{ border-right:none; }
   .calendar tr:last-child td{ border-bottom:none; }
@@ -281,7 +265,6 @@
     font-size: 12px;
   }
   .dim{ color:#444; }
-
 </style>
 </head>
 
@@ -290,8 +273,8 @@
 <div class="topbar">
   <div>
     <h1 id="appTitle">Sport Tracker</h1>
-    <h2 id="appSub">Mehrere Sessions pro Tag · Auswertung: Tag/Woche/Monat/Jahr/Gesamt</h2>
-    <div class="small">Speicherung lokal im Browser (Archiv). Updates am Code löschen deine Daten nicht – außer Privatmodus/Website-Daten löschen.</div>
+    <h2>Mehrere Sessions pro Tag · Auswertung: Tag/Woche/Monat/Jahr/Gesamt</h2>
+    <div class="small">Speicherung lokal im Browser (Archiv). Code-Updates löschen Daten nicht (außer Privatmodus/Website-Daten löschen).</div>
   </div>
 
   <div class="row" style="min-width:280px;">
@@ -312,7 +295,7 @@
   <div class="row" style="justify-content:space-between;">
     <div>
       <h3>📊 Übersicht</h3>
-      <div class="small">Wähle Zeitraum – alles ist auf einen Blick, ohne langes Scrollen.</div>
+      <div class="small">Wähle Zeitraum – alles auf einen Blick, ohne Scroll-Marathon.</div>
     </div>
     <div class="row">
       <input id="focusDate" type="date" style="max-width:220px;" />
@@ -357,7 +340,7 @@
   <div class="entryGrid">
     <div class="panel">
       <div class="row" style="justify-content:space-between;">
-        <div>
+        <div style="min-width:220px;">
           <div class="small muted">Datum</div>
           <input id="entryDate" type="date" />
         </div>
@@ -368,7 +351,7 @@
       </div>
 
       <div class="hint">
-        Pace Format: <b>mm:ss</b> (z.B. <b>5:30</b>). Kein 5:60 mehr – wird korrekt normalisiert.
+        Pace Format: <b>mm:ss</b> (z.B. <b>5:30</b>). Kein 5:60 – wird sauber normalisiert.
       </div>
 
       <div class="sessionList" id="sessionList"></div>
@@ -397,198 +380,205 @@
 <script>
 (() => {
 /* ===================== STORAGE ===================== */
-const KEY_DATA = "sport_tracker_data_v1";
-const KEY_PROFILE = "sport_tracker_profile_v1";
+const KEY_DATA = "sport_tracker_data_v2";
+const KEY_PROFILE = "sport_tracker_profile_v2";
 
 /* ===================== CONSTANTS ===================== */
-const SPORTS = [
-  "Krafttraining",
-  "Joggen",
-  "Stretching",
-  "Ringen",
-  "Schwimmen",
-  "Tennis"
-];
-
-const KM_SPORTS = ["Joggen", "Schwimmen"];
+const SPORTS = ["Krafttraining","Joggen","Stretching","Ringen","Schwimmen","Tennis"];
+const KM_SPORTS = new Set(["Joggen","Schwimmen"]);
 
 /* ===================== HELPERS ===================== */
-const pad = n => String(n).padStart(2, "0");
+const pad = n => String(n).padStart(2,"0");
 const iso = d => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
 
 function parsePace(p){
   if(!p || !p.includes(":")) return null;
   const [m,s] = p.split(":").map(Number);
-  if(!Number.isFinite(m) || !Number.isFinite(s)) return null;
+  if(!Number.isFinite(m) || !Number.isFinite(s) || s<0 || s>59 || m<0) return null;
   return m*60 + s;
 }
 function paceFromSeconds(sec){
   let total = Math.round(sec);
-  const m = Math.floor(total / 60);
+  const m = Math.floor(total/60);
   const s = total % 60;
   return `${m}:${pad(s)}`;
 }
 
 /* ===================== STATE ===================== */
-let db = JSON.parse(localStorage.getItem(KEY_DATA) || "{}");
+let db = (() => {
+  try { return JSON.parse(localStorage.getItem(KEY_DATA) || "{}"); }
+  catch { return {}; }
+})();
 let profile = localStorage.getItem(KEY_PROFILE) || "";
 
+/* ===================== DOM ===================== */
+const profileInput = document.getElementById("profileName");
+const saveProfileBtn = document.getElementById("saveProfile");
+const exportBtn = document.getElementById("exportBtn");
+const importBtn = document.getElementById("importBtn");
+const importFile = document.getElementById("importFile");
+
+const entryDateInput = document.getElementById("entryDate");
+const focusDateInput = document.getElementById("focusDate");
+const todayBtn = document.getElementById("todayBtn");
+
+const sessionList = document.getElementById("sessionList");
+const kpiGrid = document.getElementById("kpiGrid");
+const rangeLabel = document.getElementById("rangeLabel");
+
+const weekStripWrap = document.getElementById("weekStripWrap");
+const weekStrip = document.getElementById("weekStrip");
+
+const chartA = document.getElementById("chartA");
+const chartB = document.getElementById("chartB");
+
+const monthCal = document.getElementById("monthCal");
+const calLabel = document.getElementById("calLabel");
+const calPrev = document.getElementById("calPrev");
+const calNext = document.getElementById("calNext");
+const calThis = document.getElementById("calThis");
+
+/* ===================== SAVE/LOAD ===================== */
 function saveDB(){ localStorage.setItem(KEY_DATA, JSON.stringify(db)); }
 function saveProfile(){
   localStorage.setItem(KEY_PROFILE, profile);
   document.getElementById("appTitle").textContent = profile || "Sport Tracker";
 }
 
-/* ===================== PROFILE ===================== */
-const profileInput = document.getElementById("profileName");
-document.getElementById("saveProfile").onclick = () => {
-  profile = profileInput.value.trim();
-  saveProfile();
-};
+/* ===================== PROFILE INIT ===================== */
 profileInput.value = profile;
 saveProfile();
+saveProfileBtn.onclick = () => { profile = profileInput.value.trim(); saveProfile(); };
 
-/* ===================== DATE CONTROL ===================== */
-const entryDateInput = document.getElementById("entryDate");
-const focusDateInput = document.getElementById("focusDate");
-const todayBtn = document.getElementById("todayBtn");
-
-let today = new Date();
-entryDateInput.value = iso(today);
-focusDateInput.value = iso(today);
+/* ===================== DATE INIT ===================== */
+const now = new Date();
+entryDateInput.value = iso(now);
+focusDateInput.value = iso(now);
 
 todayBtn.onclick = () => {
   focusDateInput.value = iso(new Date());
   renderAll();
 };
 
-/* ===================== SESSIONS ===================== */
-function getDay(date){
-  if(!db[date]) db[date] = [];
-  return db[date];
+/* ===================== DATA MODEL ===================== */
+/**
+db[YYYY-MM-DD] = [
+  { type, duration(min), calories, km, pace }
+]
+*/
+
+function getDay(dateIso){
+  if(!Array.isArray(db[dateIso])) db[dateIso] = [];
+  return db[dateIso];
 }
 
-function addSession(date){
-  getDay(date).push({
-    type:"",
-    duration:"",
-    calories:"",
-    km:"",
-    pace:""
-  });
+function addSession(dateIso){
+  getDay(dateIso).push({ type:"", duration:"", calories:"", km:"", pace:"" });
   saveDB();
 }
 
-function removeSession(date, idx){
-  getDay(date).splice(idx,1);
-  if(getDay(date).length===0) delete db[date];
+function removeSession(dateIso, idx){
+  const arr = getDay(dateIso);
+  arr.splice(idx,1);
+  if(arr.length===0) delete db[dateIso];
   saveDB();
 }
 
-/* ===================== RENDER SESSIONS ===================== */
-const sessionList = document.getElementById("sessionList");
 document.getElementById("addSessionBtn").onclick = () => {
   addSession(entryDateInput.value);
   renderSessions();
+  updateAfterEdit();
 };
+
 document.getElementById("clearDayBtn").onclick = () => {
   delete db[entryDateInput.value];
   saveDB();
   renderAll();
 };
 
+entryDateInput.onchange = () => renderSessions();
+focusDateInput.onchange = () => renderAll();
+
+/* ===================== IMPORTANT FIX ===================== */
+/* Beim Tippen NICHT renderSessions() neu bauen -> sonst Fokusverlust */
+function updateAfterEdit(){
+  renderDashboard();
+  renderCharts();
+  renderCalendar();
+}
+
+/* ===================== RENDER SESSIONS ===================== */
 function renderSessions(){
-  const date = entryDateInput.value;
+  const dateIso = entryDateInput.value;
+  const sessions = getDay(dateIso);
+
   sessionList.innerHTML = "";
-  const sessions = getDay(date);
 
   if(!sessions.length){
     sessionList.innerHTML = `<div class="small muted">Noch keine Sessions an diesem Tag.</div>`;
     return;
   }
 
-  sessions.forEach((s, i) => {
-    const isKm = KM_SPORTS.includes(s.type);
+  sessions.forEach((s, idx) => {
+    const isKm = KM_SPORTS.has(s.type);
 
-    const div = document.createElement("div");
-    div.className = "session";
-    div.innerHTML = `
+    const wrap = document.createElement("div");
+    wrap.className = "session";
+
+    wrap.innerHTML = `
       <div class="sessionHead">
-        <strong>Session ${i+1}</strong>
+        <strong>Session ${idx+1}</strong>
         <button class="danger">Löschen</button>
       </div>
+
       <div class="grid7">
-        <select>
+        <select aria-label="Sportart">
           <option value="">Sportart</option>
-          ${SPORTS.map(x=>`<option ${x===s.type?"selected":""}>${x}</option>`).join("")}
+          ${SPORTS.map(x => `<option value="${x}" ${x===s.type?"selected":""}>${x}</option>`).join("")}
         </select>
-        <input type="number" placeholder="Dauer (min)" value="${s.duration}">
-        <input type="number" placeholder="Kalorien" value="${s.calories}">
-        <input type="number" placeholder="Kilometer" value="${s.km}" ${isKm?"":"disabled"}>
-        <input placeholder="Pace mm:ss" value="${s.pace}" ${isKm?"":"disabled"}>
+
+        <input type="number" inputmode="numeric" min="0" placeholder="Dauer (min)" value="${s.duration ?? ""}">
+        <input type="number" inputmode="numeric" min="0" placeholder="Kalorien" value="${s.calories ?? ""}">
+        <input type="number" inputmode="decimal" min="0" step="0.1" placeholder="Kilometer" value="${s.km ?? ""}" ${isKm?"":"disabled"}>
+        <input placeholder="Pace mm:ss" value="${s.pace ?? ""}" ${isKm?"":"disabled"}>
+        <div></div>
       </div>
     `;
 
-    const [sel,dur,cal,km,pace] = div.querySelectorAll("select,input");
+    const delBtn = wrap.querySelector("button");
+    const sel = wrap.querySelector("select");
+    const inputs = wrap.querySelectorAll("input");
+    const dur = inputs[0];
+    const cal = inputs[1];
+    const km  = inputs[2];
+    const pace= inputs[3];
 
+    delBtn.onclick = () => {
+      removeSession(dateIso, idx);
+      renderAll();
+    };
+
+    // Sportart-Wechsel: hier ist Re-Render ok, weil Felder enabled/disabled werden
     sel.onchange = () => {
       s.type = sel.value;
+      saveDB();
       renderSessions();
-      renderAll();
-    };
-    dur.oninput = () => { s.duration = dur.value; saveDB(); renderAll(); };
-    cal.oninput = () => { s.calories = cal.value; saveDB(); renderAll(); };
-    km.oninput  = () => { s.km = km.value; saveDB(); renderAll(); };
-    pace.oninput= () => { s.pace = pace.value; saveDB(); renderAll(); };
-
-    div.querySelector("button").onclick = () => {
-      removeSession(date,i);
-      renderAll();
+      updateAfterEdit();
     };
 
-    sessionList.appendChild(div);
+    // LIVE speichern ohne Fokusverlust
+    dur.oninput = () => { s.duration = dur.value; saveDB(); updateAfterEdit(); };
+    cal.oninput = () => { s.calories = cal.value; saveDB(); updateAfterEdit(); };
+    km.oninput  = () => { s.km = km.value; saveDB(); updateAfterEdit(); };
+    pace.oninput= () => { s.pace = pace.value; saveDB(); updateAfterEdit(); };
+
+    sessionList.appendChild(wrap);
   });
 }
 
-/* ===================== AGGREGATION ===================== */
-function aggregate(range){
-  let total = {
-    calories:0,
-    minutes:0,
-    km:0,
-    paceSum:0,
-    paceKm:0,
-    sessions:0
-  };
-
-  Object.entries(db).forEach(([date,sessions]) => {
-    if(!inRange(date,range)) return;
-
-    sessions.forEach(s=>{
-      total.sessions++;
-      total.minutes += Number(s.duration||0);
-      total.calories += Number(s.calories||0);
-      if(KM_SPORTS.includes(s.type)){
-        const km = Number(s.km||0);
-        const ps = parsePace(s.pace);
-        if(km>0){
-          total.km += km;
-          if(ps!=null){
-            total.paceSum += ps*km;
-            total.paceKm += km;
-          }
-        }
-      }
-    });
-  });
-
-  total.avgPace = total.paceKm ? paceFromSeconds(total.paceSum/total.paceKm) : "–";
-  return total;
-}
-
-/* ===================== RANGE ===================== */
+/* ===================== RANGE / TABS ===================== */
 let activeRange = "day";
-document.querySelectorAll(".tab").forEach(t=>{
+document.querySelectorAll(".tab").forEach(t => {
   t.onclick = () => {
     document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));
     t.classList.add("active");
@@ -597,135 +587,73 @@ document.querySelectorAll(".tab").forEach(t=>{
   };
 });
 
-function inRange(date,range){
-  const d = new Date(date);
+function inRange(dateIso, range){
+  const d = new Date(dateIso);
   const f = new Date(focusDateInput.value);
+  if(range==="day") return dateIso === focusDateInput.value;
 
-  if(range==="day") return date===focusDateInput.value;
   if(range==="week"){
+    // "letzte 7 Tage" rückwärts inkl. Fokusdatum
     const diff = (d - f) / 86400000;
-    return diff>=-6 && diff<=0;
+    return diff >= -6 && diff <= 0;
   }
-  if(range==="month"){
-    return d.getMonth()===f.getMonth() && d.getFullYear()===f.getFullYear();
-  }
-  if(range==="year"){
-    return d.getFullYear()===f.getFullYear();
-  }
+  if(range==="month") return d.getMonth()===f.getMonth() && d.getFullYear()===f.getFullYear();
+  if(range==="year")  return d.getFullYear()===f.getFullYear();
   return true; // all
 }
 
-/* ===================== DASHBOARD ===================== */
-const kpiGrid = document.getElementById("kpiGrid");
-function renderDashboard(){
-  const a = aggregate(activeRange);
-  kpiGrid.innerHTML = `
-    <div class="kpi"><div class="v">${a.calories}</div><div class="l">Kalorien</div></div>
-    <div class="kpi"><div class="v">${a.minutes}</div><div class="l">Minuten</div></div>
-    <div class="kpi"><div class="v">${a.km.toFixed(1)}</div><div class="l">Kilometer</div></div>
-    <div class="kpi"><div class="v">${a.avgPace}</div><div class="l">Ø Pace</div></div>
-  `;
-}
+/* ===================== AGGREGATION ===================== */
+function aggregate(range){
+  const total = { calories:0, minutes:0, km:0, paceSum:0, paceKm:0, sessions:0 };
 
-/* ===================== PLACEHOLDER ===================== */
-function renderCharts(){}
-function renderCalendar(){}
+  for(const [dateIso, sessions] of Object.entries(db)){
+    if(!inRange(dateIso, range)) continue;
+    if(!Array.isArray(sessions)) continue;
 
-/* ===================== MASTER ===================== */
-function renderAll(){
-  renderSessions();
-  renderDashboard();
-  renderCharts();
-  renderCalendar();
-}
+    sessions.forEach(s => {
+      total.sessions++;
+      total.minutes += Number(s.duration || 0);
+      total.calories += Number(s.calories || 0);
 
-renderAll();
-/* ===================== EXPORT / IMPORT (Backup) ===================== */
-const exportBtn = document.getElementById("exportBtn");
-const importBtn = document.getElementById("importBtn");
-const importFile = document.getElementById("importFile");
-
-exportBtn.onclick = () => {
-  const payload = {
-    version: 1,
-    exportedAt: new Date().toISOString(),
-    profile,
-    db
-  };
-  const blob = new Blob([JSON.stringify(payload, null, 2)], {type:"application/json"});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = `sport-tracker-backup-${iso(new Date())}.json`;
-  document.body.appendChild(a);
-  a.click();
-  a.remove();
-  URL.revokeObjectURL(url);
-};
-
-importBtn.onclick = () => importFile.click();
-
-importFile.onchange = async () => {
-  const file = importFile.files?.[0];
-  if(!file) return;
-  try{
-    const text = await file.text();
-    const payload = JSON.parse(text);
-
-    // akzeptiere entweder komplettes payload oder nur db
-    if(payload && payload.db && typeof payload.db === "object"){
-      db = payload.db;
-      if(typeof payload.profile === "string"){
-        profile = payload.profile;
-        profileInput.value = profile;
-        saveProfile();
+      if(KM_SPORTS.has(s.type)){
+        const km = Number(s.km || 0);
+        const ps = parsePace(s.pace);
+        if(km > 0){
+          total.km += km;
+          if(ps != null){
+            total.paceSum += ps * km; // distanzgewichtet
+            total.paceKm += km;
+          }
+        }
       }
-      saveDB();
-      renderAll();
-      alert("Import erfolgreich ✅");
-    } else if(payload && typeof payload === "object"){
-      db = payload;
-      saveDB();
-      renderAll();
-      alert("Import erfolgreich ✅");
-    } else {
-      alert("Import fehlgeschlagen: falsches Format.");
-    }
-  } catch(e){
-    alert("Import fehlgeschlagen: Datei konnte nicht gelesen werden.");
-  } finally {
-    importFile.value = "";
+    });
   }
-};
 
-/* ===================== WEEK STRIP (Tageskalorien in der Woche) ===================== */
-const weekStripWrap = document.getElementById("weekStripWrap");
-const weekStrip = document.getElementById("weekStrip");
-const rangeLabel = document.getElementById("rangeLabel");
+  total.avgPace = total.paceKm ? paceFromSeconds(total.paceSum/total.paceKm) : "–";
+  return total;
+}
 
+/* ===================== WEEK STRIP HELPERS ===================== */
 function mondayOf(dateIso){
   const d = new Date(dateIso);
   const day = d.getDay();
-  const diff = day === 0 ? -6 : 1 - day;
+  const diff = day===0 ? -6 : 1-day;
   d.setDate(d.getDate()+diff);
   return iso(d);
 }
-
 function addDays(dateIso, n){
   const d = new Date(dateIso);
   d.setDate(d.getDate()+n);
   return iso(d);
 }
-
 function sumForDate(dateIso){
   const sessions = db[dateIso] || [];
   let calories=0, minutes=0, km=0, paceSum=0, paceKm=0, count=0;
-
-  sessions.forEach(s=>{
+  sessions.forEach(s => {
     count++;
     minutes += Number(s.duration||0);
     calories += Number(s.calories||0);
-    if(KM_SPORTS.includes(s.type)){
+    if(KM_SPORTS.has(s.type)){
       const k = Number(s.km||0);
       const ps = parsePace(s.pace);
       if(k>0){
@@ -734,258 +662,19 @@ function sumForDate(dateIso){
       }
     }
   });
-
-  return {
-    calories,
-    minutes,
-    km,
-    avgPace: paceKm ? paceFromSeconds(paceSum/paceKm) : "–",
-    sessions: count
-  };
+  return { calories, minutes, km, avgPace: paceKm ? paceFromSeconds(paceSum/paceKm) : "–", sessions: count };
 }
 
-/* ===================== CHARTS (Canvas) ===================== */
-const chartA = document.getElementById("chartA");
-const chartB = document.getElementById("chartB");
-
-function clearCanvas(c){
-  const ctx = c.getContext("2d");
-  ctx.clearRect(0,0,c.width,c.height);
-}
-
-function drawAxes(ctx, w, h, padL, padB){
-  ctx.strokeStyle = "#202020";
-  ctx.lineWidth = 1;
-  // y-axis
-  ctx.beginPath();
-  ctx.moveTo(padL, 10);
-  ctx.lineTo(padL, h - padB);
-  ctx.stroke();
-  // x-axis
-  ctx.beginPath();
-  ctx.moveTo(padL, h - padB);
-  ctx.lineTo(w - 10, h - padB);
-  ctx.stroke();
-}
-
-function drawBars(ctx, values, labels, title){
-  const w = ctx.canvas.width;
-  const h = ctx.canvas.height;
-  const padL = 40;
-  const padB = 26;
-
-  ctx.fillStyle = "#ffffff";
-  ctx.font = "14px system-ui";
-  ctx.fillText(title, 12, 18);
-
-  drawAxes(ctx, w, h, padL, padB);
-
-  const maxVal = Math.max(1, ...values);
-  const innerW = (w - 10) - padL;
-  const innerH = (h - padB) - 24;
-  const n = values.length;
-  const gap = 6;
-  const barW = Math.max(6, (innerW - gap*(n-1)) / n);
-
-  values.forEach((v, i) => {
-    const x = padL + i*(barW+gap);
-    const bh = (v / maxVal) * innerH;
-    const y = (h - padB) - bh;
-
-    ctx.fillStyle = "rgba(0,255,106,0.55)";
-    ctx.fillRect(x, y, barW, bh);
-
-    ctx.fillStyle = "#9a9a9a";
-    ctx.font = "10px system-ui";
-    const lab = labels[i] ?? "";
-    ctx.fillText(lab, x, h - 10);
-  });
-}
-
-function drawLine(ctx, values, labels, title){
-  const w = ctx.canvas.width;
-  const h = ctx.canvas.height;
-  const padL = 40;
-  const padB = 26;
-
-  ctx.fillStyle = "#ffffff";
-  ctx.font = "14px system-ui";
-  ctx.fillText(title, 12, 18);
-
-  drawAxes(ctx, w, h, padL, padB);
-
-  const maxVal = Math.max(1, ...values);
-  const innerW = (w - 10) - padL;
-  const innerH = (h - padB) - 24;
-  const n = values.length;
-
-  const stepX = n > 1 ? innerW/(n-1) : innerW;
-
-  // line
-  ctx.strokeStyle = "rgba(0,255,106,0.9)";
-  ctx.lineWidth = 2;
-  ctx.beginPath();
-  values.forEach((v, i) => {
-    const x = padL + i*stepX;
-    const y = (h - padB) - (v/maxVal)*innerH;
-    if(i===0) ctx.moveTo(x,y);
-    else ctx.lineTo(x,y);
-  });
-  ctx.stroke();
-
-  // points + labels
-  values.forEach((v, i) => {
-    const x = padL + i*stepX;
-    const y = (h - padB) - (v/maxVal)*innerH;
-
-    ctx.fillStyle = "rgba(0,255,106,1)";
-    ctx.beginPath();
-    ctx.arc(x,y,3,0,Math.PI*2);
-    ctx.fill();
-
-    ctx.fillStyle = "#9a9a9a";
-    ctx.font = "10px system-ui";
-    const lab = labels[i] ?? "";
-    ctx.fillText(lab, x-6, h - 10);
-  });
-}
-
-function getMonthDays(focusIso){
-  const d = new Date(focusIso);
-  const y = d.getFullYear();
-  const m = d.getMonth();
-  const first = new Date(y,m,1);
-  const last = new Date(y,m+1,0);
-  const days = last.getDate();
-  const out = [];
-  for(let i=1;i<=days;i++){
-    out.push(iso(new Date(y,m,i)));
-  }
-  return out;
-}
-
-function weekNumberISO(dateIso){
-  // ISO week number
-  const d = new Date(dateIso);
-  d.setHours(0,0,0,0);
-  d.setDate(d.getDate() + 3 - ((d.getDay() + 6) % 7));
-  const week1 = new Date(d.getFullYear(), 0, 4);
-  return 1 + Math.round(((d - week1) / 86400000 - 3 + ((week1.getDay()+6)%7)) / 7);
-}
-
-function getYearWeeks(focusIso){
-  const d = new Date(focusIso);
-  const y = d.getFullYear();
-  // we iterate days, bucket by ISO week
-  const buckets = new Map(); // week -> km
-  const start = new Date(y,0,1);
-  const end = new Date(y,11,31);
-  for(let cur = new Date(start); cur <= end; cur.setDate(cur.getDate()+1)){
-    const dateKey = iso(cur);
-    const wn = weekNumberISO(dateKey);
-    const sum = sumForDate(dateKey);
-    const prev = buckets.get(wn) || 0;
-    buckets.set(wn, prev + Number(sum.km||0));
-  }
-  // produce arrays week 1..53
-  const weeks = [];
-  const kms = [];
-  for(let w=1; w<=53; w++){
-    if(!buckets.has(w) && w>52) break;
-    weeks.push(w);
-    kms.push(Number((buckets.get(w)||0).toFixed(2)));
-  }
-  return { weeks, kms };
-}
-
-/* ===================== RENDER CHARTS ===================== */
-function renderCharts(){
-  const f = focusDateInput.value;
-
-  // Chart A: month daily calories bars
-  clearCanvas(chartA);
-  const ctxA = chartA.getContext("2d");
-  const days = getMonthDays(f);
-  const valsA = days.map(d => sumForDate(d).calories);
-  const labelsA = days.map(d => String(Number(d.slice(-2)))); // day number
-  const monthName = new Date(f).toLocaleString("de-DE", { month:"long", year:"numeric" });
-  drawBars(ctxA, valsA, labelsA, `Kalorien pro Tag (${monthName})`);
-
-  // Chart B: year weekly km line
-  clearCanvas(chartB);
-  const ctxB = chartB.getContext("2d");
-  const { weeks, kms } = getYearWeeks(f);
-  // label sparsely: every 4 weeks
-  const labelsB = weeks.map(w => (w%4===0 ? String(w) : ""));
-  const year = new Date(f).getFullYear();
-  drawLine(ctxB, kms, labelsB, `Kilometer pro Woche (${year})`);
-}
-
-/* ===================== MONTH CALENDAR (✔ if trained) ===================== */
-const monthCal = document.getElementById("monthCal");
-const calLabel = document.getElementById("calLabel");
-const calPrev = document.getElementById("calPrev");
-const calNext = document.getElementById("calNext");
-const calThis = document.getElementById("calThis");
-
-let calMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
-
-calPrev.onclick = () => { calMonth = new Date(calMonth.getFullYear(), calMonth.getMonth()-1, 1); renderCalendar(); };
-calNext.onclick = () => { calMonth = new Date(calMonth.getFullYear(), calMonth.getMonth()+1, 1); renderCalendar(); };
-calThis.onclick = () => { calMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1); renderCalendar(); };
-
-function renderCalendar(){
-  const y = calMonth.getFullYear();
-  const m = calMonth.getMonth();
-  const monthName = calMonth.toLocaleString("de-DE", { month:"long", year:"numeric" });
-  calLabel.textContent = monthName;
-
-  const first = new Date(y,m,1);
-  const last = new Date(y,m+1,0);
-  const daysInMonth = last.getDate();
-  const jsDay = first.getDay(); // Sun=0
-  const offset = (jsDay===0 ? 6 : jsDay-1); // Mon=0
-
-  const headers = ["Mo","Di","Mi","Do","Fr","Sa","So"];
-  let html = "<thead><tr>" + headers.map(h=>`<th class="small muted">${h}</th>`).join("") + "</tr></thead><tbody>";
-
-  let dayNum = 1 - offset;
-  for(let row=0; row<6; row++){
-    html += "<tr>";
-    for(let col=0; col<7; col++){
-      if(dayNum < 1 || dayNum > daysInMonth){
-        html += `<td class="dim">&nbsp;</td>`;
-      } else {
-        const d = new Date(y,m,dayNum);
-        const dateKey = iso(d);
-        const trained = Array.isArray(db[dateKey]) && db[dateKey].length > 0;
-
-        html += `<td>
-          <div class="calCell">
-            <div style="font-weight:800;">${dayNum}</div>
-            ${trained ? `<div class="check">✓</div>` : ""}
-          </div>
-          <div class="small muted" style="margin-top:6px;">
-            ${trained ? `${sumForDate(dateKey).calories} kcal · ${sumForDate(dateKey).minutes} min` : ""}
-          </div>
-        </td>`;
-      }
-      dayNum++;
-    }
-    html += "</tr>";
-  }
-  html += "</tbody>";
-  monthCal.innerHTML = html;
-}
-
-/* ===================== RANGE LABEL + WEEK STRIP ===================== */
+/* ===================== DASHBOARD (KPIs + LABEL + WEEK STRIP) ===================== */
 function renderRangeLabelAndStrip(){
   const f = new Date(focusDateInput.value);
 
   if(activeRange==="day"){
     rangeLabel.textContent = `Tag: ${f.toLocaleDateString("de-DE")}`;
     weekStripWrap.style.display = "none";
+    return;
   }
+
   if(activeRange==="week"){
     const mon = mondayOf(focusDateInput.value);
     const sun = addDays(mon, 6);
@@ -1008,55 +697,52 @@ function renderRangeLabelAndStrip(){
       `;
       weekStrip.appendChild(card);
     }
+    return;
   }
+
   if(activeRange==="month"){
     rangeLabel.textContent = `Monat: ${f.toLocaleDateString("de-DE", { month:"long", year:"numeric" })}`;
     weekStripWrap.style.display = "none";
+    return;
   }
+
   if(activeRange==="year"){
     rangeLabel.textContent = `Jahr: ${f.getFullYear()}`;
     weekStripWrap.style.display = "none";
+    return;
   }
-  if(activeRange==="all"){
-    rangeLabel.textContent = `Gesamt: alle Daten`;
-    weekStripWrap.style.display = "none";
-  }
+
+  rangeLabel.textContent = `Gesamt: alle Daten`;
+  weekStripWrap.style.display = "none";
 }
 
-/* ===================== IMPROVED KPI GRID (more infos) ===================== */
 function renderDashboard(){
   const a = aggregate(activeRange);
 
-  // Extra: Ø sessions pro Tag & Ø Minuten pro Tag im Range
-  let daysCount = 1;
+  // Ø/Tag im Range (für Motivation)
   const f = new Date(focusDateInput.value);
-
+  let daysCount = 1;
   if(activeRange==="week") daysCount = 7;
-  if(activeRange==="month"){
-    const y = f.getFullYear(), m = f.getMonth();
-    daysCount = new Date(y,m+1,0).getDate();
-  }
+  if(activeRange==="month") daysCount = new Date(f.getFullYear(), f.getMonth()+1, 0).getDate();
   if(activeRange==="year"){
     const y = f.getFullYear();
-    daysCount = ((new Date(y,11,31) - new Date(y,0,1))/86400000) + 1;
+    daysCount = Math.round((new Date(y,11,31) - new Date(y,0,1))/86400000) + 1;
   }
   if(activeRange==="all"){
-    // approx: count unique days with any entry, but keep stable if empty
-    const keys = Object.keys(db);
-    daysCount = Math.max(1, keys.length);
+    daysCount = Math.max(1, Object.keys(db).length);
   }
 
-  const avgSessionsPerDay = (a.sessions / daysCount);
-  const avgMinutesPerDay = (a.minutes / daysCount);
-  const avgCaloriesPerDay = (a.calories / daysCount);
+  const avgSessionsPerDay = a.sessions / daysCount;
+  const avgMinutesPerDay = a.minutes / daysCount;
+  const avgCaloriesPerDay = a.calories / daysCount;
 
   kpiGrid.innerHTML = `
-    <div class="kpi"><div class="v">${a.calories}</div><div class="l">Kalorien (${activeRange})</div></div>
-    <div class="kpi"><div class="v">${a.minutes}</div><div class="l">Minuten (${activeRange})</div></div>
-    <div class="kpi"><div class="v">${a.km.toFixed(1)}</div><div class="l">Kilometer (${activeRange})</div></div>
-    <div class="kpi"><div class="v">${a.avgPace}</div><div class="l">Ø Pace (Joggen/Schwimmen)</div></div>
+    <div class="kpi"><div class="v">${a.calories}</div><div class="l">Kalorien</div></div>
+    <div class="kpi"><div class="v">${a.minutes}</div><div class="l">Minuten</div></div>
+    <div class="kpi"><div class="v">${a.km.toFixed(1)}</div><div class="l">Kilometer (Joggen/Schwimmen)</div></div>
+    <div class="kpi"><div class="v">${a.avgPace}</div><div class="l">Ø Pace (distanzgewichtet)</div></div>
 
-    <div class="kpi"><div class="v">${a.sessions}</div><div class="l">Sessions (${activeRange})</div></div>
+    <div class="kpi"><div class="v">${a.sessions}</div><div class="l">Sessions</div></div>
     <div class="kpi"><div class="v">${avgSessionsPerDay.toFixed(2)}</div><div class="l">Ø Sessions / Tag</div></div>
     <div class="kpi"><div class="v">${Math.round(avgMinutesPerDay)}</div><div class="l">Ø Minuten / Tag</div></div>
     <div class="kpi"><div class="v">${Math.round(avgCaloriesPerDay)}</div><div class="l">Ø Kalorien / Tag</div></div>
@@ -1065,22 +751,253 @@ function renderDashboard(){
   renderRangeLabelAndStrip();
 }
 
-/* ===================== HOOK FOCUS DATE ===================== */
-focusDateInput.onchange = () => renderAll();
-entryDateInput.onchange = () => renderSessions();
+/* ===================== CHARTS (Canvas) ===================== */
+function clearCanvas(c){
+  const ctx = c.getContext("2d");
+  ctx.clearRect(0,0,c.width,c.height);
+}
+function drawAxes(ctx, w, h, padL, padB){
+  ctx.strokeStyle = "#202020";
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(padL, 12);
+  ctx.lineTo(padL, h - padB);
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(padL, h - padB);
+  ctx.lineTo(w - 12, h - padB);
+  ctx.stroke();
+}
+function drawBars(ctx, values, labels, title){
+  const w = ctx.canvas.width, h = ctx.canvas.height;
+  const padL = 44, padB = 28;
 
-/* ===================== FINAL MASTER ===================== */
+  ctx.fillStyle = "#ffffff";
+  ctx.font = "14px system-ui";
+  ctx.fillText(title, 12, 18);
+
+  drawAxes(ctx, w, h, padL, padB);
+
+  const maxVal = Math.max(1, ...values);
+  const innerW = (w - 12) - padL;
+  const innerH = (h - padB) - 28;
+  const n = values.length;
+  const gap = 4;
+  const barW = Math.max(2, (innerW - gap*(n-1)) / n);
+
+  values.forEach((v,i) => {
+    const x = padL + i*(barW+gap);
+    const bh = (v/maxVal)*innerH;
+    const y = (h - padB) - bh;
+    ctx.fillStyle = "rgba(0,255,106,0.55)";
+    ctx.fillRect(x,y,barW,bh);
+
+    ctx.fillStyle = "#9a9a9a";
+    ctx.font = "10px system-ui";
+    ctx.fillText(labels[i] ?? "", x, h - 10);
+  });
+}
+function drawLine(ctx, values, labels, title){
+  const w = ctx.canvas.width, h = ctx.canvas.height;
+  const padL = 44, padB = 28;
+
+  ctx.fillStyle = "#ffffff";
+  ctx.font = "14px system-ui";
+  ctx.fillText(title, 12, 18);
+
+  drawAxes(ctx, w, h, padL, padB);
+
+  const maxVal = Math.max(1, ...values);
+  const innerW = (w - 12) - padL;
+  const innerH = (h - padB) - 28;
+  const n = values.length;
+  const stepX = n>1 ? innerW/(n-1) : innerW;
+
+  ctx.strokeStyle = "rgba(0,255,106,0.9)";
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  values.forEach((v,i) => {
+    const x = padL + i*stepX;
+    const y = (h - padB) - (v/maxVal)*innerH;
+    if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+  });
+  ctx.stroke();
+
+  values.forEach((v,i) => {
+    const x = padL + i*stepX;
+    const y = (h - padB) - (v/maxVal)*innerH;
+    ctx.fillStyle = "rgba(0,255,106,1)";
+    ctx.beginPath(); ctx.arc(x,y,3,0,Math.PI*2); ctx.fill();
+
+    ctx.fillStyle = "#9a9a9a";
+    ctx.font = "10px system-ui";
+    ctx.fillText(labels[i] ?? "", x-6, h - 10);
+  });
+}
+
+function getMonthDays(focusIso){
+  const d = new Date(focusIso);
+  const y = d.getFullYear(), m = d.getMonth();
+  const days = new Date(y, m+1, 0).getDate();
+  const out = [];
+  for(let i=1;i<=days;i++) out.push(iso(new Date(y,m,i)));
+  return out;
+}
+
+function weekNumberISO(dateIso){
+  const d = new Date(dateIso);
+  d.setHours(0,0,0,0);
+  d.setDate(d.getDate() + 3 - ((d.getDay() + 6) % 7));
+  const week1 = new Date(d.getFullYear(), 0, 4);
+  return 1 + Math.round(((d - week1) / 86400000 - 3 + ((week1.getDay()+6)%7)) / 7);
+}
+
+function getYearWeeks(focusIso){
+  const y = new Date(focusIso).getFullYear();
+  const buckets = new Map();
+  const start = new Date(y,0,1);
+  const end = new Date(y,11,31);
+  for(let cur = new Date(start); cur <= end; cur.setDate(cur.getDate()+1)){
+    const k = iso(cur);
+    const wn = weekNumberISO(k);
+    const km = sumForDate(k).km || 0;
+    buckets.set(wn, (buckets.get(wn)||0) + km);
+  }
+  const weeks = [];
+  const kms = [];
+  for(let w=1; w<=53; w++){
+    if(!buckets.has(w) && w>52) break;
+    weeks.push(w);
+    kms.push(Number((buckets.get(w)||0).toFixed(2)));
+  }
+  return { weeks, kms };
+}
+
+function renderCharts(){
+  const fIso = focusDateInput.value;
+
+  // Chart A: month daily calories bars
+  clearCanvas(chartA);
+  const ctxA = chartA.getContext("2d");
+  const days = getMonthDays(fIso);
+  const valsA = days.map(d => sumForDate(d).calories);
+  const labelsA = days.map(d => String(Number(d.slice(-2))));
+  const monthName = new Date(fIso).toLocaleString("de-DE", { month:"long", year:"numeric" });
+  drawBars(ctxA, valsA, labelsA, `Kalorien pro Tag (${monthName})`);
+
+  // Chart B: year weekly km line
+  clearCanvas(chartB);
+  const ctxB = chartB.getContext("2d");
+  const { weeks, kms } = getYearWeeks(fIso);
+  const labelsB = weeks.map(w => (w%4===0 ? String(w) : ""));
+  const year = new Date(fIso).getFullYear();
+  drawLine(ctxB, kms, labelsB, `Kilometer pro Woche (${year})`);
+}
+
+/* ===================== MONTH CALENDAR (✔ trained) ===================== */
+let calMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+calPrev.onclick = () => { calMonth = new Date(calMonth.getFullYear(), calMonth.getMonth()-1, 1); renderCalendar(); };
+calNext.onclick = () => { calMonth = new Date(calMonth.getFullYear(), calMonth.getMonth()+1, 1); renderCalendar(); };
+calThis.onclick = () => { calMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1); renderCalendar(); };
+
+function renderCalendar(){
+  const y = calMonth.getFullYear();
+  const m = calMonth.getMonth();
+  calLabel.textContent = calMonth.toLocaleString("de-DE", { month:"long", year:"numeric" });
+
+  const first = new Date(y,m,1);
+  const daysInMonth = new Date(y,m+1,0).getDate();
+  const jsDay = first.getDay(); // Sun=0
+  const offset = (jsDay===0 ? 6 : jsDay-1); // Mon=0
+
+  const headers = ["Mo","Di","Mi","Do","Fr","Sa","So"];
+  let html = "<thead><tr>" + headers.map(h=>`<th class="small muted">${h}</th>`).join("") + "</tr></thead><tbody>";
+
+  let dayNum = 1 - offset;
+  for(let row=0; row<6; row++){
+    html += "<tr>";
+    for(let col=0; col<7; col++){
+      if(dayNum < 1 || dayNum > daysInMonth){
+        html += `<td class="dim">&nbsp;</td>`;
+      } else {
+        const d = new Date(y,m,dayNum);
+        const key = iso(d);
+        const trained = Array.isArray(db[key]) && db[key].length > 0;
+        const sum = trained ? sumForDate(key) : null;
+
+        html += `<td>
+          <div class="calCell">
+            <div style="font-weight:800;">${dayNum}</div>
+            ${trained ? `<div class="check">✓</div>` : ""}
+          </div>
+          <div class="small muted" style="margin-top:6px;">
+            ${trained ? `${sum.calories} kcal · ${sum.minutes} min` : ""}
+          </div>
+        </td>`;
+      }
+      dayNum++;
+    }
+    html += "</tr>";
+  }
+  html += "</tbody>";
+  monthCal.innerHTML = html;
+}
+
+/* ===================== EXPORT / IMPORT ===================== */
+exportBtn.onclick = () => {
+  const payload = { version: 1, exportedAt: new Date().toISOString(), profile, db };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], {type:"application/json"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `sport-tracker-backup-${iso(new Date())}.json`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+};
+importBtn.onclick = () => importFile.click();
+importFile.onchange = async () => {
+  const file = importFile.files?.[0];
+  if(!file) return;
+  try{
+    const text = await file.text();
+    const payload = JSON.parse(text);
+    if(payload && payload.db && typeof payload.db === "object"){
+      db = payload.db;
+      if(typeof payload.profile === "string"){
+        profile = payload.profile;
+        profileInput.value = profile;
+        saveProfile();
+      }
+      saveDB();
+      renderAll();
+      alert("Import erfolgreich ✅");
+    } else if(payload && typeof payload === "object"){
+      db = payload;
+      saveDB();
+      renderAll();
+      alert("Import erfolgreich ✅");
+    } else {
+      alert("Import fehlgeschlagen: falsches Format.");
+    }
+  } catch {
+    alert("Import fehlgeschlagen: Datei konnte nicht gelesen werden.");
+  } finally {
+    importFile.value = "";
+  }
+};
+
+/* ===================== MASTER ===================== */
 function renderAll(){
   renderSessions();
   renderDashboard();
   renderCharts();
   renderCalendar();
 }
-
 renderAll();
 
 })();
 </script>
-
 </body>
 </html>
