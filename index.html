@@ -3,65 +3,62 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Routine Planner</title>
+<title>Sport Tracker</title>
 
 <style>
   :root{
     --bg:#000;
     --fg:#fff;
-    --muted:#aaa;
-    --line:#2a2a2a;
+    --muted:#a8a8a8;
+    --line:#262626;
     --panel:#0c0c0c;
     --panel2:#101010;
     --accent:#00ff6a;
     --warn:#ffcc00;
     --bad:#ff5b5b;
   }
+
   body{
     background:var(--bg);
     color:var(--fg);
     font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-    max-width: 1100px;
-    margin: 38px auto;
-    padding: 0 16px;
+    max-width: 1250px;
+    margin: 34px auto;
+    padding: 0 16px 40px;
   }
+
   h1{ margin:0; font-size: 30px; letter-spacing:-0.3px; }
-  h2{ margin:6px 0 0 0; font-size: 18px; color:var(--muted); font-weight:600; }
-  h3{ margin:0 0 10px 0; font-size: 16px; }
-  .muted{ color:var(--muted); }
-  .small{ font-size: 12px; color:var(--muted); }
-  hr{ border:none; border-top:1px solid var(--line); margin: 22px 0; }
+  h2{ margin:6px 0 0; font-size: 16px; color: var(--muted); font-weight: 600; }
+  h3{ margin:0 0 10px; font-size: 16px; }
+  .small{ font-size: 12px; color: var(--muted); }
+  .muted{ color: var(--muted); }
+  hr{ border:none; border-top:1px solid var(--line); margin: 18px 0; }
 
   .topbar{
     border:1px solid var(--line);
-    border-radius: 14px;
+    border-radius: 16px;
     padding: 14px;
-    background: var(--panel);
+    background: linear-gradient(180deg, #0f0f0f, #080808);
     display:flex;
     justify-content:space-between;
     align-items:flex-end;
     gap:12px;
     flex-wrap:wrap;
+    position:relative;
+    overflow:hidden;
   }
-  .buttons{ display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
-  button{
-    border:1px solid var(--line);
-    background: var(--panel2);
-    color: var(--fg);
-    border-radius: 10px;
-    padding: 8px 10px;
-    cursor:pointer;
+  .topbar::before{
+    content:"";
+    position:absolute;
+    right:-80px; top:-90px;
+    width:260px; height:260px;
+    border-radius:999px;
+    background: radial-gradient(circle at 30% 30%, rgba(0,255,106,0.22), rgba(0,0,0,0) 60%);
+    pointer-events:none;
   }
-  button:hover{ background:#151515; }
-  .danger{ color:var(--bad); }
 
-  .card{
-    border:1px solid var(--line);
-    border-radius: 14px;
-    padding: 14px;
-    background: var(--panel);
-    margin-bottom: 14px;
-  }
+  .row{ display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+  .grow{ flex: 1; min-width: 240px; }
 
   input, select{
     width: 100%;
@@ -69,1452 +66,1018 @@
     background: var(--panel2);
     color: var(--fg);
     border:1px solid var(--line);
-    border-radius: 10px;
-    padding: 7px 9px;
+    border-radius: 12px;
+    padding: 8px 10px;
   }
   input[type="checkbox"]{ width:auto; }
 
-  .row{ display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
-  .checklist{ display:grid; gap:8px; }
-  .checkRow{ display:flex; gap:10px; align-items:flex-start; }
-  .checkRow label{ line-height: 1.2; }
+  button{
+    border:1px solid var(--line);
+    background: #111;
+    color: var(--fg);
+    border-radius: 12px;
+    padding: 9px 12px;
+    cursor:pointer;
+  }
+  button:hover{ background:#151515; }
+  .danger{ color: var(--bad); border-color:#3a1a1a; }
+  .ghost{ background: transparent; }
 
-  /* ===================== DASHBOARD (3 BOXEN NEBENEINANDER) ===================== */
-  .dashWrap{
-    display:grid;
-    grid-template-columns: repeat(3, minmax(260px, 1fr));
-    gap:12px;
-    margin-top:12px;
-  }
-  @media (max-width: 980px){
-    .dashWrap{ grid-template-columns: 1fr; }
-  }
-  .dashCard{
+  .card{
     border:1px solid var(--line);
-    border-radius:16px;
-    padding:14px;
-    background: linear-gradient(180deg, #0d0d0d, #070707);
-    position:relative;
-    overflow:hidden;
+    border-radius: 16px;
+    padding: 14px;
+    background: var(--panel);
+    margin-top: 12px;
   }
-  .dashCard::before{
-    content:"";
-    position:absolute;
-    inset:-60px -60px auto auto;
-    width:220px;
-    height:220px;
-    border-radius:999px;
-    background: radial-gradient(circle at 30% 30%, rgba(0,255,106,0.18), rgba(0,0,0,0) 60%);
-    pointer-events:none;
-  }
-  .dashTitle{
-    font-weight:900;
-    margin-bottom:10px;
-    letter-spacing:-0.2px;
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    gap:10px;
-  }
-  .dashHint{ font-size:12px; color:var(--muted); margin-top:-6px; margin-bottom:10px; }
-  .chipGrid{
-    display:grid;
-    grid-template-columns: 1fr 1fr;
-    gap:10px;
-  }
-  .chip{
-    border:1px solid var(--line);
-    background: rgba(16,16,16,0.95);
-    border-radius:14px;
-    padding:10px;
-  }
-  .chip .v{ font-size:18px; font-weight:900; color: var(--accent); }
-  .chip .l{ font-size:12px; color: var(--muted); margin-top:4px; line-height:1.2; }
-  .miniList{
-    border:1px solid var(--line);
-    border-radius:12px;
-    padding:10px;
-    background:#0b0b0b;
-    margin-top:10px;
-  }
-  .miniList ul{ margin:8px 0 0 18px; }
 
-  /* ===================== SPORT ===================== */
-  .dayBlock{
-    border:1px solid var(--line);
-    border-radius: 14px;
-    padding: 12px;
-    background: var(--panel2);
+  /* ============== DASHBOARD ============== */
+  .tabs{
+    display:flex; gap:8px; flex-wrap:wrap;
     margin-top: 10px;
   }
-  .dayHeader{
-    display:flex;
-    justify-content:space-between;
-    gap:10px;
-    align-items:center;
-    flex-wrap:wrap;
-  }
-  .dayTitle{ font-weight:700; }
-  .sessions{ display:grid; gap:10px; margin-top:10px; }
-  .session{
+  .tab{
+    padding: 7px 10px;
+    border-radius: 999px;
     border:1px solid var(--line);
-    border-radius: 12px;
-    padding: 10px;
-    background: #0b0b0b;
+    background: #0f0f0f;
+    color: var(--muted);
+    cursor:pointer;
+    user-select:none;
   }
-  .sessionGrid{
+  .tab.active{
+    background: rgba(0,255,106,0.12);
+    color: var(--fg);
+    border-color:#1b4f30;
+  }
+
+  .dashGrid{
     display:grid;
-    grid-template-columns: 1.1fr 0.6fr 0.6fr 0.6fr 0.6fr 1fr auto;
-    gap:8px;
-    align-items:start;
+    grid-template-columns: 1.05fr 0.95fr;
+    gap:12px;
+    margin-top: 12px;
   }
   @media (max-width: 980px){
-    .sessionGrid{ grid-template-columns: 1fr 1fr; }
-  }
-  .sessionActions{ display:flex; gap:8px; justify-content:flex-end; }
-  .miniBtn{ padding: 7px 9px; border-radius: 10px; }
-  .miniBtn.danger{ border-color:#3a1a1a; }
-  .disabledLook{ opacity:0.35; }
-
-  /* ===================== SUPPLEMENTS ===================== */
-  .suppDayBlock{ border:1px solid var(--line); border-radius:14px; padding:12px; background: var(--panel2); margin-top:10px; }
-  .suppHeader{ display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap; }
-  .suppList{ margin-top:10px; display:grid; gap:8px; }
-  .pill{
-    display:inline-flex; align-items:center; gap:8px;
-    border:1px solid var(--line); background:#0b0b0b;
-    border-radius:999px; padding:6px 10px; font-size:12px; color:var(--muted);
-  }
-  .pill button{
-    padding:2px 8px; border-radius:999px;
+    .dashGrid{ grid-template-columns: 1fr; }
   }
 
-  /* ===================== NAMAZ ===================== */
-  .namazGrid{
+  .kpiGrid{
     display:grid;
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(4, minmax(140px, 1fr));
+    gap:10px;
+  }
+  @media (max-width: 980px){
+    .kpiGrid{ grid-template-columns: repeat(2, minmax(140px, 1fr)); }
+  }
+  .kpi{
+    border:1px solid var(--line);
+    background: linear-gradient(180deg, #101010, #0a0a0a);
+    border-radius: 16px;
+    padding: 12px;
+  }
+  .kpi .v{
+    font-size: 20px;
+    font-weight: 900;
+    color: var(--accent);
+    line-height: 1.1;
+  }
+  .kpi .l{
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 6px;
+    line-height: 1.2;
+  }
+
+  .panel{
+    border:1px solid var(--line);
+    background: #0b0b0b;
+    border-radius: 16px;
+    padding: 12px;
+  }
+
+  canvas{
+    width: 100%;
+    height: 220px;
+    border:1px solid var(--line);
+    background:#080808;
+    border-radius: 16px;
+  }
+
+  /* ============== ENTRY ============== */
+  .entryGrid{
+    display:grid;
+    grid-template-columns: 0.9fr 1.1fr;
     gap:12px;
+    margin-top: 12px;
   }
-  @media (min-width: 980px){
-    .namazGrid{ grid-template-columns: 1.2fr 0.8fr; }
+  @media (max-width: 980px){
+    .entryGrid{ grid-template-columns: 1fr; }
   }
-  .calHeader{ display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap; }
+
+  .sessionList{ display:grid; gap:10px; margin-top:10px; }
+  .session{
+    border:1px solid var(--line);
+    background: #0b0b0b;
+    border-radius: 16px;
+    padding: 12px;
+  }
+  .sessionHead{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:10px;
+    flex-wrap:wrap;
+  }
+  .tag{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    border:1px solid var(--line);
+    background:#0f0f0f;
+    border-radius:999px;
+    padding:6px 10px;
+    font-size:12px;
+    color: var(--muted);
+  }
+
+  .grid7{
+    display:grid;
+    grid-template-columns: repeat(6, minmax(140px, 1fr)) auto;
+    gap:8px;
+    align-items:start;
+    margin-top: 10px;
+  }
+  @media (max-width: 980px){
+    .grid7{ grid-template-columns: 1fr 1fr; }
+  }
+
+  .hint{
+    font-size:12px;
+    color: var(--muted);
+    margin-top: 8px;
+  }
+
+  /* ============== WEEK STRIP ============== */
+  .weekStrip{
+    display:grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap:10px;
+    margin-top: 12px;
+  }
+  @media (max-width: 980px){
+    .weekStrip{ grid-template-columns: repeat(2, 1fr); }
+  }
+  .dayCard{
+    border:1px solid var(--line);
+    background: #0b0b0b;
+    border-radius: 16px;
+    padding: 12px;
+  }
+  .dayCard .d{ font-weight: 800; }
+  .dayCard .sub{ margin-top:6px; font-size:12px; color:var(--muted); display:flex; flex-direction:column; gap:4px; }
+
+  /* ============== MONTH CALENDAR ============== */
+  .calHeader{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:10px;
+    flex-wrap:wrap;
+  }
   .calendar{
     width:100%;
     border-collapse: collapse;
-    overflow:hidden;
-    border-radius: 12px;
     border:1px solid var(--line);
-    background: #0b0b0b;
+    border-radius: 16px;
+    overflow:hidden;
+    background:#080808;
+    margin-top: 10px;
   }
   .calendar th, .calendar td{
     border-bottom:1px solid var(--line);
     border-right:1px solid var(--line);
-    padding:8px;
-    vertical-align:top;
+    padding: 10px;
+    vertical-align: top;
+    height: 70px;
   }
   .calendar th:last-child, .calendar td:last-child{ border-right:none; }
   .calendar tr:last-child td{ border-bottom:none; }
-  .calDayBtn{
-    width:100%;
-    border:1px solid var(--line);
-    background:#101010;
-    color:#fff;
-    border-radius:10px;
-    padding:8px;
-    text-align:left;
-    cursor:pointer;
+  .calCell{
+    display:flex;
+    justify-content:space-between;
+    gap:10px;
+    align-items:flex-start;
   }
-  .calDayBtn:hover{ background:#151515; }
-  .badge{
-    display:inline-block;
-    font-size:11px;
-    padding:2px 8px;
-    border:1px solid var(--line);
-    border-radius:999px;
-    margin-left:6px;
-    color: var(--muted);
+  .check{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    width:22px; height:22px;
+    border-radius: 999px;
+    border:1px solid #1b4f30;
+    background: rgba(0,255,106,0.14);
+    color: var(--accent);
+    font-weight: 900;
+    font-size: 12px;
   }
-  .badge.ok{ color: var(--accent); border-color:#164b2a; }
-  .badge.warn{ color: var(--warn); border-color:#5a4b12; }
-  .badge.bad{ color: var(--bad); border-color:#5a1b1b; }
+  .dim{ color:#444; }
 
-  .panel{
-    border:1px solid var(--line);
-    border-radius: 14px;
-    padding: 12px;
-    background: var(--panel2);
-  }
 </style>
 </head>
 
 <body>
 
 <div class="topbar">
-  <div style="min-width:260px;">
-    <h1 id="plannerTitle">Routine Planner</h1>
-    <h2>Ottoman Power Routinen</h2>
-    <div class="small">Woche: <span id="weekLabel"></span> · Speicherung lokal (Archiv).</div>
+  <div>
+    <h1 id="appTitle">Sport Tracker</h1>
+    <h2 id="appSub">Mehrere Sessions pro Tag · Auswertung: Tag/Woche/Monat/Jahr/Gesamt</h2>
+    <div class="small">Speicherung lokal im Browser (Archiv). Updates am Code löschen deine Daten nicht – außer Privatmodus/Website-Daten löschen.</div>
   </div>
 
-  <div style="min-width:280px; flex:1;">
-    <div class="small muted" style="margin-bottom:6px;">Name des Routineplaners</div>
-    <div class="row" style="gap:8px;">
-      <input id="plannerNameInput" placeholder="z.B. Niyazi Tuncay" style="flex:1; min-width:160px;">
-      <button id="savePlannerName" style="white-space:nowrap;">Speichern</button>
+  <div class="row" style="min-width:280px;">
+    <div class="grow">
+      <div class="small muted" style="margin-bottom:6px;">Name / Profil</div>
+      <input id="profileName" placeholder="z.B. Niyazi Tuncay" />
     </div>
-    <div class="small muted" style="margin-top:6px;">
-      Bleibt gespeichert (Safari), außer im Privatmodus oder wenn Website-Daten gelöscht werden.
+    <div style="display:flex; gap:8px; align-items:end;">
+      <button id="saveProfile">Speichern</button>
+      <button id="exportBtn" class="ghost" title="Backup als JSON">Export</button>
+      <button id="importBtn" class="ghost" title="Restore aus JSON">Import</button>
+      <input id="importFile" type="file" accept="application/json" style="display:none;" />
     </div>
-  </div>
-
-  <div class="buttons">
-    <button id="prevWeek">◀ Vorherige Woche</button>
-    <button id="todayWeek">Diese Woche</button>
-    <button id="nextWeek">Nächste Woche ▶</button>
-    <button id="resetWeek" class="danger" title="Setzt nur die aktuelle Woche zurück">Woche zurücksetzen</button>
   </div>
 </div>
 
-<hr>
-
-<!-- ===================== AUSWERTUNG: 3 BOXEN HORIZONTAL ===================== -->
 <div class="card">
   <div class="row" style="justify-content:space-between;">
     <div>
-      <h3>📈 Gesamtübersicht</h3>
-      <div class="small">Sport · Lesen · Namaz — kompakt, motivierend, alles auf einen Blick.</div>
+      <h3>📊 Übersicht</h3>
+      <div class="small">Wähle Zeitraum – alles ist auf einen Blick, ohne langes Scrollen.</div>
     </div>
-    <button id="refreshDash">Aktualisieren</button>
+    <div class="row">
+      <input id="focusDate" type="date" style="max-width:220px;" />
+      <button id="todayBtn">Heute</button>
+    </div>
   </div>
 
-  <div class="dashWrap">
-    <div class="dashCard">
-      <div class="dashTitle">🏋️ Sport <span class="small muted">Woche + Gesamt</span></div>
-      <div class="dashHint">Kurzwerte: Zeit, Kalorien, Joggen, Pace.</div>
-      <div id="dashSport"></div>
-    </div>
+  <div class="tabs" id="rangeTabs">
+    <div class="tab active" data-range="day">Tag</div>
+    <div class="tab" data-range="week">Woche</div>
+    <div class="tab" data-range="month">Monat</div>
+    <div class="tab" data-range="year">Jahr</div>
+    <div class="tab" data-range="all">Gesamt</div>
+  </div>
 
-    <div class="dashCard">
-      <div class="dashTitle">📚 Lesen <span class="small muted">Woche + Gesamt</span></div>
-      <div class="dashHint">Minuten, Seiten, fertige Bücher.</div>
-      <div id="dashReading"></div>
+  <div class="dashGrid">
+    <div class="panel">
+      <div class="small muted" id="rangeLabel">—</div>
+      <div class="kpiGrid" id="kpiGrid"></div>
 
-      <div class="miniList">
-        <div style="font-weight:700;">Fertige Bücher</div>
-        <ul id="finishedBooksList"></ul>
-      </div>
-
-      <div style="margin-top:10px;">
-        <button id="clearFinishedBooks" class="danger" style="width:100%;">Liste fertiger Bücher leeren</button>
+      <div id="weekStripWrap" style="display:none;">
+        <hr>
+        <h3 style="margin-bottom:8px;">🔥 Tageskalorien (Woche)</h3>
+        <div class="weekStrip" id="weekStrip"></div>
       </div>
     </div>
 
-    <div class="dashCard">
-      <div class="dashTitle">🕌 Namaz <span class="small muted">Gesamt</span></div>
-      <div class="dashHint">Gebete gesamt, vollständige Tage, Jahre (≈/365).</div>
-      <div id="dashNamaz"></div>
+    <div class="panel">
+      <h3 style="margin-bottom:10px;">📈 Diagramme</h3>
+      <div class="small muted" style="margin-bottom:8px;">Monat: Kalorien pro Tag · Jahr: Kilometer pro Woche</div>
+      <canvas id="chartA" width="900" height="260"></canvas>
+      <div style="height:10px;"></div>
+      <canvas id="chartB" width="900" height="260"></canvas>
     </div>
   </div>
 </div>
 
-<hr>
-
 <div class="card">
-  <h3>🕌 Namaz-Tracker (Datum, rückwirkend bis 2000)</h3>
-  <div class="small">Wähle Datum/Monat, hake Sabach/Öğle/İkindi/Akşam/Yatsı ab. Ein kompletter Tag zählt nur, wenn alle 5 abgehakt sind.</div>
+  <h3>➕ Sport eintragen (Multi-Sessions)</h3>
+  <div class="small">Joggen & Schwimmen: Dauer + Kilometer + Pace (mm:ss / km). Alles andere: Dauer + Kalorien.</div>
 
-  <div class="namazGrid" style="margin-top:10px;">
+  <div class="entryGrid">
     <div class="panel">
-      <div class="calHeader">
-        <div class="row" style="gap:8px;">
+      <div class="row" style="justify-content:space-between;">
+        <div>
+          <div class="small muted">Datum</div>
+          <input id="entryDate" type="date" />
+        </div>
+        <div style="display:flex; gap:8px; align-items:end;">
+          <button id="addSessionBtn">+ Session</button>
+          <button id="clearDayBtn" class="danger" title="Löscht alle Sessions an diesem Datum">Tag löschen</button>
+        </div>
+      </div>
+
+      <div class="hint">
+        Pace Format: <b>mm:ss</b> (z.B. <b>5:30</b>). Kein 5:60 mehr – wird korrekt normalisiert.
+      </div>
+
+      <div class="sessionList" id="sessionList"></div>
+    </div>
+
+    <div class="panel">
+      <h3 style="margin-bottom:10px;">🗓️ Monatskalender</h3>
+      <div class="small muted">✔ erscheint, wenn du an dem Tag mindestens 1 Training hast.</div>
+
+      <div class="calHeader" style="margin-top:10px;">
+        <div class="row">
           <button id="calPrev">◀</button>
-          <button id="calToday">Heute</button>
           <button id="calNext">▶</button>
-          <span class="small muted">Monat:</span>
-          <span id="calLabel" style="font-weight:700;"></span>
+          <button id="calThis">Dieser Monat</button>
         </div>
-        <div class="row" style="gap:8px;">
-          <input id="jumpDate" type="date" style="max-width:220px;">
-          <button id="jumpBtn">Zu Datum</button>
-        </div>
+        <div style="font-weight:900;" id="calLabel">—</div>
       </div>
 
-      <div class="small" style="margin-top:8px;">
-        Legende: <span class="badge ok">5/5</span> komplett · <span class="badge warn">1–4/5</span> teilweise · <span class="badge bad">0/5</span> nichts
-      </div>
-
-      <div style="margin-top:10px; overflow:auto;">
-        <table class="calendar" id="calendar"></table>
+      <div style="overflow:auto;">
+        <table class="calendar" id="monthCal"></table>
       </div>
     </div>
-
-    <div class="panel">
-      <h3 style="margin-bottom:8px;">Ausgewählter Tag: <span id="selDateLabel"></span></h3>
-      <div id="namazForm" class="checklist"></div>
-
-      <div style="margin-top:10px;">
-        <input id="namazNote" placeholder="Notiz (optional)" />
-      </div>
-
-      <div class="row" style="margin-top:10px; justify-content:space-between;">
-        <button id="clearDay" class="danger">Tag zurücksetzen</button>
-        <button id="closeDay">Schließen</button>
-      </div>
-
-      <hr style="margin:14px 0;">
-      <h3 style="margin-bottom:8px;">Namaz-Gesamtbilanz</h3>
-      <div id="namazTotals"></div>
-    </div>
-  </div>
-</div>
-
-<hr>
-
-<div class="card">
-  <h3>💊 Supplements</h3>
-  <div class="small">Start ist leer. Wähle aus deiner Liste oder füge eigene Supplements hinzu. Erst dann erscheinen sie im Wochen-Tracker.</div>
-
-  <div class="panel" style="margin-top:10px;">
-    <div style="font-weight:800; margin-bottom:8px;">Supplements auswählen</div>
-    <div class="small muted">✔ ankreuzen = in deinen Plan übernehmen</div>
-    <div id="suppCatalog" style="margin-top:10px;"></div>
-
-    <div style="margin-top:14px;">
-      <div style="font-weight:800; margin-bottom:8px;">Eigenes Supplement hinzufügen</div>
-      <div class="row" style="gap:8px;">
-        <input id="addSuppInput" placeholder="z.B. Zink 15mg" style="flex:1; min-width:200px;">
-        <button id="addSuppBtn" style="white-space:nowrap;">Hinzufügen</button>
-      </div>
-      <div class="small muted" style="margin-top:8px;">Eigene Supplements werden gespeichert (Archiv) und können später entfernt werden.</div>
-    </div>
-
-    <div style="margin-top:14px;">
-      <div style="font-weight:800; margin-bottom:8px;">Aktiv im Plan</div>
-      <div id="suppActivePills" class="row"></div>
-    </div>
-  </div>
-
-  <div style="margin-top:12px;">
-    <h3 style="margin-bottom:6px;">Wochentracker (Mo–So)</h3>
-    <div class="small muted">Hier hake ich pro Tag ab.</div>
-    <div id="suppDays"></div>
-  </div>
-</div>
-
-<div class="card">
-  <h3>🏋️ Sport – mehrere Sessions pro Tag</h3>
-  <div class="small">Joggen: Pace = <b>Minuten pro Kilometer</b> (Format <b>mm:ss</b> pro km, z.B. 5:30).</div>
-  <div id="sportDays"></div>
-</div>
-
-<div class="card">
-  <h3>📚 Lesen – Wochenplan</h3>
-  <div class="small">Pro Tag: Titel + Seiten + Minuten + „Buch fertig“.</div>
-
-  <div style="overflow:auto; margin-top:10px;">
-    <table style="width:100%; border-collapse:collapse;">
-      <thead>
-        <tr>
-          <th style="width:120px; text-align:left; color:var(--muted); padding:8px; border-bottom:1px solid var(--line);">Tag</th>
-          <th style="text-align:left; color:var(--muted); padding:8px; border-bottom:1px solid var(--line);">Titel</th>
-          <th style="width:130px; text-align:left; color:var(--muted); padding:8px; border-bottom:1px solid var(--line);">Seiten</th>
-          <th style="width:130px; text-align:left; color:var(--muted); padding:8px; border-bottom:1px solid var(--line);">Minuten</th>
-          <th style="width:130px; text-align:left; color:var(--muted); padding:8px; border-bottom:1px solid var(--line);">Buch fertig</th>
-        </tr>
-      </thead>
-      <tbody id="readBody"></tbody>
-    </table>
   </div>
 </div>
 
 <script>
 (() => {
-  // ===================== STORAGE KEYS =====================
-  const WEEK_PREFIX = "op_week_v6_";
-  const NAMAZ_KEY = "op_namaz_v1";
-  const FINISHED_BOOKS_KEY = "op_books_finished_v1";
-  const PLANNER_NAME_KEY = "op_planner_name_v1";
-  const SUPP_CONFIG_KEY = "op_supp_config_v2"; 
-  // { custom:[{id,text}], activeIds:[id...] }
+/* ===================== STORAGE ===================== */
+const KEY_DATA = "sport_tracker_data_v1";
+const KEY_PROFILE = "sport_tracker_profile_v1";
 
-  // ===================== CONSTANTS =====================
-  const DAYS = [
-    {key:"mon", label:"Montag"},
-    {key:"tue", label:"Dienstag"},
-    {key:"wed", label:"Mittwoch"},
-    {key:"thu", label:"Donnerstag"},
-    {key:"fri", label:"Freitag"},
-    {key:"sat", label:"Samstag"},
-    {key:"sun", label:"Sonntag"},
-  ];
+/* ===================== CONSTANTS ===================== */
+const SPORTS = [
+  "Krafttraining",
+  "Joggen",
+  "Stretching",
+  "Ringen",
+  "Schwimmen",
+  "Tennis"
+];
 
-  // Katalog (bleibt vorhanden), aber NICHT automatisch aktiv
-  const SUPP_CATALOG = [
-    { id:"d3k2", text:"Vitamin D3 / K2 (pro 10kg – 1000 IE)" },
-    { id:"omega3", text:"Omega 3 – 4 Kapseln" },
-    { id:"kurkuma", text:"Kurkuma + Piperin – 4 Kapseln" },
-    { id:"cellagon", text:"Cellagon Multivitamin – 25 ml" },
-    { id:"magnesium", text:"Magnesiumkapseln" },
-    { id:"granatapfel", text:"Granatapfelsaft – 300–400 ml" },
-  ];
+const KM_SPORTS = ["Joggen", "Schwimmen"];
 
-  const SPORTS = ["", "Krafttraining", "Joggen", "Stretching", "Ringen", "Schwimmen", "Tennis"];
+/* ===================== HELPERS ===================== */
+const pad = n => String(n).padStart(2, "0");
+const iso = d => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
 
-  const NAMAZ_PRAYERS = [
-    { id:"sabach", label:"Sabach" },
-    { id:"ogle", label:"Öğle" },
-    { id:"ikindi", label:"İkindi" },
-    { id:"aksam", label:"Akşam" },
-    { id:"yatsi", label:"Yatsı" },
-  ];
+function parsePace(p){
+  if(!p || !p.includes(":")) return null;
+  const [m,s] = p.split(":").map(Number);
+  if(!Number.isFinite(m) || !Number.isFinite(s)) return null;
+  return m*60 + s;
+}
+function paceFromSeconds(sec){
+  let total = Math.round(sec);
+  const m = Math.floor(total / 60);
+  const s = total % 60;
+  return `${m}:${pad(s)}`;
+}
 
-  // ===================== HELPERS =====================
-  const pad2 = n => String(n).padStart(2,"0");
+/* ===================== STATE ===================== */
+let db = JSON.parse(localStorage.getItem(KEY_DATA) || "{}");
+let profile = localStorage.getItem(KEY_PROFILE) || "";
 
-  function lsGet(key, fallback){
-    try { const raw = localStorage.getItem(key); return raw ? JSON.parse(raw) : fallback; }
-    catch { return fallback; }
-  }
-  function lsSet(key, value){ localStorage.setItem(key, JSON.stringify(value)); }
+function saveDB(){ localStorage.setItem(KEY_DATA, JSON.stringify(db)); }
+function saveProfile(){
+  localStorage.setItem(KEY_PROFILE, profile);
+  document.getElementById("appTitle").textContent = profile || "Sport Tracker";
+}
 
-  function startOfWeekMonday(date){
-    const d = new Date(date);
-    const day = d.getDay(); // Sun=0
-    const diff = (day === 0 ? -6 : 1 - day);
-    d.setDate(d.getDate() + diff);
-    d.setHours(0,0,0,0);
-    return d;
-  }
-  function fmtDate(d){ return `${pad2(d.getDate())}.${pad2(d.getMonth()+1)}.${d.getFullYear()}`; }
-  function weekKey(monday){ return `${monday.getFullYear()}-${pad2(monday.getMonth()+1)}-${pad2(monday.getDate())}`; }
-  function isoDate(d){ return `${d.getFullYear()}-${pad2(d.getMonth()+1)}-${pad2(d.getDate())}`; }
-  function parseIso(iso){ const [y,m,da] = iso.split("-").map(Number); return new Date(y, m-1, da); }
+/* ===================== PROFILE ===================== */
+const profileInput = document.getElementById("profileName");
+document.getElementById("saveProfile").onclick = () => {
+  profile = profileInput.value.trim();
+  saveProfile();
+};
+profileInput.value = profile;
+saveProfile();
 
-  function parsePaceToSeconds(paceStr){
-    if (!paceStr || !paceStr.includes(":")) return null;
-    const [m,s] = paceStr.split(":").map(Number);
-    if (!Number.isFinite(m) || !Number.isFinite(s)) return null;
-    return m*60 + s;
-  }
-  function secondsToPace(sec){
-    const m = Math.floor(sec/60);
-    const s = Math.round(sec%60);
-    return `${m}:${String(s).padStart(2,"0")}`;
-  }
+/* ===================== DATE CONTROL ===================== */
+const entryDateInput = document.getElementById("entryDate");
+const focusDateInput = document.getElementById("focusDate");
+const todayBtn = document.getElementById("todayBtn");
 
-  function chip(value, label){
-    return `<div class="chip"><div class="v">${value}</div><div class="l">${label}</div></div>`;
-  }
+let today = new Date();
+entryDateInput.value = iso(today);
+focusDateInput.value = iso(today);
 
-  function safeId(){
-    return "c_" + Math.random().toString(36).slice(2,10);
-  }
+todayBtn.onclick = () => {
+  focusDateInput.value = iso(new Date());
+  renderAll();
+};
 
-  // ===================== PLANNER NAME =====================
-  const plannerTitleEl = document.getElementById("plannerTitle");
-  const plannerNameInput = document.getElementById("plannerNameInput");
-  const savePlannerNameBtn = document.getElementById("savePlannerName");
+/* ===================== SESSIONS ===================== */
+function getDay(date){
+  if(!db[date]) db[date] = [];
+  return db[date];
+}
 
-  function loadPlannerName(){
-    const name = lsGet(PLANNER_NAME_KEY, "");
-    if (typeof name === "string" && name.trim()){
-      plannerTitleEl.textContent = name.trim();
-      plannerNameInput.value = name.trim();
-    } else {
-      plannerTitleEl.textContent = "Routine Planner";
-      plannerNameInput.value = "";
-    }
-  }
-
-  function savePlannerName(){
-    const name = (plannerNameInput.value || "").trim();
-    lsSet(PLANNER_NAME_KEY, name);
-    plannerTitleEl.textContent = name || "Routine Planner";
-  }
-
-  savePlannerNameBtn.addEventListener("click", savePlannerName);
-
-  // ===================== SUPPLEMENT CONFIG =====================
-  // activeIds: welche Supplements überhaupt im Wochen-Tracker erscheinen
-  // custom: eigene Supplements
-  let suppCfg = lsGet(SUPP_CONFIG_KEY, { custom: [], activeIds: [] });
-
-  function normalizeSuppText(t){
-    return (t || "").trim().replace(/\s+/g, " ");
-  }
-
-  function allSuppOptions(){
-    const custom = (suppCfg.custom || []).map(x => ({ id:x.id, text:x.text, custom:true }));
-    return [...SUPP_CATALOG.map(x => ({...x, custom:false})), ...custom];
-  }
-
-  function isActiveSupp(id){
-    return Array.isArray(suppCfg.activeIds) && suppCfg.activeIds.includes(id);
-  }
-
-  function setActiveSupp(id, active){
-    suppCfg.activeIds = Array.isArray(suppCfg.activeIds) ? suppCfg.activeIds : [];
-    const has = suppCfg.activeIds.includes(id);
-    if (active && !has) suppCfg.activeIds.push(id);
-    if (!active && has) suppCfg.activeIds = suppCfg.activeIds.filter(x => x !== id);
-    lsSet(SUPP_CONFIG_KEY, suppCfg);
-  }
-
-  function addCustomSupp(text){
-    const clean = normalizeSuppText(text);
-    if (!clean) return;
-
-    const exists = allSuppOptions().some(s => s.text.toLowerCase() === clean.toLowerCase());
-    if (exists) return;
-
-    const id = safeId();
-    suppCfg.custom = Array.isArray(suppCfg.custom) ? suppCfg.custom : [];
-    suppCfg.custom.push({ id, text: clean });
-    lsSet(SUPP_CONFIG_KEY, suppCfg);
-  }
-
-  function removeCustomSupp(id){
-    suppCfg.custom = Array.isArray(suppCfg.custom) ? suppCfg.custom : [];
-    suppCfg.custom = suppCfg.custom.filter(x => x.id !== id);
-    // auch aus active entfernen
-    setActiveSupp(id, false);
-    lsSet(SUPP_CONFIG_KEY, suppCfg);
-  }
-
-  // ===================== WEEK DATA =====================
-  let currentMonday = startOfWeekMonday(new Date());
-  const weekLabelEl = document.getElementById("weekLabel");
-
-  function weekStorageKey(){ return WEEK_PREFIX + weekKey(currentMonday); }
-
-  function emptyWeek(){
-    const supplements = Object.fromEntries(DAYS.map(d => [d.key, { note:"", items:{} }]));
-    const sport = Object.fromEntries(DAYS.map(d => [d.key, { sessions: [] }]));
-    const reading = Object.fromEntries(DAYS.map(d => [d.key, { title:"", pages:"", minutes:"", finished:false }]));
-    return { supplements, sport, reading };
-  }
-
-  let weekData = lsGet(weekStorageKey(), emptyWeek());
-  function saveWeek(){ lsSet(weekStorageKey(), weekData); }
-
-  function renderWeekLabel(){
-    const end = new Date(currentMonday); end.setDate(end.getDate()+6);
-    weekLabelEl.textContent = `${fmtDate(currentMonday)} – ${fmtDate(end)}`;
-  }
-
-  function listAllWeeks(){
-    const keys = Object.keys(localStorage).filter(k => k.startsWith(WEEK_PREFIX));
-    return keys.map(k => ({ key:k, data: lsGet(k, null) })).filter(x => x.data && typeof x.data === "object");
-  }
-
-  // ===================== FINISHED BOOKS =====================
-  let finishedBooks = lsGet(FINISHED_BOOKS_KEY, []);
-  const finishedBooksListEl = document.getElementById("finishedBooksList");
-
-  function saveFinishedBooks(){ lsSet(FINISHED_BOOKS_KEY, finishedBooks); }
-
-  function addFinishedBookOnce(title){
-    const clean = (title || "").trim().replace(/\s+/g, " ");
-    if (!clean) return;
-    const exists = finishedBooks.some(b => (b.title||"").toLowerCase() === clean.toLowerCase());
-    if (exists) return;
-    finishedBooks.push({ title: clean, isoFinished: isoDate(new Date()) });
-    saveFinishedBooks();
-  }
-
-  function renderFinishedBooksList(){
-    finishedBooksListEl.innerHTML = "";
-    if (!finishedBooks.length){
-      const li = document.createElement("li");
-      li.className = "small muted";
-      li.textContent = "Noch keine fertigen Bücher.";
-      finishedBooksListEl.appendChild(li);
-      return;
-    }
-    finishedBooks
-      .slice()
-      .sort((a,b) => (a.isoFinished||"").localeCompare(b.isoFinished||""))
-      .forEach(b => {
-        const li = document.createElement("li");
-        li.textContent = `${b.title} (${b.isoFinished})`;
-        finishedBooksListEl.appendChild(li);
-      });
-  }
-
-  document.getElementById("clearFinishedBooks").addEventListener("click", () => {
-    finishedBooks = [];
-    saveFinishedBooks();
-    renderFinishedBooksList();
-    renderDashboard();
+function addSession(date){
+  getDay(date).push({
+    type:"",
+    duration:"",
+    calories:"",
+    km:"",
+    pace:""
   });
+  saveDB();
+}
 
-  // ===================== SUPPLEMENTS UI =====================
-  const suppCatalogEl = document.getElementById("suppCatalog");
-  const addSuppInput = document.getElementById("addSuppInput");
-  const addSuppBtn = document.getElementById("addSuppBtn");
-  const suppActivePillsEl = document.getElementById("suppActivePills");
-  const suppDaysEl = document.getElementById("suppDays");
+function removeSession(date, idx){
+  getDay(date).splice(idx,1);
+  if(getDay(date).length===0) delete db[date];
+  saveDB();
+}
 
-  function renderSuppCatalog(){
-    suppCatalogEl.innerHTML = "";
-    const opts = allSuppOptions();
+/* ===================== RENDER SESSIONS ===================== */
+const sessionList = document.getElementById("sessionList");
+document.getElementById("addSessionBtn").onclick = () => {
+  addSession(entryDateInput.value);
+  renderSessions();
+};
+document.getElementById("clearDayBtn").onclick = () => {
+  delete db[entryDateInput.value];
+  saveDB();
+  renderAll();
+};
 
-    opts.forEach(s => {
-      const row = document.createElement("div");
-      row.className = "checkRow";
+function renderSessions(){
+  const date = entryDateInput.value;
+  sessionList.innerHTML = "";
+  const sessions = getDay(date);
 
-      const cb = document.createElement("input");
-      cb.type = "checkbox";
-      cb.checked = isActiveSupp(s.id);
-
-      cb.addEventListener("change", () => {
-        setActiveSupp(s.id, cb.checked);
-        // sicherstellen, dass weekData.items existieren
-        DAYS.forEach(d => {
-          weekData.supplements[d.key].items[s.id] = weekData.supplements[d.key].items[s.id] || false;
-        });
-        saveWeek();
-        renderSuppActivePills();
-        renderSuppDays();
-        renderDashboard();
-      });
-
-      const label = document.createElement("label");
-      label.textContent = s.text + (s.custom ? " (custom)" : "");
-
-      row.appendChild(cb);
-      row.appendChild(label);
-
-      // Delete button for custom items
-      if (s.custom){
-        const del = document.createElement("button");
-        del.className = "miniBtn danger";
-        del.textContent = "Entfernen";
-        del.addEventListener("click", () => {
-          removeCustomSupp(s.id);
-          renderSuppCatalog();
-          renderSuppActivePills();
-          renderSuppDays();
-          renderDashboard();
-        });
-        row.appendChild(del);
-      }
-
-      suppCatalogEl.appendChild(row);
-    });
+  if(!sessions.length){
+    sessionList.innerHTML = `<div class="small muted">Noch keine Sessions an diesem Tag.</div>`;
+    return;
   }
 
-  addSuppBtn.addEventListener("click", () => {
-    addCustomSupp(addSuppInput.value);
-    addSuppInput.value = "";
-    renderSuppCatalog();
+  sessions.forEach((s, i) => {
+    const isKm = KM_SPORTS.includes(s.type);
+
+    const div = document.createElement("div");
+    div.className = "session";
+    div.innerHTML = `
+      <div class="sessionHead">
+        <strong>Session ${i+1}</strong>
+        <button class="danger">Löschen</button>
+      </div>
+      <div class="grid7">
+        <select>
+          <option value="">Sportart</option>
+          ${SPORTS.map(x=>`<option ${x===s.type?"selected":""}>${x}</option>`).join("")}
+        </select>
+        <input type="number" placeholder="Dauer (min)" value="${s.duration}">
+        <input type="number" placeholder="Kalorien" value="${s.calories}">
+        <input type="number" placeholder="Kilometer" value="${s.km}" ${isKm?"":"disabled"}>
+        <input placeholder="Pace mm:ss" value="${s.pace}" ${isKm?"":"disabled"}>
+      </div>
+    `;
+
+    const [sel,dur,cal,km,pace] = div.querySelectorAll("select,input");
+
+    sel.onchange = () => {
+      s.type = sel.value;
+      renderSessions();
+      renderAll();
+    };
+    dur.oninput = () => { s.duration = dur.value; saveDB(); renderAll(); };
+    cal.oninput = () => { s.calories = cal.value; saveDB(); renderAll(); };
+    km.oninput  = () => { s.km = km.value; saveDB(); renderAll(); };
+    pace.oninput= () => { s.pace = pace.value; saveDB(); renderAll(); };
+
+    div.querySelector("button").onclick = () => {
+      removeSession(date,i);
+      renderAll();
+    };
+
+    sessionList.appendChild(div);
   });
+}
 
-  function renderSuppActivePills(){
-    suppActivePillsEl.innerHTML = "";
-    const active = (suppCfg.activeIds || []);
-    if (!active.length){
-      const span = document.createElement("span");
-      span.className = "small muted";
-      span.textContent = "Noch keine Supplements aktiv. Wähle oben welche aus.";
-      suppActivePillsEl.appendChild(span);
-      return;
-    }
+/* ===================== AGGREGATION ===================== */
+function aggregate(range){
+  let total = {
+    calories:0,
+    minutes:0,
+    km:0,
+    paceSum:0,
+    paceKm:0,
+    sessions:0
+  };
 
-    const opts = allSuppOptions();
-    active.forEach(id => {
-      const s = opts.find(o => o.id === id);
-      if (!s) return;
+  Object.entries(db).forEach(([date,sessions]) => {
+    if(!inRange(date,range)) return;
 
-      const pill = document.createElement("span");
-      pill.className = "pill";
-      pill.textContent = s.text;
-
-      const x = document.createElement("button");
-      x.className = "miniBtn danger";
-      x.textContent = "×";
-      x.addEventListener("click", () => {
-        setActiveSupp(id, false);
-        renderSuppCatalog();
-        renderSuppActivePills();
-        renderSuppDays();
-        renderDashboard();
-      });
-
-      pill.appendChild(x);
-      suppActivePillsEl.appendChild(pill);
-    });
-  }
-
-  function renderSuppDays(){
-    suppDaysEl.innerHTML = "";
-
-    const activeIds = (suppCfg.activeIds || []);
-    if (!activeIds.length){
-      const msg = document.createElement("div");
-      msg.className = "small muted";
-      msg.style.marginTop = "8px";
-      msg.textContent = "Aktiviere oben Supplements, damit hier der Wochen-Tracker erscheint.";
-      suppDaysEl.appendChild(msg);
-      return;
-    }
-
-    const opts = allSuppOptions();
-
-    DAYS.forEach(d => {
-      if (!weekData.supplements[d.key]){
-        weekData.supplements[d.key] = { note:"", items:{} };
-      }
-      // ensure keys exist
-      activeIds.forEach(id => {
-        if (typeof weekData.supplements[d.key].items[id] !== "boolean"){
-          weekData.supplements[d.key].items[id] = false;
+    sessions.forEach(s=>{
+      total.sessions++;
+      total.minutes += Number(s.duration||0);
+      total.calories += Number(s.calories||0);
+      if(KM_SPORTS.includes(s.type)){
+        const km = Number(s.km||0);
+        const ps = parsePace(s.pace);
+        if(km>0){
+          total.km += km;
+          if(ps!=null){
+            total.paceSum += ps*km;
+            total.paceKm += km;
+          }
         }
-      });
-
-      const block = document.createElement("div");
-      block.className = "suppDayBlock";
-
-      const header = document.createElement("div");
-      header.className = "suppHeader";
-      header.innerHTML = `<div class="dayTitle">${d.label}</div>`;
-      block.appendChild(header);
-
-      const list = document.createElement("div");
-      list.className = "suppList";
-
-      activeIds.forEach(id => {
-        const s = opts.find(o => o.id === id);
-        if (!s) return;
-
-        const row = document.createElement("div");
-        row.className = "checkRow";
-
-        const cb = document.createElement("input");
-        cb.type = "checkbox";
-        cb.checked = !!weekData.supplements[d.key].items[id];
-        cb.addEventListener("change", () => {
-          weekData.supplements[d.key].items[id] = cb.checked;
-          saveWeek();
-          renderDashboard();
-        });
-
-        const label = document.createElement("label");
-        label.textContent = s.text;
-
-        row.appendChild(cb);
-        row.appendChild(label);
-        list.appendChild(row);
-      });
-
-      const note = document.createElement("input");
-      note.placeholder = "Notiz (optional)";
-      note.value = weekData.supplements[d.key].note || "";
-      note.addEventListener("input", () => {
-        weekData.supplements[d.key].note = note.value;
-        saveWeek();
-      });
-
-      block.appendChild(list);
-      block.appendChild(document.createElement("div")).style.height = "8px";
-      block.appendChild(note);
-
-      suppDaysEl.appendChild(block);
-    });
-
-    saveWeek();
-  }
-
-  // ===================== SPORT (MULTI) =====================
-  const sportDaysEl = document.getElementById("sportDays");
-
-  function newSession(){
-    return { type:"", minutes:"", calories:"", km:"", pace:"", note:"" };
-  }
-
-  function renderSportMulti(){
-    sportDaysEl.innerHTML = "";
-
-    DAYS.forEach(d => {
-      if (!weekData.sport[d.key] || !Array.isArray(weekData.sport[d.key].sessions)){
-        weekData.sport[d.key] = { sessions: [] };
       }
+    });
+  });
 
-      const block = document.createElement("div");
-      block.className = "dayBlock";
+  total.avgPace = total.paceKm ? paceFromSeconds(total.paceSum/total.paceKm) : "–";
+  return total;
+}
 
-      const header = document.createElement("div");
-      header.className = "dayHeader";
-      header.innerHTML = `<div class="dayTitle">${d.label}</div>`;
+/* ===================== RANGE ===================== */
+let activeRange = "day";
+document.querySelectorAll(".tab").forEach(t=>{
+  t.onclick = () => {
+    document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));
+    t.classList.add("active");
+    activeRange = t.dataset.range;
+    renderAll();
+  };
+});
 
-      const addBtn = document.createElement("button");
-      addBtn.className = "miniBtn";
-      addBtn.textContent = "+ Session hinzufügen";
-      addBtn.addEventListener("click", () => {
-        weekData.sport[d.key].sessions.push(newSession());
-        saveWeek();
-        renderSportMulti();
-        renderDashboard();
-      });
+function inRange(date,range){
+  const d = new Date(date);
+  const f = new Date(focusDateInput.value);
 
-      header.appendChild(addBtn);
-      block.appendChild(header);
+  if(range==="day") return date===focusDateInput.value;
+  if(range==="week"){
+    const diff = (d - f) / 86400000;
+    return diff>=-6 && diff<=0;
+  }
+  if(range==="month"){
+    return d.getMonth()===f.getMonth() && d.getFullYear()===f.getFullYear();
+  }
+  if(range==="year"){
+    return d.getFullYear()===f.getFullYear();
+  }
+  return true; // all
+}
 
-      const sessionsWrap = document.createElement("div");
-      sessionsWrap.className = "sessions";
+/* ===================== DASHBOARD ===================== */
+const kpiGrid = document.getElementById("kpiGrid");
+function renderDashboard(){
+  const a = aggregate(activeRange);
+  kpiGrid.innerHTML = `
+    <div class="kpi"><div class="v">${a.calories}</div><div class="l">Kalorien</div></div>
+    <div class="kpi"><div class="v">${a.minutes}</div><div class="l">Minuten</div></div>
+    <div class="kpi"><div class="v">${a.km.toFixed(1)}</div><div class="l">Kilometer</div></div>
+    <div class="kpi"><div class="v">${a.avgPace}</div><div class="l">Ø Pace</div></div>
+  `;
+}
 
-      const sessions = weekData.sport[d.key].sessions;
+/* ===================== PLACEHOLDER ===================== */
+function renderCharts(){}
+function renderCalendar(){}
 
-      if (sessions.length === 0){
-        const empty = document.createElement("div");
-        empty.className = "small muted";
-        empty.textContent = "Keine Sport-Session eingetragen.";
-        empty.style.marginTop = "8px";
-        block.appendChild(empty);
+/* ===================== MASTER ===================== */
+function renderAll(){
+  renderSessions();
+  renderDashboard();
+  renderCharts();
+  renderCalendar();
+}
+
+renderAll();
+/* ===================== EXPORT / IMPORT (Backup) ===================== */
+const exportBtn = document.getElementById("exportBtn");
+const importBtn = document.getElementById("importBtn");
+const importFile = document.getElementById("importFile");
+
+exportBtn.onclick = () => {
+  const payload = {
+    version: 1,
+    exportedAt: new Date().toISOString(),
+    profile,
+    db
+  };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], {type:"application/json"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `sport-tracker-backup-${iso(new Date())}.json`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+};
+
+importBtn.onclick = () => importFile.click();
+
+importFile.onchange = async () => {
+  const file = importFile.files?.[0];
+  if(!file) return;
+  try{
+    const text = await file.text();
+    const payload = JSON.parse(text);
+
+    // akzeptiere entweder komplettes payload oder nur db
+    if(payload && payload.db && typeof payload.db === "object"){
+      db = payload.db;
+      if(typeof payload.profile === "string"){
+        profile = payload.profile;
+        profileInput.value = profile;
+        saveProfile();
+      }
+      saveDB();
+      renderAll();
+      alert("Import erfolgreich ✅");
+    } else if(payload && typeof payload === "object"){
+      db = payload;
+      saveDB();
+      renderAll();
+      alert("Import erfolgreich ✅");
+    } else {
+      alert("Import fehlgeschlagen: falsches Format.");
+    }
+  } catch(e){
+    alert("Import fehlgeschlagen: Datei konnte nicht gelesen werden.");
+  } finally {
+    importFile.value = "";
+  }
+};
+
+/* ===================== WEEK STRIP (Tageskalorien in der Woche) ===================== */
+const weekStripWrap = document.getElementById("weekStripWrap");
+const weekStrip = document.getElementById("weekStrip");
+const rangeLabel = document.getElementById("rangeLabel");
+
+function mondayOf(dateIso){
+  const d = new Date(dateIso);
+  const day = d.getDay();
+  const diff = day === 0 ? -6 : 1 - day;
+  d.setDate(d.getDate()+diff);
+  return iso(d);
+}
+
+function addDays(dateIso, n){
+  const d = new Date(dateIso);
+  d.setDate(d.getDate()+n);
+  return iso(d);
+}
+
+function sumForDate(dateIso){
+  const sessions = db[dateIso] || [];
+  let calories=0, minutes=0, km=0, paceSum=0, paceKm=0, count=0;
+
+  sessions.forEach(s=>{
+    count++;
+    minutes += Number(s.duration||0);
+    calories += Number(s.calories||0);
+    if(KM_SPORTS.includes(s.type)){
+      const k = Number(s.km||0);
+      const ps = parsePace(s.pace);
+      if(k>0){
+        km += k;
+        if(ps!=null){ paceSum += ps*k; paceKm += k; }
+      }
+    }
+  });
+
+  return {
+    calories,
+    minutes,
+    km,
+    avgPace: paceKm ? paceFromSeconds(paceSum/paceKm) : "–",
+    sessions: count
+  };
+}
+
+/* ===================== CHARTS (Canvas) ===================== */
+const chartA = document.getElementById("chartA");
+const chartB = document.getElementById("chartB");
+
+function clearCanvas(c){
+  const ctx = c.getContext("2d");
+  ctx.clearRect(0,0,c.width,c.height);
+}
+
+function drawAxes(ctx, w, h, padL, padB){
+  ctx.strokeStyle = "#202020";
+  ctx.lineWidth = 1;
+  // y-axis
+  ctx.beginPath();
+  ctx.moveTo(padL, 10);
+  ctx.lineTo(padL, h - padB);
+  ctx.stroke();
+  // x-axis
+  ctx.beginPath();
+  ctx.moveTo(padL, h - padB);
+  ctx.lineTo(w - 10, h - padB);
+  ctx.stroke();
+}
+
+function drawBars(ctx, values, labels, title){
+  const w = ctx.canvas.width;
+  const h = ctx.canvas.height;
+  const padL = 40;
+  const padB = 26;
+
+  ctx.fillStyle = "#ffffff";
+  ctx.font = "14px system-ui";
+  ctx.fillText(title, 12, 18);
+
+  drawAxes(ctx, w, h, padL, padB);
+
+  const maxVal = Math.max(1, ...values);
+  const innerW = (w - 10) - padL;
+  const innerH = (h - padB) - 24;
+  const n = values.length;
+  const gap = 6;
+  const barW = Math.max(6, (innerW - gap*(n-1)) / n);
+
+  values.forEach((v, i) => {
+    const x = padL + i*(barW+gap);
+    const bh = (v / maxVal) * innerH;
+    const y = (h - padB) - bh;
+
+    ctx.fillStyle = "rgba(0,255,106,0.55)";
+    ctx.fillRect(x, y, barW, bh);
+
+    ctx.fillStyle = "#9a9a9a";
+    ctx.font = "10px system-ui";
+    const lab = labels[i] ?? "";
+    ctx.fillText(lab, x, h - 10);
+  });
+}
+
+function drawLine(ctx, values, labels, title){
+  const w = ctx.canvas.width;
+  const h = ctx.canvas.height;
+  const padL = 40;
+  const padB = 26;
+
+  ctx.fillStyle = "#ffffff";
+  ctx.font = "14px system-ui";
+  ctx.fillText(title, 12, 18);
+
+  drawAxes(ctx, w, h, padL, padB);
+
+  const maxVal = Math.max(1, ...values);
+  const innerW = (w - 10) - padL;
+  const innerH = (h - padB) - 24;
+  const n = values.length;
+
+  const stepX = n > 1 ? innerW/(n-1) : innerW;
+
+  // line
+  ctx.strokeStyle = "rgba(0,255,106,0.9)";
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  values.forEach((v, i) => {
+    const x = padL + i*stepX;
+    const y = (h - padB) - (v/maxVal)*innerH;
+    if(i===0) ctx.moveTo(x,y);
+    else ctx.lineTo(x,y);
+  });
+  ctx.stroke();
+
+  // points + labels
+  values.forEach((v, i) => {
+    const x = padL + i*stepX;
+    const y = (h - padB) - (v/maxVal)*innerH;
+
+    ctx.fillStyle = "rgba(0,255,106,1)";
+    ctx.beginPath();
+    ctx.arc(x,y,3,0,Math.PI*2);
+    ctx.fill();
+
+    ctx.fillStyle = "#9a9a9a";
+    ctx.font = "10px system-ui";
+    const lab = labels[i] ?? "";
+    ctx.fillText(lab, x-6, h - 10);
+  });
+}
+
+function getMonthDays(focusIso){
+  const d = new Date(focusIso);
+  const y = d.getFullYear();
+  const m = d.getMonth();
+  const first = new Date(y,m,1);
+  const last = new Date(y,m+1,0);
+  const days = last.getDate();
+  const out = [];
+  for(let i=1;i<=days;i++){
+    out.push(iso(new Date(y,m,i)));
+  }
+  return out;
+}
+
+function weekNumberISO(dateIso){
+  // ISO week number
+  const d = new Date(dateIso);
+  d.setHours(0,0,0,0);
+  d.setDate(d.getDate() + 3 - ((d.getDay() + 6) % 7));
+  const week1 = new Date(d.getFullYear(), 0, 4);
+  return 1 + Math.round(((d - week1) / 86400000 - 3 + ((week1.getDay()+6)%7)) / 7);
+}
+
+function getYearWeeks(focusIso){
+  const d = new Date(focusIso);
+  const y = d.getFullYear();
+  // we iterate days, bucket by ISO week
+  const buckets = new Map(); // week -> km
+  const start = new Date(y,0,1);
+  const end = new Date(y,11,31);
+  for(let cur = new Date(start); cur <= end; cur.setDate(cur.getDate()+1)){
+    const dateKey = iso(cur);
+    const wn = weekNumberISO(dateKey);
+    const sum = sumForDate(dateKey);
+    const prev = buckets.get(wn) || 0;
+    buckets.set(wn, prev + Number(sum.km||0));
+  }
+  // produce arrays week 1..53
+  const weeks = [];
+  const kms = [];
+  for(let w=1; w<=53; w++){
+    if(!buckets.has(w) && w>52) break;
+    weeks.push(w);
+    kms.push(Number((buckets.get(w)||0).toFixed(2)));
+  }
+  return { weeks, kms };
+}
+
+/* ===================== RENDER CHARTS ===================== */
+function renderCharts(){
+  const f = focusDateInput.value;
+
+  // Chart A: month daily calories bars
+  clearCanvas(chartA);
+  const ctxA = chartA.getContext("2d");
+  const days = getMonthDays(f);
+  const valsA = days.map(d => sumForDate(d).calories);
+  const labelsA = days.map(d => String(Number(d.slice(-2)))); // day number
+  const monthName = new Date(f).toLocaleString("de-DE", { month:"long", year:"numeric" });
+  drawBars(ctxA, valsA, labelsA, `Kalorien pro Tag (${monthName})`);
+
+  // Chart B: year weekly km line
+  clearCanvas(chartB);
+  const ctxB = chartB.getContext("2d");
+  const { weeks, kms } = getYearWeeks(f);
+  // label sparsely: every 4 weeks
+  const labelsB = weeks.map(w => (w%4===0 ? String(w) : ""));
+  const year = new Date(f).getFullYear();
+  drawLine(ctxB, kms, labelsB, `Kilometer pro Woche (${year})`);
+}
+
+/* ===================== MONTH CALENDAR (✔ if trained) ===================== */
+const monthCal = document.getElementById("monthCal");
+const calLabel = document.getElementById("calLabel");
+const calPrev = document.getElementById("calPrev");
+const calNext = document.getElementById("calNext");
+const calThis = document.getElementById("calThis");
+
+let calMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+
+calPrev.onclick = () => { calMonth = new Date(calMonth.getFullYear(), calMonth.getMonth()-1, 1); renderCalendar(); };
+calNext.onclick = () => { calMonth = new Date(calMonth.getFullYear(), calMonth.getMonth()+1, 1); renderCalendar(); };
+calThis.onclick = () => { calMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1); renderCalendar(); };
+
+function renderCalendar(){
+  const y = calMonth.getFullYear();
+  const m = calMonth.getMonth();
+  const monthName = calMonth.toLocaleString("de-DE", { month:"long", year:"numeric" });
+  calLabel.textContent = monthName;
+
+  const first = new Date(y,m,1);
+  const last = new Date(y,m+1,0);
+  const daysInMonth = last.getDate();
+  const jsDay = first.getDay(); // Sun=0
+  const offset = (jsDay===0 ? 6 : jsDay-1); // Mon=0
+
+  const headers = ["Mo","Di","Mi","Do","Fr","Sa","So"];
+  let html = "<thead><tr>" + headers.map(h=>`<th class="small muted">${h}</th>`).join("") + "</tr></thead><tbody>";
+
+  let dayNum = 1 - offset;
+  for(let row=0; row<6; row++){
+    html += "<tr>";
+    for(let col=0; col<7; col++){
+      if(dayNum < 1 || dayNum > daysInMonth){
+        html += `<td class="dim">&nbsp;</td>`;
       } else {
-        sessions.forEach((sess, idx) => {
-          const card = document.createElement("div");
-          card.className = "session";
+        const d = new Date(y,m,dayNum);
+        const dateKey = iso(d);
+        const trained = Array.isArray(db[dateKey]) && db[dateKey].length > 0;
 
-          const grid = document.createElement("div");
-          grid.className = "sessionGrid";
-
-          const sel = document.createElement("select");
-          SPORTS.forEach(opt => {
-            const o = document.createElement("option");
-            o.value = opt;
-            o.textContent = opt === "" ? "— Sport —" : opt;
-            sel.appendChild(o);
-          });
-          sel.value = sess.type || "";
-
-          const inpMin = document.createElement("input");
-          inpMin.type = "number";
-          inpMin.min = "0";
-          inpMin.placeholder = "Dauer (min)";
-          inpMin.value = sess.minutes ?? "";
-
-          const inpCal = document.createElement("input");
-          inpCal.type = "number";
-          inpCal.min = "0";
-          inpCal.placeholder = "Kalorien";
-          inpCal.value = sess.calories ?? "";
-
-          const inpKm = document.createElement("input");
-          inpKm.type = "number";
-          inpKm.min = "0";
-          inpKm.step = "0.1";
-          inpKm.placeholder = "KM (nur Joggen)";
-          inpKm.value = sess.km ?? "";
-
-          const inpPace = document.createElement("input");
-          inpPace.placeholder = "Pace (mm:ss / km)";
-          inpPace.value = sess.pace ?? "";
-
-          const inpNote = document.createElement("input");
-          inpNote.placeholder = "Notiz";
-          inpNote.value = sess.note ?? "";
-
-          const actions = document.createElement("div");
-          actions.className = "sessionActions";
-
-          const del = document.createElement("button");
-          del.className = "miniBtn danger";
-          del.textContent = "Löschen";
-          del.addEventListener("click", () => {
-            weekData.sport[d.key].sessions.splice(idx, 1);
-            saveWeek();
-            renderSportMulti();
-            renderDashboard();
-          });
-          actions.appendChild(del);
-
-          function updateJog(){
-            const isJog = sel.value === "Joggen";
-            inpKm.disabled = !isJog;
-            inpPace.disabled = !isJog;
-            inpKm.classList.toggle("disabledLook", !isJog);
-            inpPace.classList.toggle("disabledLook", !isJog);
-          }
-
-          function persist(){
-            weekData.sport[d.key].sessions[idx] = {
-              type: sel.value,
-              minutes: inpMin.value,
-              calories: inpCal.value,
-              km: inpKm.value,
-              pace: inpPace.value,
-              note: inpNote.value
-            };
-            saveWeek();
-            updateJog();
-            renderDashboard();
-          }
-
-          [sel, inpMin, inpCal, inpKm, inpPace, inpNote].forEach(el => el.addEventListener("input", persist));
-          sel.addEventListener("change", persist);
-
-          updateJog();
-
-          grid.appendChild(sel);
-          grid.appendChild(inpMin);
-          grid.appendChild(inpCal);
-          grid.appendChild(inpKm);
-          grid.appendChild(inpPace);
-          grid.appendChild(inpNote);
-          grid.appendChild(actions);
-
-          card.appendChild(grid);
-          sessionsWrap.appendChild(card);
-        });
-
-        block.appendChild(sessionsWrap);
+        html += `<td>
+          <div class="calCell">
+            <div style="font-weight:800;">${dayNum}</div>
+            ${trained ? `<div class="check">✓</div>` : ""}
+          </div>
+          <div class="small muted" style="margin-top:6px;">
+            ${trained ? `${sumForDate(dateKey).calories} kcal · ${sumForDate(dateKey).minutes} min` : ""}
+          </div>
+        </td>`;
       }
-
-      sportDaysEl.appendChild(block);
-    });
-
-    saveWeek();
+      dayNum++;
+    }
+    html += "</tr>";
   }
+  html += "</tbody>";
+  monthCal.innerHTML = html;
+}
 
-  // ===================== READING (WEEK) =====================
-  const readBody = document.getElementById("readBody");
+/* ===================== RANGE LABEL + WEEK STRIP ===================== */
+function renderRangeLabelAndStrip(){
+  const f = new Date(focusDateInput.value);
 
-  function renderReading(){
-    readBody.innerHTML = "";
-
-    DAYS.forEach(d => {
-      const tr = document.createElement("tr");
-      const r = weekData.reading[d.key] || (weekData.reading[d.key] = { title:"", pages:"", minutes:"", finished:false });
-
-      function tdBase(){
-        const td = document.createElement("td");
-        td.style.padding="8px";
-        td.style.borderBottom="1px solid var(--line)";
-        return td;
-      }
-
-      const tdDay = tdBase();
-      tdDay.textContent = d.label;
-
-      const tdTitle = tdBase();
-      const inpTitle = document.createElement("input");
-      inpTitle.placeholder="Buchtitel";
-      inpTitle.value = r.title ?? "";
-      tdTitle.appendChild(inpTitle);
-
-      const tdPages = tdBase();
-      const inpPages = document.createElement("input");
-      inpPages.type="number"; inpPages.min="0"; inpPages.placeholder="Seiten";
-      inpPages.value = r.pages ?? "";
-      tdPages.appendChild(inpPages);
-
-      const tdMin = tdBase();
-      const inpMin = document.createElement("input");
-      inpMin.type="number"; inpMin.min="0"; inpMin.placeholder="Minuten";
-      inpMin.value = r.minutes ?? "";
-      tdMin.appendChild(inpMin);
-
-      const tdDone = tdBase();
-      const cbDone = document.createElement("input");
-      cbDone.type="checkbox";
-      cbDone.checked = !!r.finished;
-      tdDone.appendChild(cbDone);
-
-      function persist(){
-        weekData.reading[d.key] = {
-          title: inpTitle.value,
-          pages: inpPages.value,
-          minutes: inpMin.value,
-          finished: cbDone.checked
-        };
-        saveWeek();
-
-        if (cbDone.checked){
-          addFinishedBookOnce(inpTitle.value);
-          renderFinishedBooksList();
-        }
-        renderDashboard();
-      }
-
-      [inpTitle, inpPages, inpMin].forEach(el => el.addEventListener("input", persist));
-      cbDone.addEventListener("change", persist);
-
-      tr.appendChild(tdDay);
-      tr.appendChild(tdTitle);
-      tr.appendChild(tdPages);
-      tr.appendChild(tdMin);
-      tr.appendChild(tdDone);
-      readBody.appendChild(tr);
-    });
-
-    saveWeek();
+  if(activeRange==="day"){
+    rangeLabel.textContent = `Tag: ${f.toLocaleDateString("de-DE")}`;
+    weekStripWrap.style.display = "none";
   }
+  if(activeRange==="week"){
+    const mon = mondayOf(focusDateInput.value);
+    const sun = addDays(mon, 6);
+    rangeLabel.textContent = `Woche: ${new Date(mon).toLocaleDateString("de-DE")} – ${new Date(sun).toLocaleDateString("de-DE")}`;
 
-  // ===================== NAMAZ DB =====================
-  let namazDB = lsGet(NAMAZ_KEY, {});
-
-  function ensureNamazDay(iso){
-    if (!namazDB[iso]){
-      namazDB[iso] = { sabach:false, ogle:false, ikindi:false, aksam:false, yatsi:false, note:"" };
-    } else {
-      NAMAZ_PRAYERS.forEach(p => {
-        if (typeof namazDB[iso][p.id] !== "boolean") namazDB[iso][p.id] = !!namazDB[iso][p.id];
-      });
-      if (typeof namazDB[iso].note !== "string") namazDB[iso].note = "";
+    weekStripWrap.style.display = "block";
+    weekStrip.innerHTML = "";
+    for(let i=0;i<7;i++){
+      const dIso = addDays(mon, i);
+      const s = sumForDate(dIso);
+      const name = new Date(dIso).toLocaleDateString("de-DE", { weekday:"short" });
+      const card = document.createElement("div");
+      card.className = "dayCard";
+      card.innerHTML = `
+        <div class="d">${name}</div>
+        <div class="sub">
+          <span><b style="color:var(--accent)">${s.calories}</b> kcal</span>
+          <span>${s.minutes} min · ${s.sessions} sessions</span>
+        </div>
+      `;
+      weekStrip.appendChild(card);
     }
   }
+  if(activeRange==="month"){
+    rangeLabel.textContent = `Monat: ${f.toLocaleDateString("de-DE", { month:"long", year:"numeric" })}`;
+    weekStripWrap.style.display = "none";
+  }
+  if(activeRange==="year"){
+    rangeLabel.textContent = `Jahr: ${f.getFullYear()}`;
+    weekStripWrap.style.display = "none";
+  }
+  if(activeRange==="all"){
+    rangeLabel.textContent = `Gesamt: alle Daten`;
+    weekStripWrap.style.display = "none";
+  }
+}
 
-  function saveNamaz(){ lsSet(NAMAZ_KEY, namazDB); }
+/* ===================== IMPROVED KPI GRID (more infos) ===================== */
+function renderDashboard(){
+  const a = aggregate(activeRange);
 
-  function countNamazTotals(){
-    let perPrayer = Object.fromEntries(NAMAZ_PRAYERS.map(p => [p.id, 0]));
-    let fullDays = 0;
-    const minDate = new Date(2000,0,1);
+  // Extra: Ø sessions pro Tag & Ø Minuten pro Tag im Range
+  let daysCount = 1;
+  const f = new Date(focusDateInput.value);
 
-    Object.keys(namazDB).forEach(k => {
-      const d = parseIso(k);
-      if (d < minDate) return;
-
-      const day = namazDB[k];
-      let all5 = true;
-
-      NAMAZ_PRAYERS.forEach(p => {
-        if (day[p.id]) perPrayer[p.id]++;
-        if (!day[p.id]) all5 = false;
-      });
-
-      if (all5) fullDays++;
-    });
-
-    return { perPrayer, fullDays, years: fullDays/365 };
+  if(activeRange==="week") daysCount = 7;
+  if(activeRange==="month"){
+    const y = f.getFullYear(), m = f.getMonth();
+    daysCount = new Date(y,m+1,0).getDate();
+  }
+  if(activeRange==="year"){
+    const y = f.getFullYear();
+    daysCount = ((new Date(y,11,31) - new Date(y,0,1))/86400000) + 1;
+  }
+  if(activeRange==="all"){
+    // approx: count unique days with any entry, but keep stable if empty
+    const keys = Object.keys(db);
+    daysCount = Math.max(1, keys.length);
   }
 
-  // ===================== NAMAZ UI =====================
-  const calEl = document.getElementById("calendar");
-  const calLabelEl = document.getElementById("calLabel");
-  const selDateLabelEl = document.getElementById("selDateLabel");
-  const namazFormEl = document.getElementById("namazForm");
-  const namazNoteEl = document.getElementById("namazNote");
-  const jumpDateEl = document.getElementById("jumpDate");
-  const namazTotalsEl = document.getElementById("namazTotals");
+  const avgSessionsPerDay = (a.sessions / daysCount);
+  const avgMinutesPerDay = (a.minutes / daysCount);
+  const avgCaloriesPerDay = (a.calories / daysCount);
 
-  let calMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
-  let selectedIso = isoDate(new Date());
+  kpiGrid.innerHTML = `
+    <div class="kpi"><div class="v">${a.calories}</div><div class="l">Kalorien (${activeRange})</div></div>
+    <div class="kpi"><div class="v">${a.minutes}</div><div class="l">Minuten (${activeRange})</div></div>
+    <div class="kpi"><div class="v">${a.km.toFixed(1)}</div><div class="l">Kilometer (${activeRange})</div></div>
+    <div class="kpi"><div class="v">${a.avgPace}</div><div class="l">Ø Pace (Joggen/Schwimmen)</div></div>
 
-  jumpDateEl.min = "2000-01-01";
-  jumpDateEl.max = "2099-12-31";
-  jumpDateEl.value = selectedIso;
+    <div class="kpi"><div class="v">${a.sessions}</div><div class="l">Sessions (${activeRange})</div></div>
+    <div class="kpi"><div class="v">${avgSessionsPerDay.toFixed(2)}</div><div class="l">Ø Sessions / Tag</div></div>
+    <div class="kpi"><div class="v">${Math.round(avgMinutesPerDay)}</div><div class="l">Ø Minuten / Tag</div></div>
+    <div class="kpi"><div class="v">${Math.round(avgCaloriesPerDay)}</div><div class="l">Ø Kalorien / Tag</div></div>
+  `;
 
-  function dayStatusBadge(iso){
-    ensureNamazDay(iso);
-    const day = namazDB[iso];
-    let count = 0;
-    NAMAZ_PRAYERS.forEach(p => { if (day[p.id]) count++; });
+  renderRangeLabelAndStrip();
+}
 
-    if (count === 5) return { txt:"5/5", cls:"ok" };
-    if (count === 0) return { txt:"0/5", cls:"bad" };
-    return { txt:`${count}/5`, cls:"warn" };
-  }
+/* ===================== HOOK FOCUS DATE ===================== */
+focusDateInput.onchange = () => renderAll();
+entryDateInput.onchange = () => renderSessions();
 
-  function renderNamazTotals(){
-    const t = countNamazTotals();
-    namazTotalsEl.innerHTML = "";
-    namazTotalsEl.innerHTML = `
-      <div class="chipGrid">
-        ${chip(t.perPrayer.sabach, "Sabach")}
-        ${chip(t.perPrayer.ogle, "Öğle")}
-        ${chip(t.perPrayer.ikindi, "İkindi")}
-        ${chip(t.perPrayer.aksam, "Akşam")}
-        ${chip(t.perPrayer.yatsi, "Yatsı")}
-        ${chip(t.fullDays, "Tage komplett (5/5)")}
-        ${chip(t.years.toFixed(2), "Jahre (≈/365)")}
-        ${chip("🙏", "Kontinuität")}
-      </div>
-    `;
-  }
+/* ===================== FINAL MASTER ===================== */
+function renderAll(){
+  renderSessions();
+  renderDashboard();
+  renderCharts();
+  renderCalendar();
+}
 
-  function selectNamazDate(iso, silent=false){
-    const min = new Date(2000,0,1);
-    if (parseIso(iso) < min) return;
-
-    selectedIso = iso;
-    jumpDateEl.value = iso;
-
-    ensureNamazDay(iso);
-    const day = namazDB[iso];
-
-    selDateLabelEl.textContent = iso;
-    namazFormEl.innerHTML = "";
-
-    NAMAZ_PRAYERS.forEach(p => {
-      const row = document.createElement("div");
-      row.className = "checkRow";
-
-      const cb = document.createElement("input");
-      cb.type = "checkbox";
-      cb.checked = !!day[p.id];
-
-      cb.addEventListener("change", () => {
-        day[p.id] = cb.checked;
-        saveNamaz();
-        renderNamazTotals();
-        renderDashboard();
-        renderCalendar();
-      });
-
-      const label = document.createElement("label");
-      label.textContent = p.label;
-
-      row.appendChild(cb);
-      row.appendChild(label);
-      namazFormEl.appendChild(row);
-    });
-
-    namazNoteEl.value = day.note || "";
-    namazNoteEl.oninput = () => {
-      day.note = namazNoteEl.value;
-      saveNamaz();
-    };
-
-    if (!silent) renderCalendar();
-  }
-
-  function renderCalendar(){
-    const y = calMonth.getFullYear();
-    const m = calMonth.getMonth();
-
-    const monthNames = ["Januar","Februar","März","April","Mai","Juni","Juli","August","September","Oktober","November","Dezember"];
-    calLabelEl.textContent = `${monthNames[m]} ${y}`;
-
-    const first = new Date(y, m, 1);
-    const last = new Date(y, m+1, 0);
-    const daysInMonth = last.getDate();
-
-    const jsDay = first.getDay(); // Sun=0
-    const offset = (jsDay === 0 ? 6 : jsDay - 1); // Mon=0
-
-    const headers = ["Mo","Di","Mi","Do","Fr","Sa","So"];
-    let html = "<thead><tr>" + headers.map(h => `<th style="color:var(--muted); font-weight:600;">${h}</th>`).join("") + "</tr></thead><tbody>";
-
-    let dayNum = 1 - offset;
-    for (let row=0; row<6; row++){
-      html += "<tr>";
-      for (let col=0; col<7; col++){
-        if (dayNum < 1 || dayNum > daysInMonth){
-          html += `<td style="background:#070707; color:#333;">&nbsp;</td>`;
-        } else {
-          const d = new Date(y, m, dayNum);
-          const min = new Date(2000,0,1);
-          const disabled = d < min;
-          const iso = isoDate(d);
-
-          const badge = !disabled ? dayStatusBadge(iso) : {txt:"", cls:""};
-          const isSel = iso === selectedIso;
-
-          html += `<td style="background:${isSel ? "#111" : "#0b0b0b"};">
-            <button class="calDayBtn" data-iso="${iso}" ${disabled ? "disabled style='opacity:.25; cursor:not-allowed;'" : ""}>
-              <div style="font-weight:700;">${dayNum}
-                ${!disabled ? `<span class="badge ${badge.cls}">${badge.txt}</span>` : ""}
-              </div>
-              <div class="small muted" style="margin-top:4px;">${iso}</div>
-            </button>
-          </td>`;
-        }
-        dayNum++;
-      }
-      html += "</tr>";
-    }
-    html += "</tbody>";
-    calEl.innerHTML = html;
-
-    calEl.querySelectorAll("button[data-iso]").forEach(btn => {
-      btn.addEventListener("click", () => selectNamazDate(btn.getAttribute("data-iso")));
-    });
-
-    selectNamazDate(selectedIso, true);
-  }
-
-  // ===================== DASHBOARD RENDER =====================
-  function countThisWeek(){
-    let sportMinutes = 0;
-    let sportCalories = 0;
-    let jogKm = 0;
-    let jogPaceWeighted = 0;
-
-    let readMinutes = 0;
-    let readPages = 0;
-    let finishedBooksWeek = 0;
-
-    // Supplements: wie viele aktive items abgehakt
-    let suppChecked = 0;
-
-    DAYS.forEach(d => {
-      // sport
-      const sessions = weekData.sport?.[d.key]?.sessions || [];
-      sessions.forEach(s => {
-        sportMinutes += Number(s.minutes || 0);
-        sportCalories += Number(s.calories || 0);
-
-        if (s.type === "Joggen"){
-          const km = Number(s.km || 0);
-          const ps = parsePaceToSeconds(s.pace);
-          if (km > 0){
-            jogKm += km;
-            if (ps != null) jogPaceWeighted += ps * km;
-          }
-        }
-      });
-
-      // reading
-      const r = weekData.reading?.[d.key];
-      if (r){
-        readMinutes += Number(r.minutes || 0);
-        readPages += Number(r.pages || 0);
-        if (r.finished) finishedBooksWeek++;
-      }
-
-      // supplements
-      const items = weekData.supplements?.[d.key]?.items || {};
-      (suppCfg.activeIds || []).forEach(id => {
-        if (items[id]) suppChecked++;
-      });
-    });
-
-    const avgPace = (jogKm > 0 && jogPaceWeighted > 0) ? secondsToPace(jogPaceWeighted / jogKm) : "–";
-
-    return {
-      sportMinutes, sportCalories,
-      jogKm: Number(jogKm.toFixed(1)),
-      avgPace,
-      readMinutes, readPages, finishedBooksWeek,
-      suppChecked
-    };
-  }
-
-  function aggregateTotals(){
-    let sportMinutes = 0;
-    let sportCalories = 0;
-    let jogKm = 0;
-    let jogPaceWeighted = 0;
-
-    let readMinutesTotal = 0;
-    let readPagesTotal = 0;
-
-    listAllWeeks().forEach(w => {
-      const sport = w.data.sport || {};
-      const reading = w.data.reading || {};
-
-      DAYS.forEach(d => {
-        const sessions = sport[d.key]?.sessions || [];
-        sessions.forEach(s => {
-          sportMinutes += Number(s.minutes || 0);
-          sportCalories += Number(s.calories || 0);
-          if (s.type === "Joggen"){
-            const km = Number(s.km || 0);
-            const ps = parsePaceToSeconds(s.pace);
-            if (km > 0){
-              jogKm += km;
-              if (ps != null) jogPaceWeighted += ps * km;
-            }
-          }
-        });
-
-        const r = reading[d.key];
-        if (r){
-          readMinutesTotal += Number(r.minutes || 0);
-          readPagesTotal += Number(r.pages || 0);
-        }
-      });
-    });
-
-    const avgPace = (jogKm > 0 && jogPaceWeighted > 0) ? secondsToPace(jogPaceWeighted / jogKm) : "–";
-
-    return {
-      sportMinutes, sportCalories,
-      jogKm: Number(jogKm.toFixed(1)),
-      avgPace,
-      readMinutesTotal,
-      readPagesTotal
-    };
-  }
-
-  function renderDashboard(){
-    const w = countThisWeek();
-    const t = aggregateTotals();
-    const n = countNamazTotals();
-
-    // Sport
-    document.getElementById("dashSport").innerHTML = `
-      <div class="chipGrid">
-        ${chip(w.sportMinutes, "Minuten (Woche)")}
-        ${chip(w.sportCalories, "Kalorien (Woche)")}
-        ${chip(w.jogKm, "Joggen KM (Woche)")}
-        ${chip(w.avgPace, "Ø Pace (Woche)")}
-      </div>
-      <div class="chipGrid" style="margin-top:10px;">
-        ${chip(t.sportMinutes, "Minuten (gesamt)")}
-        ${chip(t.sportCalories, "Kalorien (gesamt)")}
-        ${chip(t.jogKm, "Joggen KM (gesamt)")}
-        ${chip(t.avgPace, "Ø Pace (gesamt)")}
-      </div>
-    `;
-
-    // Lesen
-    document.getElementById("dashReading").innerHTML = `
-      <div class="chipGrid">
-        ${chip(w.readMinutes, "Leseminuten (Woche)")}
-        ${chip(w.readPages, "Seiten (Woche)")}
-        ${chip(w.finishedBooksWeek, "Bücher fertig (Woche)")}
-        ${chip(w.suppChecked, "Supp. Häkchen (Woche)")}
-      </div>
-      <div class="chipGrid" style="margin-top:10px;">
-        ${chip(t.readMinutesTotal, "Leseminuten (gesamt)")}
-        ${chip(t.readPagesTotal, "Seiten (gesamt)")}
-        ${chip(finishedBooks.length, "Bücher fertig (gesamt)")}
-        ${chip("✓", "Dranbleiben")}
-      </div>
-    `;
-
-    // Namaz
-    const totalNamaz =
-      n.perPrayer.sabach + n.perPrayer.ogle + n.perPrayer.ikindi + n.perPrayer.aksam + n.perPrayer.yatsi;
-
-    document.getElementById("dashNamaz").innerHTML = `
-      <div class="chipGrid">
-        ${chip(totalNamaz, "Gebete gesamt")}
-        ${chip(n.fullDays, "Tage komplett (5/5)")}
-        ${chip(n.years.toFixed(2), "Jahre (≈/365)")}
-        ${chip(n.perPrayer.sabach, "Sabach")}
-      </div>
-      <div class="chipGrid" style="margin-top:10px;">
-        ${chip(n.perPrayer.ogle, "Öğle")}
-        ${chip(n.perPrayer.ikindi, "İkindi")}
-        ${chip(n.perPrayer.aksam, "Akşam")}
-        ${chip(n.perPrayer.yatsi, "Yatsı")}
-      </div>
-    `;
-  }
-
-  // ===================== NAV BUTTONS / EVENTS =====================
-  document.getElementById("prevWeek").addEventListener("click", () => {
-    currentMonday.setDate(currentMonday.getDate() - 7);
-    weekData = lsGet(weekStorageKey(), emptyWeek());
-    rerenderWeek();
-  });
-  document.getElementById("nextWeek").addEventListener("click", () => {
-    currentMonday.setDate(currentMonday.getDate() + 7);
-    weekData = lsGet(weekStorageKey(), emptyWeek());
-    rerenderWeek();
-  });
-  document.getElementById("todayWeek").addEventListener("click", () => {
-    currentMonday = startOfWeekMonday(new Date());
-    weekData = lsGet(weekStorageKey(), emptyWeek());
-    rerenderWeek();
-  });
-  document.getElementById("resetWeek").addEventListener("click", () => {
-    localStorage.removeItem(weekStorageKey());
-    weekData = emptyWeek();
-    saveWeek();
-    rerenderWeek();
-  });
-
-  document.getElementById("refreshDash").addEventListener("click", () => {
-    renderDashboard();
-    renderFinishedBooksList();
-    renderSuppCatalog();
-    renderSuppActivePills();
-    renderSuppDays();
-    renderNamazTotals();
-  });
-
-  // Namaz controls
-  document.getElementById("calPrev").addEventListener("click", () => {
-    calMonth = new Date(calMonth.getFullYear(), calMonth.getMonth()-1, 1);
-    renderCalendar();
-  });
-  document.getElementById("calNext").addEventListener("click", () => {
-    calMonth = new Date(calMonth.getFullYear(), calMonth.getMonth()+1, 1);
-    renderCalendar();
-  });
-  document.getElementById("calToday").addEventListener("click", () => {
-    const t = new Date();
-    calMonth = new Date(t.getFullYear(), t.getMonth(), 1);
-    selectNamazDate(isoDate(t));
-    renderCalendar();
-  });
-  document.getElementById("jumpBtn").addEventListener("click", () => {
-    const iso = jumpDateEl.value;
-    if (!iso) return;
-    const d = parseIso(iso);
-    calMonth = new Date(d.getFullYear(), d.getMonth(), 1);
-    selectNamazDate(iso);
-    renderCalendar();
-  });
-  document.getElementById("clearDay").addEventListener("click", () => {
-    ensureNamazDay(selectedIso);
-    NAMAZ_PRAYERS.forEach(p => namazDB[selectedIso][p.id] = false);
-    namazDB[selectedIso].note = "";
-    saveNamaz();
-    selectNamazDate(selectedIso, true);
-    renderNamazTotals();
-    renderDashboard();
-    renderCalendar();
-  });
-  document.getElementById("closeDay").addEventListener("click", () => {
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  });
-
-  function rerenderWeek(){
-    renderWeekLabel();
-    renderSuppCatalog();
-    renderSuppActivePills();
-    renderSuppDays();
-    renderSportMulti();
-    renderReading();
-    renderFinishedBooksList();
-    renderNamazTotals();
-    renderDashboard();
-  }
-    // ===================== READING / SPORT / NAMAZ / SUPP INIT HELPERS =====================
-
-  // Reading table exists already in HTML; we already render it in renderReading()
-  // Sport multi exists already in HTML; we already render it in renderSportMulti()
-  // Supplements selector + weekly tracker exists already
-  // Namaz calendar + day editor exists already
-
-  // ---------------- INIT NAMAZ DEFAULTS ----------------
-  ensureNamazDay(selectedIso);
-  saveNamaz();
-
-  // ---------------- FIRST RENDER ----------------
-  function initAll(){
-    loadPlannerName();
-    renderWeekLabel();
-
-    // Supplements UI
-    renderSuppCatalog();
-    renderSuppActivePills();
-    renderSuppDays();
-
-    // Sport + Reading
-    renderSportMulti();
-    renderReading();
-
-    // Finished books + Namaz
-    renderFinishedBooksList();
-    renderNamazTotals();
-    renderCalendar();
-
-    // Dashboard overview
-    renderDashboard();
-
-    // Persist week after ensuring structures
-    saveWeek();
-  }
-
-  initAll();
+renderAll();
 
 })();
 </script>
