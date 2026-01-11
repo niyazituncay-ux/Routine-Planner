@@ -1,169 +1,1366 @@
 <!doctype html>
 <html lang="de">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Sport Tracker</title>
 
 <style>
-:root{
-  --bg:#000;
-  --fg:#fff;
-  --muted:#a8a8a8;
-  --line:#262626;
-  --panel:#0c0c0c;
-  --panel2:#101010;
-  --accent:#00ff6a;
-}
-body{
-  background:var(--bg);
-  color:var(--fg);
-  font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-  max-width:1200px;
-  margin:32px auto;
-  padding:0 16px 40px;
-}
-h1{ margin:0; font-size:30px; }
-h2{ margin:4px 0 0; font-size:14px; color:var(--muted); }
-h3{ margin:0 0 10px; font-size:16px; }
-.small{ font-size:12px; color:var(--muted); }
+  :root{
+    --bg:#000;
+    --fg:#fff;
+    --muted:#a8a8a8;
+    --line:#262626;
+    --panel:#0c0c0c;
+    --panel2:#101010;
+    --accent:#00ff6a;
+    --bad:#ff5b5b;
+  }
+  *{ box-sizing:border-box; }
+  body{
+    background:var(--bg);
+    color:var(--fg);
+    font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+    max-width: 1250px;
+    margin: 34px auto;
+    padding: 0 16px 44px;
+  }
+  h1{ margin:0; font-size:30px; letter-spacing:-0.3px; }
+  h2{ margin:6px 0 0; font-size:16px; color:var(--muted); font-weight:600; }
+  h3{ margin:0 0 10px; font-size:16px; }
+  .small{ font-size:12px; color:var(--muted); }
+  .muted{ color:var(--muted); }
+  hr{ border:none; border-top:1px solid var(--line); margin: 18px 0; }
 
-.card{
-  background:var(--panel);
-  border:1px solid var(--line);
-  border-radius:16px;
-  padding:16px;
-  margin-top:14px;
-}
+  .topbar{
+    border:1px solid var(--line);
+    border-radius: 16px;
+    padding: 14px;
+    background: linear-gradient(180deg, #0f0f0f, #080808);
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-end;
+    gap:12px;
+    flex-wrap:wrap;
+    position:relative;
+    overflow:hidden;
+  }
+  .topbar::before{
+    content:"";
+    position:absolute;
+    right:-80px; top:-90px;
+    width:260px; height:260px;
+    border-radius:999px;
+    background: radial-gradient(circle at 30% 30%, rgba(0,255,106,0.22), rgba(0,0,0,0) 60%);
+    pointer-events:none;
+  }
 
-.row{
-  display:flex;
-  gap:10px;
-  flex-wrap:wrap;
-  align-items:center;
-}
-.grow{ flex:1; min-width:220px; }
+  .row{ display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+  .grow{ flex: 1; min-width: 240px; }
 
-input, select, textarea{
-  width:100%;
-  background:var(--panel2);
-  color:var(--fg);
-  border:1px solid var(--line);
-  border-radius:12px;
-  padding:8px 10px;
-}
+  input, select, textarea{
+    width: 100%;
+    box-sizing:border-box;
+    background: var(--panel2);
+    color: var(--fg);
+    border:1px solid var(--line);
+    border-radius: 12px;
+    padding: 8px 10px;
+  }
+  textarea{ min-height:110px; }
 
-button{
-  background:#111;
-  color:var(--fg);
-  border:1px solid var(--line);
-  border-radius:12px;
-  padding:9px 14px;
-  cursor:pointer;
-}
-button:hover{ background:#161616; }
+  button{
+    border:1px solid var(--line);
+    background: #111;
+    color: var(--fg);
+    border-radius: 12px;
+    padding: 9px 12px;
+    cursor:pointer;
+  }
+  button:hover{ background:#151515; }
+  .danger{ color: var(--bad); border-color:#3a1a1a; }
+  .ghost{ background: transparent; }
 
-.session{
-  border:1px solid var(--line);
-  background:#0b0b0b;
-  border-radius:14px;
-  padding:12px;
-  margin-top:10px;
-}
+  .card{
+    border:1px solid var(--line);
+    border-radius: 16px;
+    padding: 14px;
+    background: var(--panel);
+    margin-top: 12px;
+  }
 
-.gridSession{
-  display:grid;
-  grid-template-columns: repeat(6, minmax(120px,1fr));
-  gap:8px;
-}
+  /* ===== DASHBOARD ===== */
+  .tabs{
+    display:flex; gap:8px; flex-wrap:wrap;
+    margin-top: 10px;
+  }
+  .tab{
+    padding: 7px 10px;
+    border-radius: 999px;
+    border:1px solid var(--line);
+    background: #0f0f0f;
+    color: var(--muted);
+    cursor:pointer;
+    user-select:none;
+  }
+  .tab.active{
+    background: rgba(0,255,106,0.12);
+    color: var(--fg);
+    border-color:#1b4f30;
+  }
 
-@media (max-width:900px){
-  .gridSession{ grid-template-columns: 1fr 1fr; }
-}
+  .dashGrid{
+    display:grid;
+    grid-template-columns: 1.05fr 0.95fr;
+    gap:12px;
+    margin-top: 12px;
+  }
+  @media (max-width: 980px){
+    .dashGrid{ grid-template-columns: 1fr; }
+  }
+
+  .kpiGrid{
+    display:grid;
+    grid-template-columns: repeat(3, minmax(140px, 1fr));
+    gap:10px;
+  }
+  @media (max-width: 980px){
+    .kpiGrid{ grid-template-columns: repeat(2, minmax(140px, 1fr)); }
+  }
+  .kpi{
+    border:1px solid var(--line);
+    background: linear-gradient(180deg, #101010, #0a0a0a);
+    border-radius: 16px;
+    padding: 12px;
+  }
+  .kpi .v{
+    font-size: 20px;
+    font-weight: 900;
+    color: var(--accent);
+    line-height: 1.1;
+  }
+  .kpi .l{
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 6px;
+    line-height: 1.2;
+  }
+
+  .panel{
+    border:1px solid var(--line);
+    background: #0b0b0b;
+    border-radius: 16px;
+    padding: 12px;
+  }
+
+  canvas{
+    width: 100%;
+    height: 220px;
+    border:1px solid var(--line);
+    background:#080808;
+    border-radius: 16px;
+  }
+
+  /* ===== ENTRY ===== */
+  .entryGrid{
+    display:grid;
+    grid-template-columns: 0.9fr 1.1fr;
+    gap:12px;
+    margin-top: 12px;
+  }
+  @media (max-width: 980px){
+    .entryGrid{ grid-template-columns: 1fr; }
+  }
+
+  .sessionList{ display:grid; gap:10px; margin-top:10px; }
+  .session{
+    border:1px solid var(--line);
+    background: #0b0b0b;
+    border-radius: 16px;
+    padding: 12px;
+  }
+  .sessionHead{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:10px;
+    flex-wrap:wrap;
+  }
+
+  .gridSession{
+    display:grid;
+    grid-template-columns: repeat(6, minmax(140px, 1fr)) auto;
+    gap:8px;
+    align-items:start;
+    margin-top: 10px;
+  }
+  @media (max-width: 980px){
+    .gridSession{ grid-template-columns: 1fr 1fr; }
+  }
+
+  .hint{
+    font-size:12px;
+    color: var(--muted);
+    margin-top: 8px;
+  }
+
+  /* ===== WEEK STRIP ===== */
+  .weekStrip{
+    display:grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap:10px;
+    margin-top: 12px;
+  }
+  @media (max-width: 980px){
+    .weekStrip{ grid-template-columns: repeat(2, 1fr); }
+  }
+  .dayCard{
+    border:1px solid var(--line);
+    background: #0b0b0b;
+    border-radius: 16px;
+    padding: 12px;
+  }
+  .dayCard .d{ font-weight: 800; }
+  .dayCard .sub{ margin-top:6px; font-size:12px; color:var(--muted); display:flex; flex-direction:column; gap:4px; }
+
+  /* ===== MONTH CALENDAR ===== */
+  .calHeader{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:10px;
+    flex-wrap:wrap;
+  }
+  .calendar{
+    width:100%;
+    border-collapse: collapse;
+    border:1px solid var(--line);
+    border-radius: 16px;
+    overflow:hidden;
+    background:#080808;
+    margin-top: 10px;
+  }
+  .calendar th, .calendar td{
+    border-bottom:1px solid var(--line);
+    border-right:1px solid var(--line);
+    padding: 10px;
+    vertical-align: top;
+    height: 72px;
+  }
+  .calendar th:last-child, .calendar td:last-child{ border-right:none; }
+  .calendar tr:last-child td{ border-bottom:none; }
+  .calCell{
+    display:flex;
+    justify-content:space-between;
+    gap:10px;
+    align-items:flex-start;
+  }
+  .check{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    width:22px; height:22px;
+    border-radius: 999px;
+    border:1px solid #1b4f30;
+    background: rgba(0,255,106,0.14);
+    color: var(--accent);
+    font-weight: 900;
+    font-size: 12px;
+  }
+  .dim{ color:#444; }
+
+  /* OCR panel */
+  #ocrModal{ display:none; }
 </style>
 </head>
 
 <body>
 
-<!-- HEADER -->
-<div class="card">
-  <h1 id="appTitle">Sport Tracker</h1>
-  <h2>Multi-Sessions · OCR · Auswertung</h2>
-</div>
+<div class="topbar">
+  <div>
+    <h1 id="appTitle">Sport Tracker</h1>
+    <h2>Multi-Sessions · Ø Herzfrequenz · Tag/Woche/Monat/Jahr/Gesamt</h2>
+    <div class="small">Speicherung lokal im Browser (Archiv). Bleibt bis Website-Daten gelöscht werden.</div>
+  </div>
 
-<!-- PROFIL -->
-<div class="card">
-  <h3>Profil</h3>
-  <div class="row">
+  <div class="row" style="min-width:280px;">
     <div class="grow">
-      <div class="small">Name</div>
-      <input id="profileName" placeholder="z.B. Niyazi Tuncay">
+      <div class="small muted" style="margin-bottom:6px;">Name / Profil</div>
+      <input id="profileName" placeholder="z.B. Niyazi Tuncay" />
     </div>
-    <button id="saveProfile">Speichern</button>
+    <div style="display:flex; gap:8px; align-items:end;">
+      <button id="saveProfile">Speichern</button>
+      <button id="exportBtn" class="ghost" title="Backup als JSON">Export</button>
+      <button id="importBtn" class="ghost" title="Restore aus JSON">Import</button>
+
+      <!-- iOS Fix: nicht display:none -->
+      <input id="importFile" type="file" accept="application/json"
+             style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0;" />
+    </div>
   </div>
 </div>
 
-<!-- EINTRAG -->
 <div class="card">
-  <h3>➕ Training eintragen</h3>
-
-  <div class="row">
-    <div class="grow">
-      <div class="small">Datum</div>
-      <input id="entryDate" type="date">
+  <div class="row" style="justify-content:space-between;">
+    <div>
+      <h3>📊 Übersicht</h3>
+      <div class="small">Wähle Zeitraum – KPI + Diagramme + Kalender.</div>
     </div>
-    <button id="addSessionBtn">+ Session</button>
+    <div class="row">
+      <input id="focusDate" type="date" style="max-width:220px;" />
+      <button id="todayBtn">Heute</button>
+    </div>
   </div>
 
-  <div class="row" style="margin-top:10px;">
-    <button id="shotBtn">📷 Screenshot / Foto importieren</button>
-    <div id="ocrStatus" class="small"></div>
-    <input id="shotFile" type="file" accept="image/*" style="display:none">
+  <div class="tabs">
+    <div class="tab active" data-range="day">Tag</div>
+    <div class="tab" data-range="week">Woche</div>
+    <div class="tab" data-range="month">Monat</div>
+    <div class="tab" data-range="year">Jahr</div>
+    <div class="tab" data-range="all">Gesamt</div>
   </div>
 
-  <div id="sessionList"></div>
+  <div class="dashGrid">
+    <div class="panel">
+      <div class="small muted" id="rangeLabel">—</div>
+      <div class="kpiGrid" id="kpiGrid"></div>
+
+      <div id="weekStripWrap" style="display:none;">
+        <hr>
+        <h3 style="margin-bottom:8px;">🔥 Tageskalorien (Woche)</h3>
+        <div class="weekStrip" id="weekStrip"></div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h3 style="margin-bottom:10px;">📈 Diagramme</h3>
+      <div class="small muted" style="margin-bottom:8px;">Monat: Kalorien/Tag · Jahr: KM/Woche</div>
+      <canvas id="chartA" width="900" height="260"></canvas>
+      <div style="height:10px;"></div>
+      <canvas id="chartB" width="900" height="260"></canvas>
+    </div>
+  </div>
 </div>
 
-<!-- OCR MODAL -->
-<div class="card" id="ocrModal" style="display:none;">
-  <h3>OCR-Vorschlag</h3>
+<div class="card">
+  <h3>➕ Sport eintragen (Multi-Sessions)</h3>
+  <div class="small">Joggen & Schwimmen: Dauer + KM + Pace + Ø HF. Andere: Dauer + Kalorien + Ø HF.</div>
 
-  <div class="gridSession">
-    <select id="ocrType"></select>
-    <input id="ocrDuration" placeholder="Minuten">
-    <input id="ocrCalories" placeholder="Kalorien">
-    <input id="ocrKm" placeholder="Kilometer">
-    <input id="ocrPace" placeholder="Pace mm:ss">
-    <input id="ocrHr" placeholder="Ø Herzfrequenz">
-  </div>
+  <div class="entryGrid">
+    <div class="panel">
+      <div class="row" style="justify-content:space-between;">
+        <div style="min-width:220px;">
+          <div class="small muted">Datum</div>
+          <input id="entryDate" type="date" />
+        </div>
+        <div style="display:flex; gap:8px; align-items:end;">
+          <button id="addSessionBtn">+ Session</button>
+          <button id="clearDayBtn" class="danger" title="Löscht alle Sessions an diesem Datum">Tag löschen</button>
+        </div>
+      </div>
 
-  <textarea id="ocrRaw" style="margin-top:10px;" placeholder="Erkannter Text"></textarea>
+      <div class="hint">
+        Pace: <b>mm:ss</b> (z.B. <b>5:30</b>). Ø HF: bpm (z.B. 148).
+      </div>
 
-  <div class="row" style="margin-top:10px;">
-    <button id="ocrApply">Übernehmen</button>
-    <button id="ocrCancel">Abbrechen</button>
+      <div class="row" style="margin-top:10px;">
+        <button id="shotBtn">📷 Screenshot / Foto importieren</button>
+        <div id="ocrStatus" class="small muted"></div>
+
+        <!-- iOS Fix: nicht display:none -->
+        <input id="shotFile" type="file" accept="image/*"
+               style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0;" />
+      </div>
+
+      <div id="ocrModal" class="card">
+        <h3>Screenshot Import – Vorschlag</h3>
+        <div class="small muted" style="margin-bottom:10px;">Prüf kurz und klicke „Übernehmen“.</div>
+
+        <div class="row">
+          <div style="min-width:220px;">
+            <div class="small muted">Datum</div>
+            <input id="ocrDate" type="date">
+          </div>
+          <div style="min-width:220px;">
+            <div class="small muted">Uhrzeit (optional)</div>
+            <input id="ocrTime" placeholder="z.B. 18:45">
+          </div>
+          <div class="grow" style="min-width:220px;">
+            <div class="small muted">Sportart</div>
+            <select id="ocrType"></select>
+          </div>
+        </div>
+
+        <div class="row" style="margin-top:10px;">
+          <div class="grow"><div class="small muted">Dauer (min)</div><input id="ocrDuration" type="number" min="0"></div>
+          <div class="grow"><div class="small muted">Kalorien</div><input id="ocrCalories" type="number" min="0"></div>
+          <div class="grow"><div class="small muted">Kilometer</div><input id="ocrKm" type="number" min="0" step="0.01"></div>
+          <div class="grow"><div class="small muted">Pace (mm:ss/km)</div><input
+           id="ocrPace"></div>
+          <div class="grow"><div class="small muted">Ø HF (bpm)</div><input id="ocrHr" type="number" min="0"></div>
+        </div>
+
+        <div style="margin-top:10px;">
+          <div class="small muted">OCR Text</div>
+          <textarea id="ocrRaw"></textarea>
+        </div>
+
+        <div class="row" style="justify-content:space-between; margin-top:10px;">
+          <button id="ocrCancel" class="ghost">Abbrechen</button>
+          <button id="ocrApply">Übernehmen → Session anlegen</button>
+        </div>
+      </div>
+
+      <div class="sessionList" id="sessionList"></div>
+    </div>
+
+    <div class="panel">
+      <h3 style="margin-bottom:10px;">🗓️ Monatskalender</h3>
+      <div class="small muted">✔ wenn du an dem Tag mindestens 1 Training hast.</div>
+
+      <div class="calHeader" style="margin-top:10px;">
+        <div class="row">
+          <button id="calPrev">◀</button>
+          <button id="calNext">▶</button>
+          <button id="calThis">Dieser Monat</button>
+        </div>
+        <div style="font-weight:900;" id="calLabel">—</div>
+      </div>
+
+      <div style="overflow:auto;">
+        <table class="calendar" id="monthCal"></table>
+      </div>
+    </div>
   </div>
 </div>
 
-<!-- SCRIPT KOMMT IN PART 2 -->
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+
 <script>
 (() => {
   /* ===================== STORAGE ===================== */
-  const KEY_DATA = "sport_tracker_data_v1";
-  const KEY_PROFILE = "sport_tracker_profile_v1";
+  const KEY_DATA = "sport_tracker_data_full_onefile_v1";
+  const KEY_PROFILE = "sport_tracker_profile_full_onefile_v1";
 
   /* ===================== CONSTANTS ===================== */
   const SPORTS = ["Krafttraining","Joggen","Stretching","Ringen","Schwimmen","Tennis"];
   const KM_SPORTS = new Set(["Joggen","Schwimmen"]);
 
   /* ===================== HELPERS ===================== */
-  const $ = (id) => document.getElementById(id);
-  const pad = (n) => String(n).padStart(2,"0");
-  const iso = (d) => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+  const pad = n => String(n).padStart(2,"0");
+  const iso = d => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+  const $ = id => document.getElementById(id);
+
+  function parsePace(p){
+    if(!p || !p.includes(":")) return null;
+    const [m,s] = p.split(":").map(Number);
+    if(!Number.isFinite(m)||!Number.isFinite(s)||s<0||s>59||m<0) return null;
+    return m*60+s;
+  }
+  function paceFromSeconds(sec){
+    const t = Math.round(sec);
+    return `${Math.floor(t/60)}:${pad(t%60)}`;
+  }
+
+  /* ===================== STATE ===================== */
+  let db = (()=>{ try{return JSON.parse(localStorage.getItem(KEY_DATA)||"{}");}catch{return{};} })();
+  let profile = localStorage.getItem(KEY_PROFILE)||"";
+
+  function saveDB(){ localStorage.setItem(KEY_DATA, JSON.stringify(db)); }
+  function saveProfile(){
+    localStorage.setItem(KEY_PROFILE, profile);
+    $("appTitle").textContent = profile || "Sport Tracker";
+  }
+
+  /* ===================== DOM ===================== */
+  const profileInput=$("profileName");
+  const saveProfileBtn=$("saveProfile");
+  const exportBtn=$("exportBtn");
+  const importBtn=$("importBtn");
+  const importFile=$("importFile");
+
+  const entryDateInput=$("entryDate");
+  const focusDateInput=$("focusDate");
+  const todayBtn=$("todayBtn");
+
+  const sessionList=$("sessionList");
+  const kpiGrid=$("kpiGrid");
+  const rangeLabel=$("rangeLabel");
+
+  const weekStripWrap=$("weekStripWrap");
+  const weekStrip=$("weekStrip");
+
+  const chartA=$("chartA");
+  const chartB=$("chartB");
+
+  const monthCal=$("monthCal");
+  const calLabel=$("calLabel");
+  const calPrev=$("calPrev");
+  const calNext=$("calNext");
+  const calThis=$("calThis");
+
+  // OCR
+  const shotBtn=$("shotBtn");
+  const shotFile=$("shotFile");
+  const ocrStatus=$("ocrStatus");
+  const ocrModal=$("ocrModal");
+  const ocrDate=$("ocrDate");
+  const ocrTime=$("ocrTime");
+  const ocrType=$("ocrType");
+  const ocrDuration=$("ocrDuration");
+  const ocrCalories=$("ocrCalories");
+  const ocrKm=$("ocrKm");
+  const ocrPace=$("ocrPace");
+  const ocrHr=$("ocrHr");
+  const ocrRaw=$("ocrRaw");
+  const ocrCancel=$("ocrCancel");
+  const ocrApply=$("ocrApply");
+
+  /* ===================== INIT ===================== */
+  profileInput.value = profile;
+  saveProfile();
+  saveProfileBtn.onclick = () => { profile = profileInput.value.trim(); saveProfile(); };
+
+  const now = new Date();
+  entryDateInput.value = iso(now);
+  focusDateInput.value = iso(now);
+  todayBtn.onclick = () => { focusDateInput.value = iso(new Date()); renderAll(); };
+
+  /* ===================== MODEL ===================== */
+  function getDay(d){ if(!Array.isArray(db[d])) db[d]=[]; return db[d]; }
+  function addSession(d){ getDay(d).push({type:"",duration:"",calories:"",km:"",pace:"",hr:""}); saveDB(); }
+  function removeSession(d,i){ getDay(d).splice(i,1); if(!db[d].length) delete db[d]; saveDB(); }
+
+  function updateAfterEdit(){
+    renderDashboard();
+    renderCharts();
+    renderCalendar();
+  }
+
+  /* ===================== SESSIONS UI ===================== */
+  $("addSessionBtn").onclick = () => { addSession(entryDateInput.value); renderSessions(); updateAfterEdit(); };
+  $("clearDayBtn").onclick = () => { delete db[entryDateInput.value]; saveDB(); renderAll(); };
+  entryDateInput.onchange = () => renderSessions();
+  focusDateInput.onchange = () => renderAll();
+
+  function renderSessions(){
+    const d = entryDateInput.value;
+    const arr = getDay(d);
+    sessionList.innerHTML = "";
+    if(!arr.length){
+      sessionList.innerHTML = `<div class="small muted">Noch keine Sessions.</div>`;
+      return;
+    }
+
+    arr.forEach((s,i)=>{
+      const isKm = KM_SPORTS.has(s.type);
+      const el = document.createElement("div");
+      el.className="session";
+      el.innerHTML = `
+        <div class="sessionHead">
+          <strong>Session ${i+1}</strong>
+          <button class="danger">Löschen</button>
+        </div>
+        <div class="gridSession">
+          <select aria-label="Sportart"></select>
+          <input type="number" min="0" placeholder="Dauer (min)" value="${s.duration||""}">
+          <input type="number" min="0" placeholder="Kalorien" value="${s.calories||""}">
+          <input type="number" min="0" step="0.01" placeholder="KM" ${isKm?"":"disabled"} value="${s.km||""}">
+          <input placeholder="Pace mm:ss" ${isKm?"":"disabled"} value="${s.pace||""}">
+          <input type="number" min="0" placeholder="Ø HF bpm" value="${s.hr||""}">
+          <div></div>
+        </div>
+      `;
+      const delBtn = el.querySelector("button");
+      const sel = el.querySelector("select");
+      sel.innerHTML = `<option value="">Sportart</option>` + SPORTS.map(x=>`<option value="${x}" ${x===s.type?"selected":""}>${x}</option>`).join("");
+
+      const inputs = el.querySelectorAll("input");
+      const dur=inputs[0], cal=inputs[1], km=inputs[2], pace=inputs[3], hr=inputs[4];
+
+      delBtn.onclick = () => { removeSession(d,i); renderAll(); };
+
+      sel.onchange = () => {
+        s.type = sel.value;
+        saveDB();
+        renderSessions();
+        updateAfterEdit();
+      };
+
+      dur.oninput = () => { s.duration = dur.value; saveDB(); updateAfterEdit(); };
+      cal.oninput = () => { s.calories = cal.value; saveDB(); updateAfterEdit(); };
+      km.oninput  = () => { s.km = km.value; saveDB(); updateAfterEdit(); };
+      pace.oninput= () => { s.pace = pace.value; saveDB(); updateAfterEdit(); };
+      hr.oninput  = () => { s.hr = hr.value; saveDB(); updateAfterEdit(); };
+
+      sessionList.appendChild(el);
+    });
+  }
+
+  /* ===================== RANGE ===================== */
+  let activeRange="day";
+  document.querySelectorAll(".tab").forEach(t=>{
+    t.onclick=()=>{
+      document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));
+      t.classList.add("active");
+      activeRange=t.dataset.range;
+      renderAll();
+    };
+  });
+
+  function inRange(d,r){
+    const D=new Date(d);
+    const F=new Date(focusDateInput.value);
+    if(r==="day") return d===focusDateInput.value;
+    if(r==="week"){ const diff=(D-F)/86400000; return diff>=-6&&diff<=0; }
+    if(r==="month") return D.getMonth()===F.getMonth() && D.getFullYear()===F.getFullYear();
+    if(r==="year") return D.getFullYear()===F.getFullYear();
+    return true;
+  }
+
+  /* ===================== AGGREGATION ===================== */
+  function aggregate(r){
+    let t={cal:0,min:0,km:0,paceSum:0,paceKm:0,hrSum:0,hrMin:0,sess:0};
+
+    for(const [d,arr] of Object.entries(db)){
+      if(!inRange(d,r)) continue;
+      if(!Array.isArray(arr)) continue;
+
+      arr.forEach(s=>{
+        t.sess++;
+        const m = Number(s.duration||0);
+        t.min += m;
+        t.cal += Number(s.calories||0);
+
+        if(KM_SPORTS.has(s.type)){
+          const km = Number(s.km||0);
+          const ps = parsePace(s.pace);
+          if(km>0){
+            t.km += km;
+            if(ps!=null){
+              t.paceSum += ps*km;
+              t.paceKm += km;
+            }
+          }
+        }
+
+        const hr = Number(s.hr||0);
+        if(hr>0 && m>0){
+          t.hrSum += hr*m;
+          t.hrMin += m;
+        }
+      });
+    }
+
+    return {
+      calories: t.cal,
+      minutes: t.min,
+      km: t.km,
+      avgPace: t.paceKm ? paceFromSeconds(t.paceSum/t.paceKm) : "–",
+      avgHr: t.hrMin ? Math.round(t.hrSum/t.hrMin) : "–",
+      sessions: t.sess
+    };
+  }
+
+  /* ===================== WEEK STRIP + LABEL ===================== */
+  function mondayOf(dateIso){
+    const d=new Date(dateIso);
+    const day=d.getDay();
+    const diff=day===0 ? -6 : 1-day;
+    d.setDate(d.getDate()+diff);
+    return iso(d);
+  }
+  function addDays(dateIso,n){
+    const d=new Date(dateIso);
+    d.setDate(d.getDate()+n);
+    return iso(d);
+  }
+  function sumForDate(dateIso){
+    const arr=db[dateIso]||[];
+    let cal=0,min=0,sess=0;
+    arr.forEach(s=>{
+      sess++;
+      min+=Number(s.duration||0);
+      cal+=Number(s.calories||0);
+    });
+    return {calories:cal, minutes:min, sessions:sess};
+  }
+
+  function renderRangeLabelAndStrip(){
+    const f=new Date(focusDateInput.value);
+
+    if(activeRange==="day"){
+      rangeLabel.textContent = `Tag: ${f.toLocaleDateString("de-DE")}`;
+      weekStripWrap.style.display="none";
+      return;
+    }
+    if(activeRange==="week"){
+      const mon=mondayOf(focusDateInput.value);
+      const sun=addDays(mon,6);
+      rangeLabel.textContent = `Woche: ${new Date(mon).toLocaleDateString("de-DE")} – ${new Date(sun).toLocaleDateString("de-DE")}`;
+      weekStripWrap.style.display="block";
+      weekStrip.innerHTML="";
+      for(let i=0;i<7;i++){
+        const dIso = addDays(mon,i);
+        const s = sumForDate(dIso);
+        const name = new Date(dIso).toLocaleDateString("de-DE",{weekday:"short"});
+
+        const card = document.createElement("div");
+        card.className="dayCard";
+        card.innerHTML = `
+          <div class="d">${name}</div>
+          <div class="sub">
+            <span><b style="color:var(--accent)">${s.calories}</b> kcal</span>
+            <span>${s.minutes} min · ${s.sessions} sessions</span>
+          </div>
+        `;
+        card.style.cursor="pointer";
+        card.onclick=()=>{ focusDateInput.value=dIso; renderAll(); };
+        weekStrip.appendChild(card);
+      }
+      return;
+    }
+    if(activeRange==="month"){
+      rangeLabel.textContent = `Monat: ${f.toLocaleDateString("de-DE",{month:"long",year:"numeric"})}`;
+      weekStripWrap.style.display="none";
+      return;
+    }
+    if(activeRange==="year"){
+      rangeLabel.textContent = `Jahr: ${f.getFullYear()}`;
+      weekStripWrap.style.display="none";
+      return;
+    }
+    rangeLabel.textContent = `Gesamt: alle Daten`;
+    weekStripWrap.style.display="none";
+  }
+
+  /* ===================== DASHBOARD ===================== */
+  function renderDashboard(){
+    const a = aggregate(activeRange);
+    kpiGrid.innerHTML = `
+      <div class="kpi"><div class="v">${a.calories}</div><div class="l">Kalorien</div></div>
+      <div class="kpi"><div class="v">${a.minutes}</div><div class="l">Minuten</div></div>
+      <div class="kpi"><div class="v">${a.sessions}</div><div class="l">Sessions</div></div>
+      <div class="kpi"><div class="v">${a.km.toFixed(1)}</div><div class="l">Kilometer</div></div>
+      <div class="kpi"><div class="v">${a.avgPace}</div><div class="l">Ø Pace</div></div>
+      <div class="kpi"><div class="v">${a.avgHr}</div><div class="l">Ø Herzfrequenz</div></div>
+    `;
+    renderRangeLabelAndStrip();
+  }
+
+  /* ===================== CHARTS ===================== */
+  function clearCanvas(c){
+    const ctx=c.getContext("2d");
+    ctx.clearRect(0,0,c.width,c.height);
+  }
+  function drawAxes(ctx,w,h,padL,padB){
+    ctx.strokeStyle="#202020";
+    ctx.lineWidth=1;
+    ctx.beginPath(); ctx.moveTo(padL,12); ctx.lineTo(padL,h-padB); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(padL,h-padB); ctx.lineTo(w-12,h-padB); ctx.stroke();
+  }
+  function drawBars(ctx,values,labels,title){
+    const w=ctx.canvas.width,h=ctx.canvas.height,padL=44,padB=28;
+    ctx.fillStyle="#fff"; ctx.font="14px system-ui";
+    ctx.fillText(title,12,18);
+    drawAxes(ctx,w,h,padL,padB);
+
+    const maxVal=Math.max(1,...values);
+    const innerW=(w-12)-padL, innerH=(h-padB)-28;
+    const n=values.length, gap=4;
+    const barW=Math.max(2,(innerW-gap*(n-1))/n);
+
+    values.forEach((v,i)=>{
+      const x=padL+i*(barW+gap);
+      const bh=(v/maxVal)*innerH;
+      const y=(h-padB)-bh;
+
+      ctx.fillStyle="rgba(0,255,106,0.55)";
+      ctx.fillRect(x,y,barW,bh);
+
+      ctx.fillStyle="#9a9a9a"; ctx.font="10px system-ui";
+      ctx.fillText(labels[i]??"", x, h-10);
+    });
+     id="ocrPace"></div>
+          <div class="grow"><div class="small muted">Ø HF (bpm)</div><input id="ocrHr" type="number" min="0"></div>
+        </div>
+
+        <div style="margin-top:10px;">
+          <div class="small muted">OCR Text</div>
+          <textarea id="ocrRaw"></textarea>
+        </div>
+
+        <div class="row" style="justify-content:space-between; margin-top:10px;">
+          <button id="ocrCancel" class="ghost">Abbrechen</button>
+          <button id="ocrApply">Übernehmen → Session anlegen</button>
+        </div>
+      </div>
+
+      <div class="sessionList" id="sessionList"></div>
+    </div>
+
+    <div class="panel">
+      <h3 style="margin-bottom:10px;">🗓️ Monatskalender</h3>
+      <div class="small muted">✔ wenn du an dem Tag mindestens 1 Training hast.</div>
+
+      <div class="calHeader" style="margin-top:10px;">
+        <div class="row">
+          <button id="calPrev">◀</button>
+          <button id="calNext">▶</button>
+          <button id="calThis">Dieser Monat</button>
+        </div>
+        <div style="font-weight:900;" id="calLabel">—</div>
+      </div>
+
+      <div style="overflow:auto;">
+        <table class="calendar" id="monthCal"></table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+
+<script>
+(() => {
+  /* ===================== STORAGE ===================== */
+  const KEY_DATA = "sport_tracker_data_full_onefile_v1";
+  const KEY_PROFILE = "sport_tracker_profile_full_onefile_v1";
+
+  /* ===================== CONSTANTS ===================== */
+  const SPORTS = ["Krafttraining","Joggen","Stretching","Ringen","Schwimmen","Tennis"];
+  const KM_SPORTS = new Set(["Joggen","Schwimmen"]);
+
+  /* ===================== HELPERS ===================== */
+  const pad = n => String(n).padStart(2,"0");
+  const iso = d => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+  const $ = id => document.getElementById(id);
+
+  function parsePace(p){
+    if(!p || !p.includes(":")) return null;
+    const [m,s] = p.split(":").map(Number);
+    if(!Number.isFinite(m)||!Number.isFinite(s)||s<0||s>59||m<0) return null;
+    return m*60+s;
+  }
+  function paceFromSeconds(sec){
+    const t = Math.round(sec);
+    return `${Math.floor(t/60)}:${pad(t%60)}`;
+  }
+
+  /* ===================== STATE ===================== */
+  let db = (()=>{ try{return JSON.parse(localStorage.getItem(KEY_DATA)||"{}");}catch{return{};} })();
+  let profile = localStorage.getItem(KEY_PROFILE)||"";
+
+  function saveDB(){ localStorage.setItem(KEY_DATA, JSON.stringify(db)); }
+  function saveProfile(){
+    localStorage.setItem(KEY_PROFILE, profile);
+    $("appTitle").textContent = profile || "Sport Tracker";
+  }
+
+  /* ===================== DOM ===================== */
+  const profileInput=$("profileName");
+  const saveProfileBtn=$("saveProfile");
+  const exportBtn=$("exportBtn");
+  const importBtn=$("importBtn");
+  const importFile=$("importFile");
+
+  const entryDateInput=$("entryDate");
+  const focusDateInput=$("focusDate");
+  const todayBtn=$("todayBtn");
+
+  const sessionList=$("sessionList");
+  const kpiGrid=$("kpiGrid");
+  const rangeLabel=$("rangeLabel");
+
+  const weekStripWrap=$("weekStripWrap");
+  const weekStrip=$("weekStrip");
+
+  const chartA=$("chartA");
+  const chartB=$("chartB");
+
+  const monthCal=$("monthCal");
+  const calLabel=$("calLabel");
+  const calPrev=$("calPrev");
+  const calNext=$("calNext");
+  const calThis=$("calThis");
+
+  // OCR
+  const shotBtn=$("shotBtn");
+  const shotFile=$("shotFile");
+  const ocrStatus=$("ocrStatus");
+  const ocrModal=$("ocrModal");
+  const ocrDate=$("ocrDate");
+  const ocrTime=$("ocrTime");
+  const ocrType=$("ocrType");
+  const ocrDuration=$("ocrDuration");
+  const ocrCalories=$("ocrCalories");
+  const ocrKm=$("ocrKm");
+  const ocrPace=$("ocrPace");
+  const ocrHr=$("ocrHr");
+  const ocrRaw=$("ocrRaw");
+  const ocrCancel=$("ocrCancel");
+  const ocrApply=$("ocrApply");
+
+  /* ===================== INIT ===================== */
+  profileInput.value = profile;
+  saveProfile();
+  saveProfileBtn.onclick = () => { profile = profileInput.value.trim(); saveProfile(); };
+
+  const now = new Date();
+  entryDateInput.value = iso(now);
+  focusDateInput.value = iso(now);
+  todayBtn.onclick = () => { focusDateInput.value = iso(new Date()); renderAll(); };
+
+  /* ===================== MODEL ===================== */
+  function getDay(d){ if(!Array.isArray(db[d])) db[d]=[]; return db[d]; }
+  function addSession(d){ getDay(d).push({type:"",duration:"",calories:"",km:"",pace:"",hr:""}); saveDB(); }
+  function removeSession(d,i){ getDay(d).splice(i,1); if(!db[d].length) delete db[d]; saveDB(); }
+
+  function updateAfterEdit(){
+    renderDashboard();
+    renderCharts();
+    renderCalendar();
+  }
+
+  /* ===================== SESSIONS UI ===================== */
+  $("addSessionBtn").onclick = () => { addSession(entryDateInput.value); renderSessions(); updateAfterEdit(); };
+  $("clearDayBtn").onclick = () => { delete db[entryDateInput.value]; saveDB(); renderAll(); };
+  entryDateInput.onchange = () => renderSessions();
+  focusDateInput.onchange = () => renderAll();
+
+  function renderSessions(){
+    const d = entryDateInput.value;
+    const arr = getDay(d);
+    sessionList.innerHTML = "";
+    if(!arr.length){
+      sessionList.innerHTML = `<div class="small muted">Noch keine Sessions.</div>`;
+      return;
+    }
+
+    arr.forEach((s,i)=>{
+      const isKm = KM_SPORTS.has(s.type);
+      const el = document.createElement("div");
+      el.className="session";
+      el.innerHTML = `
+        <div class="sessionHead">
+          <strong>Session ${i+1}</strong>
+          <button class="danger">Löschen</button>
+        </div>
+        <div class="gridSession">
+          <select aria-label="Sportart"></select>
+          <input type="number" min="0" placeholder="Dauer (min)" value="${s.duration||""}">
+          <input type="number" min="0" placeholder="Kalorien" value="${s.calories||""}">
+          <input type="number" min="0" step="0.01" placeholder="KM" ${isKm?"":"disabled"} value="${s.km||""}">
+          <input placeholder="Pace mm:ss" ${isKm?"":"disabled"} value="${s.pace||""}">
+          <input type="number" min="0" placeholder="Ø HF bpm" value="${s.hr||""}">
+          <div></div>
+        </div>
+      `;
+      const delBtn = el.querySelector("button");
+      const sel = el.querySelector("select");
+      sel.innerHTML = `<option value="">Sportart</option>` + SPORTS.map(x=>`<option value="${x}" ${x===s.type?"selected":""}>${x}</option>`).join("");
+
+      const inputs = el.querySelectorAll("input");
+      const dur=inputs[0], cal=inputs[1], km=inputs[2], pace=inputs[3], hr=inputs[4];
+
+      delBtn.onclick = () => { removeSession(d,i); renderAll(); };
+
+      sel.onchange = () => {
+        s.type = sel.value;
+        saveDB();
+        renderSessions();
+        updateAfterEdit();
+      };
+
+      dur.oninput = () => { s.duration = dur.value; saveDB(); updateAfterEdit(); };
+      cal.oninput = () => { s.calories = cal.value; saveDB(); updateAfterEdit(); };
+      km.oninput  = () => { s.km = km.value; saveDB(); updateAfterEdit(); };
+      pace.oninput= () => { s.pace = pace.value; saveDB(); updateAfterEdit(); };
+      hr.oninput  = () => { s.hr = hr.value; saveDB(); updateAfterEdit(); };
+
+      sessionList.appendChild(el);
+    });
+  }
+
+  /* ===================== RANGE ===================== */
+  let activeRange="day";
+  document.querySelectorAll(".tab").forEach(t=>{
+    t.onclick=()=>{
+      document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));
+      t.classList.add("active");
+      activeRange=t.dataset.range;
+      renderAll();
+    };
+  });
+
+  function inRange(d,r){
+    const D=new Date(d);
+    const F=new Date(focusDateInput.value);
+    if(r==="day") return d===focusDateInput.value;
+    if(r==="week"){ const diff=(D-F)/86400000; return diff>=-6&&diff<=0; }
+    if(r==="month") return D.getMonth()===F.getMonth() && D.getFullYear()===F.getFullYear();
+    if(r==="year") return D.getFullYear()===F.getFullYear();
+    return true;
+  }
+
+  /* ===================== AGGREGATION ===================== */
+  function aggregate(r){
+    let t={cal:0,min:0,km:0,paceSum:0,paceKm:0,hrSum:0,hrMin:0,sess:0};
+
+    for(const [d,arr] of Object.entries(db)){
+      if(!inRange(d,r)) continue;
+      if(!Array.isArray(arr)) continue;
+
+      arr.forEach(s=>{
+        t.sess++;
+        const m = Number(s.duration||0);
+        t.min += m;
+        t.cal += Number(s.calories||0);
+
+        if(KM_SPORTS.has(s.type)){
+          const km = Number(s.km||0);
+          const ps = parsePace(s.pace);
+          if(km>0){
+            t.km += km;
+            if(ps!=null){
+              t.paceSum += ps*km;
+              t.paceKm += km;
+            }
+          }
+        }
+
+        const hr = Number(s.hr||0);
+        if(hr>0 && m>0){
+          t.hrSum += hr*m;
+          t.hrMin += m;
+        }
+      });
+    }
+
+    return {
+      calories: t.cal,
+      minutes: t.min,
+      km: t.km,
+      avgPace: t.paceKm ? paceFromSeconds(t.paceSum/t.paceKm) : "–",
+      avgHr: t.hrMin ? Math.round(t.hrSum/t.hrMin) : "–",
+      sessions: t.sess
+    };
+  }
+
+  /* ===================== WEEK STRIP + LABEL ===================== */
+  function mondayOf(dateIso){
+    const d=new Date(dateIso);
+    const day=d.getDay();
+    const diff=day===0 ? -6 : 1-day;
+    d.setDate(d.getDate()+diff);
+    return iso(d);
+  }
+  function addDays(dateIso,n){
+    const d=new Date(dateIso);
+    d.setDate(d.getDate()+n);
+    return iso(d);
+  }
+  function sumForDate(dateIso){
+    const arr=db[dateIso]||[];
+    let cal=0,min=0,sess=0;
+    arr.forEach(s=>{
+      sess++;
+      min+=Number(s.duration||0);
+      cal+=Number(s.calories||0);
+    });
+    return {calories:cal, minutes:min, sessions:sess};
+  }
+
+  function renderRangeLabelAndStrip(){
+    const f=new Date(focusDateInput.value);
+
+    if(activeRange==="day"){
+      rangeLabel.textContent = `Tag: ${f.toLocaleDateString("de-DE")}`;
+      weekStripWrap.style.display="none";
+      return;
+    }
+    if(activeRange==="week"){
+      const mon=mondayOf(focusDateInput.value);
+      const sun=addDays(mon,6);
+      rangeLabel.textContent = `Woche: ${new Date(mon).toLocaleDateString("de-DE")} – ${new Date(sun).toLocaleDateString("de-DE")}`;
+      weekStripWrap.style.display="block";
+      weekStrip.innerHTML="";
+      for(let i=0;i<7;i++){
+        const dIso = addDays(mon,i);
+        const s = sumForDate(dIso);
+        const name = new Date(dIso).toLocaleDateString("de-DE",{weekday:"short"});
+
+        const card = document.createElement("div");
+        card.className="dayCard";
+        card.innerHTML = `
+          <div class="d">${name}</div>
+          <div class="sub">
+            <span><b style="color:var(--accent)">${s.calories}</b> kcal</span>
+            <span>${s.minutes} min · ${s.sessions} sessions</span>
+          </div>
+        `;
+        card.style.cursor="pointer";
+        card.onclick=()=>{ focusDateInput.value=dIso; renderAll(); };
+        weekStrip.appendChild(card);
+      }
+      return;
+    }
+    if(activeRange==="month"){
+      rangeLabel.textContent = `Monat: ${f.toLocaleDateString("de-DE",{month:"long",year:"numeric"})}`;
+      weekStripWrap.style.display="none";
+      return;
+    }
+    if(activeRange==="year"){
+      rangeLabel.textContent = `Jahr: ${f.getFullYear()}`;
+      weekStripWrap.style.display="none";
+      return;
+    }
+    rangeLabel.textContent = `Gesamt: alle Daten`;
+    weekStripWrap.style.display="none";
+  }
+
+  /* ===================== DASHBOARD ===================== */
+  function renderDashboard(){
+    const a = aggregate(activeRange);
+    kpiGrid.innerHTML = `
+      <div class="kpi"><div class="v">${a.calories}</div><div class="l">Kalorien</div></div>
+      <div class="kpi"><div class="v">${a.minutes}</div><div class="l">Minuten</div></div>
+      <div class="kpi"><div class="v">${a.sessions}</div><div class="l">Sessions</div></div>
+      <div class="kpi"><div class="v">${a.km.toFixed(1)}</div><div class="l">Kilometer</div></div>
+      <div class="kpi"><div class="v">${a.avgPace}</div><div class="l">Ø Pace</div></div>
+      <div class="kpi"><div class="v">${a.avgHr}</div><div class="l">Ø Herzfrequenz</div></div>
+    `;
+    renderRangeLabelAndStrip();
+  }
+
+  /* ===================== CHARTS ===================== */
+  function clearCanvas(c){
+    const ctx=c.getContext("2d");
+    ctx.clearRect(0,0,c.width,c.height);
+  }
+  function drawAxes(ctx,w,h,padL,padB){
+    ctx.strokeStyle="#202020";
+    ctx.lineWidth=1;
+    ctx.beginPath(); ctx.moveTo(padL,12); ctx.lineTo(padL,h-padB); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(padL,h-padB); ctx.lineTo(w-12,h-padB); ctx.stroke();
+  }
+  function drawBars(ctx,values,labels,title){
+    const w=ctx.canvas.width,h=ctx.canvas.height,padL=44,padB=28;
+    ctx.fillStyle="#fff"; ctx.font="14px system-ui";
+    ctx.fillText(title,12,18);
+    drawAxes(ctx,w,h,padL,padB);
+
+    const maxVal=Math.max(1,...values);
+    const innerW=(w-12)-padL, innerH=(h-padB)-28;
+    const n=values.length, gap=4;
+    const barW=Math.max(2,(innerW-gap*(n-1))/n);
+
+    values.forEach((v,i)=>{
+      const x=padL+i*(barW+gap);
+      const bh=(v/maxVal)*innerH;
+      const y=(h-padB)-bh;
+
+      ctx.fillStyle="rgba(0,255,106,0.55)";
+      ctx.fillRect(x,y,barW,bh);
+
+      ctx.fillStyle="#9a9a9a"; ctx.font="10px system-ui";
+      ctx.fillText(labels[i]??"", x, h-10);
+    });
+  }
+  function drawLine(ctx,values,labels,title){
+    const w=ctx.canvas.width,h=ctx.canvas.height,padL=44,padB=28;
+    ctx.fillStyle="#fff"; ctx.font="14px system-ui";
+    ctx.fillText(title,12,18);
+    drawAxes(ctx,w,h,padL,padB);
+
+    const maxVal=Math.max(1,...values);
+    const innerW=(w-12)-padL, innerH=(h-padB)-28;
+    const n=values.length;
+    const stepX=n>1 ? innerW/(n-1) : innerW;
+
+    ctx.strokeStyle="rgba(0,255,106,0.9)";
+    ctx.lineWidth=2;
+    ctx.beginPath();
+    values.forEach((v,i)=>{
+      const x=padL+i*stepX;
+      const y=(h-padB)-(v/maxVal)*innerH;
+      if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+    });
+    ctx.stroke();
+
+    values.forEach((v,i)=>{
+      const x=padL+i*stepX;
+      const y=(h-padB)-(v/maxVal)*innerH;
+      ctx.fillStyle="rgba(0,255,106,1)";
+      ctx.beginPath(); ctx.arc(x,y,3,0,Math.PI*2); ctx.fill();
+
+      ctx.fillStyle="#9a9a9a"; ctx.font="10px system-ui";
+      ctx.fillText(labels[i]??"", x-6, h-10);
+    });
+  }
+
+  function getMonthDays(focusIso){
+    const d=new Date(focusIso);
+    const y=d.getFullYear(), m=d.getMonth();
+    const days=new Date(y,m+1,0).getDate();
+    const out=[];
+    for(let i=1;i<=days;i++) out.push(iso(new Date(y,m,i)));
+    return out;
+  }
+
+  function weekNumberISO(dateIso){
+    const d=new Date(dateIso);
+    d.setHours(0,0,0,0);
+    d.setDate(d.getDate() + 3 - ((d.getDay() + 6) % 7));
+    const week1=new Date(d.getFullYear(),0,4);
+    return 1 + Math.round(((d-week1)/86400000 - 3 + ((week1.getDay()+6)%7)) / 7);
+  }
+
+  function getYearWeeks(focusIso){
+    const y=new Date(focusIso).getFullYear();
+    const buckets=new Map();
+    const start=new Date(y,0,1), end=new Date(y,11,31);
+
+    for(let cur=new Date(start); cur<=end; cur.setDate(cur.getDate()+1)){
+      const key=iso(cur);
+      const wn=weekNumberISO(key);
+      const arr=db[key]||[];
+
+      let km=0;
+      arr.forEach(s=>{
+        if(KM_SPORTS.has(s.type)) km += Number(s.km||0);
+      });
+
+      buckets.set(wn,(buckets.get(wn)||0)+km);
+    }
+
+    const weeks=[], kms=[];
+    for(let w=1; w<=53; w++){
+      if(!buckets.has(w) && w>52) break;
+      weeks.push(w);
+      kms.push(Number((buckets.get(w)||0).toFixed(2)));
+    }
+    return {weeks,kms};
+  }
+
+  function renderCharts(){
+    const fIso=focusDateInput.value;
+
+    clearCanvas(chartA);
+    const ctxA=chartA.getContext("2d");
+    const days=getMonthDays(fIso);
+    const valsA=days.map(d=>sumForDate(d).calories);
+    const labelsA=days.map(d=>String(Number(d.slice(-2))));
+    const monthName=new Date(fIso).toLocaleString("de-DE",{month:"long",year:"numeric"});
+    drawBars(ctxA, valsA, labelsA, `Kalorien pro Tag (${monthName})`);
+
+    clearCanvas(chartB);
+    const ctxB=chartB.getContext("2d");
+    const {weeks,kms}=getYearWeeks(fIso);
+    const labelsB=weeks.map(w=>w%4===0?String(w):"");
+    const year=new Date(fIso).getFullYear();
+    drawLine(ctxB, kms, labelsB, `Kilometer pro Woche (${year})`);
+  }
+
+  /* ===================== MONTH CALENDAR ===================== */
+  let calMonth=new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+
+  calPrev.onclick=()=>{ calMonth=new Date(calMonth.getFullYear(),calMonth.getMonth()-1,1); renderCalendar(); };
+  calNext.onclick=()=>{ calMonth=new Date(calMonth.getFullYear(),calMonth.getMonth()+1,1); renderCalendar(); };
+  calThis.onclick=()=>{ calMonth=new Date(new Date().getFullYear(),new Date().getMonth(),1); renderCalendar(); };
+
+  function renderCalendar(){
+    const y=calMonth.getFullYear(), m=calMonth.getMonth();
+    calLabel.textContent=calMonth.toLocaleString("de-DE",{month:"long",year:"numeric"});
+
+    const first=new Date(y,m,1);
+    const daysInMonth=new Date(y,m+1,0).getDate();
+    const jsDay=first.getDay();
+    const offset=(jsDay===0?6:jsDay-1);
+
+    const headers=["Mo","Di","Mi","Do","Fr","Sa","So"];
+    let html="<thead><tr>"+headers.map(h=>`<th class="small muted">${h}</th>`).join("")+"</tr></thead><tbody>";
+
+    let dayNum=1-offset;
+    for(let row=0; row<6; row++){
+      html+="<tr>";
+      for(let col=0; col<7; col++){
+        if(dayNum<1 || dayNum>daysInMonth){
+          html+=`<td class="dim">&nbsp;</td>`;
+        } else {
+          const key=iso(new Date(y,m,dayNum));
+          const trained=Array.isArray(db[key]) && db[key].length>0;
+          const sum=trained ? sumForDate(key) : null;
+
+          html+=`<td>
+            <div class="calCell">
+              <div style="font-weight:800;">${dayNum}</div>
+              ${trained ? `<div class="check">✓</div>` : ""}
+            </div>
+            <div class="small muted" style="margin-top:6px;">
+              ${trained ? `${sum.calories} kcal · ${sum.minutes} min` : ""}
+            </div>
+          </td>`;
+        }
+        dayNum++;
+      }
+      html+="</tr>";
+    }
+    html+="</tbody>";
+    monthCal.innerHTML=html;
+  }
+
+  /* ===================== IMPORT / EXPORT ===================== */
+  exportBtn.onclick=()=>{
+    const payload={version:1, exportedAt:new Date().toISOString(), profile, db};
+    const blob=new Blob([JSON.stringify(payload,null,2)],{type:"application/json"});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement("a");
+    a.href=url;
+    a.download=`sport-backup-${iso(new Date())}.json`;
+    document.body.appendChild(a); a.click(); a.remove();
+    URL.revokeObjectURL(url);
+  };
+
+  importBtn.onclick=()=>{ importFile.value=""; importFile.click(); };
+  importFile.onchange=async()=>{
+    const file=importFile.files?.[0];
+    if(!file) return;
+    try{
+      const text=await file.text();
+      const payload=JSON.parse(text);
+      if(payload && payload.db && typeof payload.db==="object"){
+        db=payload.db;
+        if(typeof payload.profile==="string"){
+          profile=payload.profile;
+          profileInput.value=profile;
+          saveProfile();
+        }
+        saveDB();
+        renderAll();
+        alert("Import erfolgreich ✅");
+      } else {
+        alert("Import: falsches Format.");
+      }
+    } catch {
+      alert("Import fehlgeschlagen.");
+    } finally {
+      importFile.value="";
+    }
+  };
+
+  /* ===================== OCR (ROBUST) ===================== */
+  function fillOcrTypes(){
+    ocrType.innerHTML = `<option value="">Auto</option>` + SPORTS.map(x=>`<option value="${x}">${x}</option>`).join("");
+  }
+  fillOcrTypes();
+
+  shotBtn.addEventListener("click", () => {
+    shotFile.value = "";
+    shotFile.click();
+  });
 
   async function fileToCanvasScaled(file, maxDim = 1600){
-    // iOS-sicher: FileReader -> Image -> Canvas
     const dataUrl = await new Promise((resolve, reject) => {
       const r = new FileReader();
       r.onload = () => resolve(r.result);
@@ -189,233 +1386,108 @@ button:hover{ background:#161616; }
     const canvas = document.createElement("canvas");
     canvas.width = cw;
     canvas.height = ch;
-    const ctx = canvas.getContext("2d", { willReadFrequently:true });
+    const ctx = canvas.getContext("2d", { willReadFrequently: true });
 
-    // weißer Hintergrund hilft OCR (auch bei Dark Mode Screens)
     ctx.fillStyle = "#fff";
-    ctx.fillRect(0,0,cw,ch);
-    ctx.drawImage(img, 0,0,cw,ch);
-
+    ctx.fillRect(0, 0, cw, ch);
+    ctx.drawImage(img, 0, 0, cw, ch);
     return canvas;
   }
 
-  function safeNum(v){
-    const n = Number(String(v||"").replace(",", "."));
-    return Number.isFinite(n) ? n : 0;
-  }
-
-  /* ===================== STATE ===================== */
-  let db = (() => {
-    try { return JSON.parse(localStorage.getItem(KEY_DATA) || "{}"); }
-    catch { return {}; }
-  })();
-
-  let profile = localStorage.getItem(KEY_PROFILE) || "";
-
-  function saveDB(){ localStorage.setItem(KEY_DATA, JSON.stringify(db)); }
-  function saveProfile(){
-    localStorage.setItem(KEY_PROFILE, profile);
-    $("appTitle").textContent = profile || "Sport Tracker";
-  }
-
-  /* ===================== INIT UI ===================== */
-  $("profileName").value = profile;
-  saveProfile();
-
-  $("saveProfile").addEventListener("click", () => {
-    profile = $("profileName").value.trim();
-    saveProfile();
-  });
-
-  $("entryDate").value = iso(new Date());
-
-  /* ===================== MODEL ===================== */
-  function getDay(dateIso){
-    if(!Array.isArray(db[dateIso])) db[dateIso] = [];
-    return db[dateIso];
-  }
-
-  function addSession(dateIso, sess){
-    const base = { type:"", duration:"", calories:"", km:"", pace:"", hr:"" };
-    getDay(dateIso).push({ ...base, ...(sess||{}) });
-    saveDB();
-  }
-
-  function removeSession(dateIso, index){
-    const arr = getDay(dateIso);
-    arr.splice(index,1);
-    if(arr.length===0) delete db[dateIso];
-    saveDB();
-  }
-
-  /* ===================== RENDER SESSIONS ===================== */
-  function renderSessions(){
-    const dateIso = $("entryDate").value;
-    const list = $("sessionList");
-    const arr = getDay(dateIso);
-
-    list.innerHTML = "";
-    if(!arr.length){
-      list.innerHTML = `<div class="small">Noch keine Sessions.</div>`;
-      return;
-    }
-
-    arr.forEach((s, i) => {
-      const isKm = KM_SPORTS.has(s.type);
-
-      const el = document.createElement("div");
-      el.className = "session";
-      el.innerHTML = `
-        <div class="row" style="justify-content:space-between;">
-          <strong>Session ${i+1}</strong>
-          <button data-del="${i}" style="border-color:#3a1a1a;color:#ff5b5b;">Löschen</button>
-        </div>
-
-        <div class="gridSession" style="margin-top:10px;">
-          <select data-k="type" aria-label="Sportart"></select>
-          <input data-k="duration" inputmode="numeric" placeholder="Minuten" value="${s.duration||""}">
-          <input data-k="calories" inputmode="numeric" placeholder="Kalorien" value="${s.calories||""}">
-          <input data-k="km" inputmode="decimal" placeholder="KM" ${isKm?"":"disabled"} value="${s.km||""}">
-          <input data-k="pace" placeholder="Pace mm:ss" ${isKm?"":"disabled"} value="${s.pace||""}">
-          <input data-k="hr" inputmode="numeric" placeholder="Ø HF" value="${s.hr||""}">
-        </div>
-
-        <div class="small" style="margin-top:8px; color:var(--muted);">
-          Joggen/Schwimmen: KM + Pace · Andere: Kalorien · Ø HF immer möglich
-        </div>
-      `;
-
-      // Sport select options
-      const sel = el.querySelector('select[data-k="type"]');
-      sel.innerHTML = `<option value="">Sportart</option>` + SPORTS.map(x =>
-        `<option value="${x}" ${x===s.type?"selected":""}>${x}</option>`
-      ).join("");
-
-      // Delete
-      el.querySelector("button[data-del]").addEventListener("click", () => {
-        removeSession(dateIso, i);
-        renderSessions();
-      });
-
-      // Change handlers
-      sel.addEventListener("change", () => {
-        s.type = sel.value;
-        saveDB();
-        renderSessions(); // re-render to enable/disable km+pace
-      });
-
-      el.querySelectorAll("input[data-k]").forEach(inp => {
-        const key = inp.dataset.k;
-        inp.addEventListener("input", () => {
-          s[key] = inp.value;
-          saveDB(); // speichern bei jeder Eingabe
-        });
-      });
-
-      list.appendChild(el);
-    });
-  }
-
-  $("addSessionBtn").addEventListener("click", () => {
-    addSession($("entryDate").value);
-    renderSessions();
-  });
-
-  $("entryDate").addEventListener("change", renderSessions);
-
-  /* ===================== OCR UI ===================== */
-  $("ocrType").innerHTML = `<option value="">Auto</option>` + SPORTS.map(x => `<option value="${x}">${x}</option>`).join("");
-
-  // iOS Safari: file input darf nicht display:none sein (aber wir haben es so im PART 1)
-  // -> wir bauen trotzdem robust: wenn display:none Probleme macht, sag Bescheid, dann machen wir "offscreen"
-  $("shotBtn").addEventListener("click", () => {
-    $("shotFile").value = ""; // iOS: sonst triggert change manchmal nicht
-    $("shotFile").click();
-  });
-
-  $("shotFile").addEventListener("change", async () => {
-    const f = $("shotFile").files?.[0];
-    if(!f) return;
+  shotFile.addEventListener("change", async () => {
+    const file = shotFile.files?.[0];
+    if(!file) return;
+    shotFile.value = "";
 
     try{
       if(!window.Tesseract){
-        $("ocrStatus").textContent = "Tesseract nicht geladen ❌";
+        ocrStatus.textContent = "Tesseract nicht geladen ❌";
         return;
       }
 
-      $("ocrStatus").textContent = "Bild vorbereiten…";
-      const canvas = await fileToCanvasScaled(f, 1600);
+      ocrStatus.textContent = "Bild wird vorbereitet…";
+      const canvas = await fileToCanvasScaled(file, 1600);
 
-      $("ocrStatus").textContent = "OCR startet…";
-
-      const res = await Tesseract.recognize(canvas, "deu+eng", {
+      ocrStatus.textContent = "OCR startet…";
+      const result = await Tesseract.recognize(canvas, "deu+eng", {
         logger: m => {
           if(m.status && typeof m.progress === "number"){
-            $("ocrStatus").textContent = `${m.status}… ${Math.round(m.progress*100)}%`;
+            ocrStatus.textContent = `${m.status}… ${Math.round(m.progress*100)}%`;
           }
         }
       });
 
-      const txt = (res?.data?.text || "")
-        .replace(/\u00A0/g," ")
-        .replace(/\s+/g," ")
-        .trim();
+      const raw=(result?.data?.text||"").replace(/\u00A0/g," ").replace(/\s+/g," ").trim();
+      ocrRaw.value=raw;
 
-      $("ocrRaw").value = txt || "";
-
-      // robustere Extraktion
-      const dur = (txt.match(/(\d{1,3})\s*(min|minute[n]?)\b/i)||[])[1] || "";
-      const kcal = (txt.match(/(\d{2,5})\s*(kcal|cal)\b/i)||[])[1] || "";
-      const km = ((txt.match(/(\d+(?:[.,]\d+)?)\s*km\b/i)||[])[1] || "").replace(",", ".");
+      const dur = (raw.match(/(\d{1,3})\s*(min|minute[n]?)\b/i)||[])[1] || "";
+      const kcal = (raw.match(/(\d{2,5})\s*(kcal|cal)\b/i)||[])[1] || "";
+      const km = ((raw.match(/(\d+(?:[.,]\d+)?)\s*km\b/i)||[])[1] || "").replace(",", ".");
       const pace =
-        (txt.match(/(\d{1,2}:\d{2})\s*(\/\s*km|\/km|min\/km)\b/i)||[])[1] ||
-        (txt.match(/\b(\d{1,2}:\d{2})\b/)||[])[1] ||
+        (raw.match(/(\d{1,2}:\d{2})\s*(\/\s*km|\/km|min\/km)\b/i)||[])[1] ||
+        (raw.match(/\b(\d{1,2}:\d{2})\b/)||[])[1] ||
         "";
       const hr =
-        (txt.match(/(\d{2,3})\s*bpm\b/i)||[])[1] ||
-        ((txt.match(/\b(hf|herz)\s*[:\-]?\s*(\d{2,3})\b/i)||[])[2] || "");
+        (raw.match(/(\d{2,3})\s*bpm\b/i)||[])[1] ||
+        ((raw.match(/\b(hf|herz)\s*[:\-]?\s*(\d{2,3})\b/i)||[])[2] || "");
 
-      $("ocrDuration").value = dur;
-      $("ocrCalories").value = kcal;
-      $("ocrKm").value = km;
-      $("ocrPace").value = pace;
-      $("ocrHr").value = hr;
+      const time = (raw.match(/\b([01]?\d|2[0-3]):([0-5]\d)\b/)||[])[0] || "";
 
-      // Auto sport
-      if(km && pace) $("ocrType").value = "Joggen";
-      else if(km && !pace) $("ocrType").value = "Schwimmen";
-      else $("ocrType").value = "Krafttraining";
+      ocrDate.value = entryDateInput.value;
+      ocrTime.value = time;
+      ocrDuration.value = dur;
+      ocrCalories.value = kcal;
+      ocrKm.value = km;
+      ocrPace.value = pace;
+      ocrHr.value = hr;
 
-      $("ocrModal").style.display = "block";
-      $("ocrStatus").textContent = "OCR fertig ✅";
+      if(km && pace) ocrType.value="Joggen";
+      else if(km && !pace) ocrType.value="Schwimmen";
+      else ocrType.value="Krafttraining";
+
+      ocrModal.style.display="block";
+      ocrStatus.textContent="OCR fertig ✅";
     } catch(e){
       console.error(e);
-      $("ocrStatus").textContent = "OCR Fehler ❌";
+      ocrStatus.textContent="OCR Fehler ❌";
     }
   });
 
-  $("ocrCancel").addEventListener("click", () => {
-    $("ocrModal").style.display = "none";
-  });
+  ocrCancel.onclick=()=>{ ocrModal.style.display="none"; };
+  ocrApply.onclick=()=>{
+    const d=ocrDate.value || entryDateInput.value;
+    const type=ocrType.value || "Krafttraining";
 
-  $("ocrApply").addEventListener("click", () => {
-    const d = $("entryDate").value;
-    addSession(d, {
-      type: $("ocrType").value || "Krafttraining",
-      duration: $("ocrDuration").value || "",
-      calories: $("ocrCalories").value || "",
-      km: $("ocrKm").value || "",
-      pace: $("ocrPace").value || "",
-      hr: $("ocrHr").value || ""
+    getDay(d).push({
+      type,
+      duration:String(ocrDuration.value||""),
+      calories:String(ocrCalories.value||""),
+      km:String(ocrKm.value||""),
+      pace:String(ocrPace.value||""),
+      hr:String(ocrHr.value||""),
+      note: ocrTime.value ? `Time: ${ocrTime.value}` : ""
     });
-    $("ocrModal").style.display = "none";
-    $("ocrStatus").textContent = "Session übernommen ✅";
-    renderSessions();
-  });
 
-  /* ===================== START ===================== */
-  renderSessions();
+    saveDB();
+    entryDateInput.value=d;
+    ocrModal.style.display="none";
+    renderSessions();
+    updateAfterEdit();
+    ocrStatus.textContent="Session übernommen ✅";
+  };
+
+  /* ===================== MASTER ===================== */
+  function renderAll(){
+    renderSessions();
+    renderDashboard();
+    renderCharts();
+    renderCalendar();
+  }
+
+  renderAll();
 })();
 </script>
+
 </body>
 </html>
+ 
