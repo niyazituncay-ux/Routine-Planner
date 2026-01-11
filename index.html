@@ -7,23 +7,14 @@
 
 <style>
 :root{
-  --bg:#000;
-  --fg:#fff;
-  --muted:#9a9a9a;
-  --line:#262626;
-  --panel:#0c0c0c;
-  --panel2:#101010;
-  --accent:#00ff6a;
-  --danger:#ff5b5b;
+  --bg:#000; --fg:#fff; --muted:#9a9a9a; --line:#262626;
+  --panel:#0c0c0c; --panel2:#101010; --accent:#00ff6a; --danger:#ff5b5b;
 }
 *{box-sizing:border-box}
 body{
-  background:var(--bg);
-  color:var(--fg);
+  background:var(--bg); color:var(--fg);
   font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
-  max-width:1200px;
-  margin:20px auto;
-  padding:0 14px 60px;
+  max-width:1200px; margin:20px auto; padding:0 14px 60px;
 }
 h1{margin:0;font-size:30px;letter-spacing:-.2px}
 h2{margin:6px 0 0;font-size:14px;color:var(--muted);font-weight:600}
@@ -40,26 +31,22 @@ h3{margin:0 0 10px;font-size:16px}
 }
 .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
 .grow{flex:1;min-width:220px}
-
 input,select,textarea{
   width:100%;
-  background:var(--panel2);
-  color:var(--fg);
-  border:1px solid var(--line);
-  border-radius:12px;
+  background:var(--panel2); color:var(--fg);
+  border:1px solid var(--line); border-radius:12px;
   padding:9px 10px;
 }
 button{
   border:1px solid var(--line);
-  background:#111;
-  color:var(--fg);
-  border-radius:12px;
-  padding:9px 12px;
+  background:#111; color:var(--fg);
+  border-radius:12px; padding:9px 12px;
   cursor:pointer;
 }
 button:hover{background:#151515}
 .danger{color:var(--danger);border-color:#3a1a1a}
 
+/* Tabs */
 .tabs{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
 .tab{
   padding:6px 12px;
@@ -75,6 +62,7 @@ button:hover{background:#151515}
   border-color:#1b4f30;
 }
 
+/* KPI */
 .kpiGrid{
   display:grid;
   grid-template-columns:repeat(3,minmax(140px,1fr));
@@ -93,15 +81,14 @@ button:hover{background:#151515}
 .kpi .v{font-size:22px;font-weight:900;color:var(--accent);line-height:1.1}
 .kpi .l{font-size:12px;color:var(--muted);margin-top:6px}
 
+/* Charts */
 .chartGrid{
   display:grid;
   grid-template-columns:1fr 1fr;
   gap:10px;
   margin-top:12px;
 }
-@media (max-width:900px){
-  .chartGrid{grid-template-columns:1fr}
-}
+@media (max-width:900px){ .chartGrid{grid-template-columns:1fr} }
 .chartWrap{
   border:1px solid var(--line);
   border-radius:16px;
@@ -111,14 +98,10 @@ button:hover{background:#151515}
 }
 canvas{width:100%;height:260px;display:block;background:#080808;border-radius:12px}
 
-/* Kalender */
+/* Calendar */
 .calHead{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  gap:10px;
-  flex-wrap:wrap;
-  margin-bottom:10px;
+  display:flex; justify-content:space-between; align-items:center;
+  gap:10px; flex-wrap:wrap; margin-bottom:10px;
 }
 .calBtnRow{display:flex;gap:8px;flex-wrap:wrap}
 .calendar{
@@ -132,33 +115,40 @@ canvas{width:100%;height:260px;display:block;background:#080808;border-radius:12
 .calendar th,.calendar td{
   border-right:1px solid var(--line);
   border-bottom:1px solid var(--line);
-  padding:10px;
-  vertical-align:top;
-  height:72px;
+  padding:10px; vertical-align:top; height:72px;
 }
 .calendar th:last-child,.calendar td:last-child{border-right:none}
 .calendar tr:last-child td{border-bottom:none}
-.calCell{
-  display:flex;
-  justify-content:space-between;
-  align-items:flex-start;
-  gap:10px;
-}
+.calCell{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
 .calDay{font-weight:900}
 .calDim{color:#444}
 .calCheck{
-  width:22px;height:22px;
-  border-radius:999px;
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  border:1px solid #1b4f30;
-  background:rgba(0,255,106,.12);
-  color:var(--accent);
-  font-weight:900;
-  font-size:12px;
+  width:22px;height:22px;border-radius:999px;
+  display:inline-flex;align-items:center;justify-content:center;
+  border:1px solid #1b4f30;background:rgba(0,255,106,.12);
+  color:var(--accent);font-weight:900;font-size:12px;
 }
 .fileHidden{position:absolute;left:-9999px;width:1px;height:1px;opacity:0}
+
+/* Sessions */
+.sessionCard{
+  border:1px solid var(--line);
+  border-radius:16px;
+  padding:12px;
+  background:#0b0b0b;
+  margin-top:10px;
+}
+.sessionHeader{
+  display:flex;justify-content:space-between;align-items:center;
+  gap:10px;flex-wrap:wrap;
+}
+.sessionGrid{
+  display:grid;
+  grid-template-columns:repeat(6,minmax(140px,1fr));
+  gap:10px;
+  margin-top:10px;
+}
+@media (max-width:900px){ .sessionGrid{grid-template-columns:1fr 1fr} }
 </style>
 
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
@@ -170,8 +160,8 @@ canvas{width:100%;height:260px;display:block;background:#080808;border-radius:12
   <div class="row">
     <div class="grow">
       <h1 id="appTitle">Sport Tracker</h1>
-      <h2>Multi-Sessions · OCR Import · Monatskalender · Strichdiagramme</h2>
-      <div class="small">Alles wird lokal gespeichert (Browser-Archiv).</div>
+      <h2>Multi-Sessions · OCR Import · Kalender · Strichdiagramme</h2>
+      <div class="small">Speichert lokal im Browser. (Archiv bleibt bis Website-Daten gelöscht werden)</div>
     </div>
     <div class="grow">
       <div class="small">Profilname</div>
@@ -183,7 +173,6 @@ canvas{width:100%;height:260px;display:block;background:#080808;border-radius:12
 
 <div class="card" id="dashboard">
   <h3>📊 Dashboard</h3>
-
   <div class="tabs">
     <div class="tab active" data-range="day">Tag</div>
     <div class="tab" data-range="week">Woche</div>
@@ -213,7 +202,7 @@ canvas{width:100%;height:260px;display:block;background:#080808;border-radius:12
 
 <div class="card" id="calendarCard">
   <h3>🗓️ Monatskalender</h3>
-  <div class="small muted">✔️ wenn du an dem Tag mindestens 1 Session hast. Klick auf einen Tag setzt Datum oben.</div>
+  <div class="small muted">✓ wenn du an dem Tag mindestens 1 Session hast. Klick setzt Datum.</div>
 
   <div class="calHead">
     <div class="calBtnRow">
@@ -230,28 +219,28 @@ canvas{width:100%;height:260px;display:block;background:#080808;border-radius:12
 </div>
 
 <script>
-/* ===================== BASIS STATE ===================== */
-const KEY_DATA="sport_db_v3";
-const KEY_PROFILE="sport_profile_v3";
+/* ===================== STATE ===================== */
+const KEY_DATA="sport_db_v4";
+const KEY_PROFILE="sport_profile_v4";
 
 let db = (()=>{ try{return JSON.parse(localStorage.getItem(KEY_DATA)||"{}");}catch{return{};} })();
 let profile = localStorage.getItem(KEY_PROFILE)||"";
 
-const $ = (id)=>document.getElementById(id);
-const pad = (n)=>String(n).padStart(2,"0");
-const iso = (d)=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
-function saveDB(){ localStorage.setItem(KEY_DATA, JSON.stringify(db)); }
+const $ = id => document.getElementById(id);
+const pad = n => String(n).padStart(2,"0");
+const iso = d => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
 function safeNum(v){ const n=Number(v); return Number.isFinite(n)?n:0; }
+function saveDB(){ localStorage.setItem(KEY_DATA, JSON.stringify(db)); }
 
 const SPORTS = ["Krafttraining","Joggen","Stretching","Ringen","Schwimmen","Tennis"];
 const KM_SPORTS = new Set(["Joggen","Schwimmen"]);
 
-function getDay(dateIso){
-  if(!Array.isArray(db[dateIso])) db[dateIso]=[];
-  return db[dateIso];
+function getDay(dayIso){
+  if(!Array.isArray(db[dayIso])) db[dayIso]=[];
+  return db[dayIso];
 }
 
-/* ===================== INIT ===================== */
+/* ===================== INIT UI ===================== */
 $("profileName").value = profile;
 $("appTitle").textContent = profile || "Sport Tracker";
 $("saveProfile").onclick = ()=>{
@@ -271,14 +260,14 @@ document.querySelectorAll(".tab").forEach(t=>{
   t.onclick=()=>{
     document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));
     t.classList.add("active");
-    activeRange=t.dataset.range;
+    activeRange = t.dataset.range;
     renderAll();
   };
 });
 </script>
 <div class="card" id="sportSection">
   <h3>🏋️ Sport Tracker (Multi-Sessions)</h3>
-  <div class="small">Mehrere Sessions pro Tag. Kein Rausklicken beim Tippen.</div>
+  <div class="small">Datum wählen → Sessions gehören exakt zu diesem Datum. Dashboard springt automatisch mit.</div>
 
   <div class="row" style="margin-top:10px;">
     <div style="min-width:220px;">
@@ -299,14 +288,23 @@ document.querySelectorAll(".tab").forEach(t=>{
 </div>
 
 <script>
-/* ===================== SESSIONS UI ===================== */
+/* ===================== DATE SYNC (WICHTIG) ===================== */
 const entryDateInput = $("entryDate");
 entryDateInput.value = $("focusDate").value;
 
+function syncFocusToEntry(){
+  const e = entryDateInput.value;
+  if(e && $("focusDate").value !== e){
+    $("focusDate").value = e;
+  }
+}
+
+/* ===================== BUTTONS ===================== */
 $("addSessionBtn").onclick = ()=>{
   const d = entryDateInput.value;
   getDay(d).push({ time:"", type:"", duration:"", calories:"", km:"", pace:"", hr:"" });
   saveDB();
+  syncFocusToEntry();
   renderSessions();
   renderAll();
 };
@@ -315,15 +313,18 @@ $("clearDayBtn").onclick = ()=>{
   const d = entryDateInput.value;
   delete db[d];
   saveDB();
+  syncFocusToEntry();
   renderSessions();
   renderAll();
 };
 
 entryDateInput.addEventListener("change", ()=>{
+  syncFocusToEntry();
   renderSessions();
   renderAll();
 });
 
+/* ===================== SESSIONS RENDER ===================== */
 function renderSessions(){
   const d = entryDateInput.value;
   const list = $("sessionList");
@@ -395,28 +396,28 @@ function attachSessionHandlers(){
   const d = entryDateInput.value;
   const list = $("sessionList");
 
-  // löschen
   list.querySelectorAll("button[data-del]").forEach(btn=>{
-    btn.onclick = ()=>{
-      const i = Number(btn.dataset.del);
-      const arr = getDay(d);
+    btn.onclick=()=>{
+      const i=Number(btn.dataset.del);
+      const arr=getDay(d);
       arr.splice(i,1);
       if(!arr.length) delete db[d];
       saveDB();
+      syncFocusToEntry();
       renderSessions();
       renderAll();
     };
   });
 
-  // inputs/selects
   list.querySelectorAll("input[data-i], select[data-i]").forEach(el=>{
-    const i = Number(el.dataset.i);
-    const k = el.dataset.k;
+    const i=Number(el.dataset.i);
+    const k=el.dataset.k;
 
     if(el.tagName==="SELECT"){
-      el.onchange = ()=>{
-        getDay(d)[i][k] = el.value;
+      el.onchange=()=>{
+        getDay(d)[i][k]=el.value;
         saveDB();
+        syncFocusToEntry();
         renderSessions(); // enable/disable km/pace
         renderAll();
       };
@@ -424,9 +425,10 @@ function attachSessionHandlers(){
     }
 
     el.addEventListener("input", ()=>{
-      getDay(d)[i][k] = el.value;
+      getDay(d)[i][k]=el.value;
       saveDB();
-      renderAll(); // Dashboard/Charts updaten, Fokus bleibt
+      syncFocusToEntry();
+      renderAll();
     });
   });
 }
@@ -434,7 +436,7 @@ function attachSessionHandlers(){
 renderSessions();
 </script>
 <script>
-/* ===================== AGGREGATION (Ø Werte robust) ===================== */
+/* ===================== AGGREGATION ===================== */
 function parsePace(p){
   if(!p || !p.includes(":")) return null;
   const [m,s] = p.split(":").map(Number);
@@ -446,21 +448,21 @@ function paceFromSeconds(sec){
   return `${Math.floor(t/60)}:${String(t%60).padStart(2,"0")}`;
 }
 
-function inRange(dateIso, range){
-  const d = new Date(dateIso);
-  const f = new Date($("focusDate").value);
+function inRange(dayIso, range){
+  const d=new Date(dayIso);
+  const f=new Date($("focusDate").value);
 
-  if(range==="day") return dateIso === $("focusDate").value;
+  if(range==="day") return dayIso === $("focusDate").value;
   if(range==="month") return d.getMonth()===f.getMonth() && d.getFullYear()===f.getFullYear();
   if(range==="year") return d.getFullYear()===f.getFullYear();
   if(range==="all") return true;
 
   if(range==="week"){
-    const fd = new Date(f);
-    const monday = new Date(fd);
-    const day = monday.getDay() || 7;
-    monday.setDate(fd.getDate() - day + 1);
-    const sunday = new Date(monday);
+    const fd=new Date(f);
+    const monday=new Date(fd);
+    const dow = monday.getDay() || 7;
+    monday.setDate(fd.getDate()-dow+1);
+    const sunday=new Date(monday);
     sunday.setDate(monday.getDate()+6);
     return d>=monday && d<=sunday;
   }
@@ -468,13 +470,9 @@ function inRange(dateIso, range){
 }
 
 function aggregate(range){
-  let calSum=0, minSum=0, kmSum=0, sessions=0;
-
-  // Ø Pace (distanzgewichtet)
-  let paceWeightedSum=0, paceWeightKm=0;
-
-  // Ø HF (dauergewichtet, aber falls Dauer fehlt: Gewicht=1)
-  let hrWeightedSum=0, hrWeight=0;
+  let calSum=0,minSum=0,kmSum=0,sessions=0;
+  let paceSum=0, paceKm=0;
+  let hrSum=0, hrW=0;
 
   for(const [dayIso, arr] of Object.entries(db)){
     if(!inRange(dayIso, range)) continue;
@@ -482,28 +480,26 @@ function aggregate(range){
 
     for(const s of arr){
       sessions++;
-
-      const mins = safeNum(s.duration);
-      const kcal = safeNum(s.calories);
+      const mins=safeNum(s.duration);
+      const kcal=safeNum(s.calories);
       calSum += kcal;
       minSum += mins;
 
       if(KM_SPORTS.has(s.type)){
-        const km = safeNum(s.km);
+        const km=safeNum(s.km);
         kmSum += km;
-
-        const ps = parsePace(s.pace);
+        const ps=parsePace(s.pace);
         if(ps!=null && km>0){
-          paceWeightedSum += ps * km;
-          paceWeightKm += km;
+          paceSum += ps*km;
+          paceKm += km;
         }
       }
 
-      const hr = safeNum(s.hr);
-      const w = mins > 0 ? mins : (hr > 0 ? 1 : 0);
-      if(hr > 0 && w > 0){
-        hrWeightedSum += hr * w;
-        hrWeight += w;
+      const hr=safeNum(s.hr);
+      const w = mins>0 ? mins : (hr>0 ? 1 : 0);
+      if(hr>0 && w>0){
+        hrSum += hr*w;
+        hrW += w;
       }
     }
   }
@@ -513,37 +509,38 @@ function aggregate(range){
     minutesTotal: Math.round(minSum),
     kmTotal: kmSum,
     sessionsTotal: sessions,
+    avgPace: paceKm ? paceFromSeconds(paceSum/paceKm) : "–",
+    avgHr: hrW ? Math.round(hrSum/hrW) : "–",
     avgCaloriesPerSession: sessions ? Math.round(calSum/sessions) : 0,
-    avgMinutesPerSession: sessions ? Math.round(minSum/sessions) : 0,
-    avgKmPerSession: sessions ? (kmSum/sessions) : 0,
-    avgPace: paceWeightKm ? paceFromSeconds(paceWeightedSum/paceWeightKm) : "–",
-    avgHr: hrWeight ? Math.round(hrWeightedSum/hrWeight) : "–",
+    avgMinutesPerSession: sessions ? Math.round(minSum/sessions) : 0
   };
 }
 
 function renderDashboard(){
-  const a = aggregate(activeRange);
+  const a=aggregate(activeRange);
   $("kpiGrid").innerHTML = `
     <div class="kpi"><div class="v">${a.caloriesTotal}</div><div class="l">Kalorien (Summe)</div></div>
     <div class="kpi"><div class="v">${a.minutesTotal}</div><div class="l">Minuten (Summe)</div></div>
-    <div class="kpi"><div class="v">${a.kmTotal.toFixed(1)}</div><div class="l">Kilometer (Summe)</div></div>
+    <div class="kpi"><div class="v">${a.kmTotal.toFixed(1)}</div><div class="l">KM (Summe)</div></div>
 
-    <div class="kpi"><div class="v">${a.avgCaloriesPerSession}</div><div class="l">Ø kcal / Session</div></div>
-    <div class="kpi"><div class="v">${a.avgMinutesPerSession}</div><div class="l">Ø Min / Session</div></div>
+    <div class="kpi"><div class="v">${a.sessionsTotal}</div><div class="l">Sessions</div></div>
+    <div class="kpi"><div class="v">${a.avgPace}</div><div class="l">Ø Pace</div></div>
     <div class="kpi"><div class="v">${a.avgHr}</div><div class="l">Ø Herzfrequenz</div></div>
   `;
 }
 
-/* ===================== CHARTS (High DPI Line) ===================== */
+/* ===================== CHARTS (Month, High-DPI Line) ===================== */
 function drawLine(canvas, values, title, unit){
   const ctx=canvas.getContext("2d");
   const dpr=window.devicePixelRatio||1;
   const cssW=canvas.clientWidth;
   const cssH=canvas.clientHeight;
+
   canvas.width=Math.max(1,Math.floor(cssW*dpr));
   canvas.height=Math.max(1,Math.floor(cssH*dpr));
   ctx.setTransform(dpr,0,0,dpr,0,0);
-  const w=cssW,h=cssH;
+
+  const w=cssW, h=cssH;
   ctx.clearRect(0,0,w,h);
 
   const padL=54,padR=12,padT=26,padB=34;
@@ -561,7 +558,7 @@ function drawLine(canvas, values, title, unit){
     const v=max/5*i;
     const y=h-padB-(v/max)*innerH;
     ctx.beginPath(); ctx.moveTo(padL,y); ctx.lineTo(w-padR,y); ctx.stroke();
-    ctx.fillText(`${Math.round(v)} ${unit}`,8,y+4);
+    ctx.fillText(`${Math.round(v)} ${unit}`, 8, y+4);
   }
 
   ctx.strokeStyle="#00ff6a";
@@ -574,7 +571,6 @@ function drawLine(canvas, values, title, unit){
   });
   ctx.stroke();
 
-  // wenige Labels für Lesbarkeit
   const step = values.length>16 ? Math.ceil(values.length/16) : 1;
   ctx.fillStyle="#00ff6a";
   values.forEach((v,i)=>{
@@ -601,7 +597,7 @@ function monthSeries(){
     });
     cal.push(c); km.push(k);
   }
-  return {cal, km, year:f.getFullYear(), month:f.getMonth()};
+  return {cal, km, y:f.getFullYear(), m:f.getMonth()};
 }
 
 function renderCharts(){
@@ -617,13 +613,15 @@ function hasTraining(dayIso){
   const arr=db[dayIso];
   return Array.isArray(arr) && arr.length>0;
 }
+
 function renderCalendar(){
   const y=calView.y, m=calView.m;
   const first=new Date(y,m,1);
   const last=new Date(y,m+1,0);
   const startDow=(first.getDay()+6)%7; // Mo=0
   const days=last.getDate();
-  $("calLabel").textContent = `${first.toLocaleDateString("de-DE",{month:"long",year:"numeric"})}`;
+
+  $("calLabel").textContent = first.toLocaleDateString("de-DE",{month:"long",year:"numeric"});
 
   const names=["Mo","Di","Mi","Do","Fr","Sa","So"];
   let html=`<tr>${names.map(n=>`<th class="small muted">${n}</th>`).join("")}</tr>`;
@@ -667,13 +665,11 @@ function renderCalendar(){
 }
 
 $("calPrev").onclick=()=>{
-  calView.m--;
-  if(calView.m<0){calView.m=11;calView.y--;}
+  calView.m--; if(calView.m<0){calView.m=11;calView.y--;}
   renderCalendar();
 };
 $("calNext").onclick=()=>{
-  calView.m++;
-  if(calView.m>11){calView.m=0;calView.y++;}
+  calView.m++; if(calView.m>11){calView.m=0;calView.y++;}
   renderCalendar();
 };
 $("calThis").onclick=()=>{
@@ -682,12 +678,11 @@ $("calThis").onclick=()=>{
   renderCalendar();
 };
 
-/* ===================== OCR (Datum Auto: OCR → file.lastModified) ===================== */
+/* ===================== OCR (Datum zuverlässig) ===================== */
 function parseDateFromText(t){
   let m=t.match(/(\d{1,2})[.\-/](\d{1,2})[.\-/](\d{2,4})/);
   if(m){
-    let dd=+m[1], mm=+m[2], yy=+m[3];
-    if(yy<100) yy+=2000;
+    let dd=+m[1], mm=+m[2], yy=+m[3]; if(yy<100) yy+=2000;
     if(dd>=1&&dd<=31&&mm>=1&&mm<=12) return `${yy}-${pad(mm)}-${pad(dd)}`;
   }
   m=t.match(/(20\d{2})[.\-/](\d{1,2})[.\-/](\d{1,2})/);
@@ -701,8 +696,9 @@ function parseTimeFromText(t){
   const m=t.match(/([01]?\d|2[0-3])[:. ]([0-5]\d)/);
   return m ? `${pad(m[1])}:${pad(m[2])}` : "";
 }
-function bestDateForFile(file, t){
-  return parseDateFromText(t) || (file?.lastModified ? iso(new Date(file.lastModified)) : entryDateInput.value);
+function bestDateForOCR(t){
+  // Wichtig: wenn kein Datum im Bild => entryDate (zuverlässig)
+  return parseDateFromText(t) || entryDateInput.value || $("focusDate").value || iso(new Date());
 }
 
 $("shotBtn").onclick=()=>$("shotFile").click();
@@ -729,18 +725,24 @@ $("shotFile").onchange=async()=>{
     const res=await Tesseract.recognize(c,"deu+eng");
     const t=(res.data.text||"").replace(/\s+/g," ").trim();
 
-    const dayIso = bestDateForFile(file, t);
+    const dayIso = bestDateForOCR(t);
     const time = parseTimeFromText(t);
 
     const dur=(t.match(/(\d+)\s*min/i)||[])[1]||"";
     const cal=(t.match(/(\d+)\s*kcal/i)||[])[1]||"";
     const kmv=(t.match(/(\d+(?:[.,]\d+)?)\s*km/i)||[])[1]||"";
     const hr =(t.match(/(\d+)\s*bpm/i)||[])[1]||"";
+    const kmNorm = kmv ? kmv.replace(",",".") : "";
 
-    const kmNorm=kmv ? kmv.replace(",",".") : "";
-    const guessedType = kmNorm ? "Joggen" : "Krafttraining";
-
-    getDay(dayIso).push({ time, type:guessedType, duration:dur, calories:cal, km:kmNorm, pace:"", hr });
+    getDay(dayIso).push({
+      time,
+      type: kmNorm ? "Joggen" : "Krafttraining",
+      duration: dur,
+      calories: cal,
+      km: kmNorm,
+      pace: "",
+      hr: hr
+    });
     saveDB();
 
     // UI auf richtigen Tag setzen
@@ -773,7 +775,7 @@ $("focusDate").addEventListener("change", ()=>{
   renderAll();
 });
 
-// initial render
+// initial
 renderAll();
 </script>
 
