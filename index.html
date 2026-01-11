@@ -1350,8 +1350,11 @@
   };
 
   /* ===================== OCR (ROBUST) ===================== */
+    /* ===================== OCR (ROBUST + AUTO-IMPORT) ===================== */
   function fillOcrTypes(){
-    ocrType.innerHTML = `<option value="">Auto</option>` + SPORTS.map(x=>`<option value="${x}">${x}</option>`).join("");
+    ocrType.innerHTML =
+      `<option value="">Auto</option>` +
+      SPORTS.map(x=>`<option value="${x}">${x}</option>`).join("");
   }
   fillOcrTypes();
 
@@ -1360,7 +1363,7 @@
     shotFile.click();
   });
 
-  async function fileToCanvasScaled(file, maxDim = 1600){
+  async function fileToCanvasScaled(file, maxDim = 1800){
     const dataUrl = await new Promise((resolve, reject) => {
       const r = new FileReader();
       r.onload = () => resolve(r.result);
@@ -1388,10 +1391,176 @@
     canvas.height = ch;
     const ctx = canvas.getContext("2d", { willReadFrequently: true });
 
+    // weißer Hintergrund hilft OCR auf dunklen Screenshots
     ctx.fillStyle = "#fff";
     ctx.fillRect(0, 0, cw, ch);
     ctx.drawImage(img, 0, 0, cw, ch);
+
     return canvas;
+  }
+
+  function normalizeText(t){
+    return (t||"")
+      .replace(/\u00A0/g," ")
+      .replace(/[|]/g,"I")
+      .replace(/\s+/g," ")
+      .trim();
+  }
+
+  function numFrom(str){
+    if(!str) return "";
+    return String(str).replace(",", ".").replace(/[^0-9.]/g,"");
+  }
+
+  function extractTime(txt){
+    // 19:31
+    const m = txt.match(/\b([01]?\d|2[0-3]):([0-5]\d)\b/);
+    return m ? m[0] : "";
+  }
+
+  function extractDateIso(txt){
+    // 23.12.2025 oder 23/12/2025
+    const m = txt.match(/\b([0-3]?\d)[.\-/]([01]?\d)[.\-/]((?:19|20)\d{2})\b/);
+    if(m){
+      const dd = String(m[1]).padStart(2,"0");
+      const mm = String(m[2]).padStart(2,"0");
+      const yyyy = m[3];
+      return `${yyyy}-${mm}-${dd}`;
+    }
+    // Wenn kein Datum im Screenshot: nichts zurückgeben
+    return "";
+  }
+
+  function extractKm(txt){
+    // Distanz 3,21 km / 3.21km / 800 m
+    const km1 = txt.match(/\b(\d+(?:[.,]\d+)?)\s*km\b/i);
+    if(km1) return numFrom(km1[1]);
+
+    const km2 = txt.match(/\b(\d+(?:[.,]\d+)?)\s*K M\b/i);
+    if(km2) return numFrom(km2[1]);
+
+    const km3 = txt.match(/\b(?:distanz|distance)\s*[:\-]?\s*(\d+(?:[.,]\d+)?)\s*km\b/i);
+    if(km3) return numFrom(km3[1]);
+
+    const m = txt.match(/\b(\d{2,5})\s*m\b/i);
+    if(m){
+      const meters = Number(m[1]);
+      if(Number.isFinite(meters) && meters > 0){
+        return String((meters/1000).toFixed(2));
+      }
+    }
+    return "";
+  }
+
+  function extractCalories(txt){
+    const m1 = txt.match(/\b(\d{2,5})\s*kcal\b/i);
+    if(m1) return m1[1];
+    const m2 = txt.match(/\b(\d{2,5})\s*cal\b/i);
+    if(m2) return m2[1];
+    const m3 = txt.match(/\b(?:kalorien|calories)\s*[:\-]?\s*(\d{2,5})\b/i);
+    if(m3) return m3[1];
+    return "";
+  }
+
+  function extractHr(txt){
+    // Ø HF 148 bpm / Durchschnitt 148 bpm / Avg 148 bpm
+    const m1 = txt.match(/\b(?:ø|Ø)\s*(?:hf|hr|herzfrequenz)\s*[:\-]?\s*(\d{2,3})\s*bpm\b/i);
+    if(m1) return m1[1];
+
+    const m2 = txt.match(/\b(?:durchschnitt|average|avg)\s*(?:hf|hr|herzfrequenz)?\s*[:\-]?\s*(\d{2,3})\s*bpm\b/i);
+    if(m2) return m2[1];
+
+    const m3 = txt.match(/\b(\d{2,3})\s*bpm\b/i);
+    if(m3) return m3[1];
+
+    // manchmal ohne bpm: "Ø HF 148"
+    const m4 = txt.match(/\b(?:ø|Ø)\s*(?:hf|hr|herzfrequenz)\s*[:\-]?\s*(\d{2,3})\b/i);
+    if(m4) return m4[1];
+
+    return "";
+  }
+
+  function extractPace(txt){
+    // 5:30 /km, 05:30 min/km, Pace 5:30
+    const m1 = txt.match(/\b(\d{1,2}:\d{2})\s*(?:\/\s*km|\/km|min\/km)\b/i);
+    if(m1) return m1[1];
+
+    const m2 = txt.match(/\bpace\s*[:\-]?\s*(\d{1,2}:\d{2})\b/i);
+    if(m2) return m2[1];
+
+    // fallback: irgendein mm:ss (kann aber auch "Zeit" sein)
+    const m3 = txt.match(/\b(\d{1,2}:\d{2})\b/);
+    return m3 ? m3[1] : "";
+  }
+
+  function extractDurationMin(txt){
+    // 32 min / 32 minuten
+    const m1 = txt.match(/\b(\d{1,3})\s*(?:min|minute|minuten)\b/i);
+    if(m1) return m1[1];
+
+    // 00:32:15 oder 1:05:00
+    const hms = txt.match(/\b(\d{1,2}):([0-5]\d):([0-5]\d)\b/);
+    if(hms){
+      const h = Number(hms[1]), m = Number(hms[2]), s = Number(hms[3]);
+      const totalMin = Math.round((h*3600 + m*60 + s)/60);
+      return String(totalMin);
+    }
+
+    // 32:15 (mm:ss)
+    const ms = txt.match(/\b(\d{1,3}):([0-5]\d)\b/);
+    if(ms){
+      const m = Number(ms[1]), s = Number(ms[2]);
+      const totalMin = Math.round((m*60 + s)/60);
+      return String(totalMin);
+    }
+
+    // manchmal "Dauer 00:32:15"
+    const m2 = txt.match(/\b(?:dauer|duration)\s*[:\-]?\s*(\d{1,2}:\d{2}:\d{2}|\d{1,3}:\d{2})\b/i);
+    if(m2){
+      const v = m2[1];
+      if(v.split(":").length === 3){
+        const [hh,mm,ss] = v.split(":").map(Number);
+        return String(Math.round((hh*3600+mm*60+ss)/60));
+      } else {
+        const [mm,ss] = v.split(":").map(Number);
+        return String(Math.round((mm*60+ss)/60));
+      }
+    }
+
+    return "";
+  }
+
+  function guessType({km, pace, raw}){
+    if(km && pace) return "Joggen";
+    if(km && !pace) return "Schwimmen";
+    // wenn Wörter drin stehen:
+    if(/\b(swim|schwimm)\b/i.test(raw)) return "Schwimmen";
+    if(/\b(run|jogg|laufen)\b/i.test(raw)) return "Joggen";
+    if(/\b(tennis)\b/i.test(raw)) return "Tennis";
+    if(/\b(ringen)\b/i.test(raw)) return "Ringen";
+    if(/\b(stretch)\b/i.test(raw)) return "Stretching";
+    if(/\b(kraft|strength|gym)\b/i.test(raw)) return "Krafttraining";
+    return "Krafttraining";
+  }
+
+  function autoCreateSessionFromOCR(fields){
+    const d = fields.dateIso || entryDateInput.value;
+    const session = {
+      type: fields.type || "Krafttraining",
+      duration: String(fields.duration || ""),
+      calories: String(fields.calories || ""),
+      km: String(fields.km || ""),
+      pace: String(fields.pace || ""),
+      hr: String(fields.hr || ""),
+      time: String(fields.time || "")
+    };
+    getDay(d).push(session);
+    saveDB();
+
+    entryDateInput.value = d;
+    focusDateInput.value = d;
+    renderSessions();
+    updateAfterEdit();
   }
 
   shotFile.addEventListener("change", async () => {
@@ -1406,76 +1575,86 @@
       }
 
       ocrStatus.textContent = "Bild wird vorbereitet…";
-      const canvas = await fileToCanvasScaled(file, 1600);
+      const canvas = await fileToCanvasScaled(file, 1800);
 
-      ocrStatus.textContent = "OCR startet…";
+      ocrStatus.textContent = "OCR läuft…";
       const result = await Tesseract.recognize(canvas, "deu+eng", {
         logger: m => {
-          if(m.status && typeof m.progress === "number"){
-            ocrStatus.textContent = `${m.status}… ${Math.round(m.progress*100)}%`;
+          if(m.progress != null){
+            ocrStatus.textContent = `OCR ${Math.round(m.progress*100)}%`;
           }
         }
       });
 
-      const raw=(result?.data?.text||"").replace(/\u00A0/g," ").replace(/\s+/g," ").trim();
-      ocrRaw.value=raw;
+      const raw = normalizeText(result?.data?.text || "");
+      ocrRaw.value = raw;
 
-      const dur = (raw.match(/(\d{1,3})\s*(min|minute[n]?)\b/i)||[])[1] || "";
-      const kcal = (raw.match(/(\d{2,5})\s*(kcal|cal)\b/i)||[])[1] || "";
-      const km = ((raw.match(/(\d+(?:[.,]\d+)?)\s*km\b/i)||[])[1] || "").replace(",", ".");
-      const pace =
-        (raw.match(/(\d{1,2}:\d{2})\s*(\/\s*km|\/km|min\/km)\b/i)||[])[1] ||
-        (raw.match(/\b(\d{1,2}:\d{2})\b/)||[])[1] ||
-        "";
-      const hr =
-        (raw.match(/(\d{2,3})\s*bpm\b/i)||[])[1] ||
-        ((raw.match(/\b(hf|herz)\s*[:\-]?\s*(\d{2,3})\b/i)||[])[2] || "");
+      const dateIso = extractDateIso(raw);       // kann leer sein
+      const time = extractTime(raw);             // kann leer sein
+      const duration = extractDurationMin(raw);
+      const calories = extractCalories(raw);
+      const km = extractKm(raw);
+      const pace = extractPace(raw);
+      const hr = extractHr(raw);
+      const typeGuess = guessType({km, pace, raw});
 
-      const time = (raw.match(/\b([01]?\d|2[0-3]):([0-5]\d)\b/)||[])[0] || "";
-
-      ocrDate.value = entryDateInput.value;
+      // Felder füllen (für Debug / falls Modal gebraucht)
+      ocrDate.value = dateIso || entryDateInput.value;
       ocrTime.value = time;
-      ocrDuration.value = dur;
-      ocrCalories.value = kcal;
+      ocrDuration.value = duration;
+      ocrCalories.value = calories;
       ocrKm.value = km;
       ocrPace.value = pace;
       ocrHr.value = hr;
+      ocrType.value = typeGuess;
 
-      if(km && pace) ocrType.value="Joggen";
-      else if(km && !pace) ocrType.value="Schwimmen";
-      else ocrType.value="Krafttraining";
+      // AUTO: Wenn wir wenigstens Dauer ODER Kalorien ODER KM erkannt haben -> direkt eintragen
+      const hasAny = !!(duration || calories || km || hr || pace);
 
-      ocrModal.style.display="block";
-      ocrStatus.textContent="OCR fertig ✅";
+      if(hasAny){
+        // ohne klicken: direkt speichern
+        autoCreateSessionFromOCR({
+          dateIso: dateIso || entryDateInput.value,
+          time,
+          duration,
+          calories,
+          km,
+          pace,
+          hr,
+          type: typeGuess
+        });
+
+        ocrStatus.textContent = "Import ✅ (automatisch gespeichert)";
+        ocrModal.style.display = "none";
+        return;
+      }
+
+      // sonst Modal zum manuellen Check
+      ocrModal.style.display = "block";
+      ocrStatus.textContent = "OCR fertig (bitte prüfen)";
+
     } catch(e){
       console.error(e);
-      ocrStatus.textContent="OCR Fehler ❌";
+      ocrStatus.textContent = "OCR Fehler ❌";
     }
   });
 
-  ocrCancel.onclick=()=>{ ocrModal.style.display="none"; };
-  ocrApply.onclick=()=>{
-    const d=ocrDate.value || entryDateInput.value;
-    const type=ocrType.value || "Krafttraining";
-
-    getDay(d).push({
-      type,
-      duration:String(ocrDuration.value||""),
-      calories:String(ocrCalories.value||""),
-      km:String(ocrKm.value||""),
-      pace:String(ocrPace.value||""),
-      hr:String(ocrHr.value||""),
-      note: ocrTime.value ? `Time: ${ocrTime.value}` : ""
+  // Falls du doch mal manuell übernehmen willst (bleibt als Fallback)
+  ocrCancel.onclick = () => { ocrModal.style.display="none"; };
+  ocrApply.onclick = () => {
+    autoCreateSessionFromOCR({
+      dateIso: ocrDate.value || entryDateInput.value,
+      time: ocrTime.value || "",
+      duration: ocrDuration.value || "",
+      calories: ocrCalories.value || "",
+      km: ocrKm.value || "",
+      pace: ocrPace.value || "",
+      hr: ocrHr.value || "",
+      type: ocrType.value || "Krafttraining"
     });
-
-    saveDB();
-    entryDateInput.value=d;
     ocrModal.style.display="none";
-    renderSessions();
-    updateAfterEdit();
-    ocrStatus.textContent="Session übernommen ✅";
+    ocrStatus.textContent = "Import ✅ (manuell gespeichert)";
   };
-
   /* ===================== MASTER ===================== */
   function renderAll(){
     renderSessions();
