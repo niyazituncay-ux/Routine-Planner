@@ -1166,26 +1166,46 @@
       ctx.fillStyle="#9a9a9a"; ctx.font="10px system-ui";
       ctx.fillText(labels[i]??"", x, h-10);
     });
-  }
-  function drawLine(ctx,values,labels,title){
-    const w=ctx.canvas.width,h=ctx.canvas.height,padL=44,padB=28;
-    ctx.fillStyle="#fff"; ctx.font="14px system-ui";
-    ctx.fillText(title,12,18);
-    drawAxes(ctx,w,h,padL,padB);
+function drawLine(ctx, values, labels, title, yUnit){
+  const c = ctx.canvas;
 
-    const maxVal=Math.max(1,...values);
-    const innerW=(w-12)-padL, innerH=(h-padB)-28;
-    const n=values.length;
-    const stepX=n>1 ? innerW/(n-1) : innerW;
+  // Retina / HiDPI (scharf auf iPhone & Mac)
+  const dpr = Math.max(1, window.devicePixelRatio || 1);
+  const cssW = c.clientWidth || 900;
+  const cssH = c.clientHeight || 260;
 
-    ctx.strokeStyle="rgba(0,255,106,0.9)";
-    ctx.lineWidth=2;
-    ctx.beginPath();
-    values.forEach((v,i)=>{
-      const x=padL+i*stepX;
-      const y=(h-padB)-(v/maxVal)*innerH;
-      if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
-    });
+  // set canvas internal size based on css size
+  c.width  = Math.round(cssW * dpr);
+  c.height = Math.round(cssH * dpr);
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0); // draw in CSS pixels
+  ctx.clearRect(0,0,cssW,cssH);
+
+  // Layout
+  const padL = 52;
+  const padR = 14;
+  const padT = 28;
+  const padB = 34;
+  const W = cssW, H = cssH;
+
+  // Title
+  ctx.fillStyle = "#fff";
+  ctx.font = "14px system-ui";
+  ctx.fillText(title, 12, 18);
+
+  // Range
+  const maxValRaw = Math.max(0, ...values);
+  const maxVal = maxValRaw <= 0 ? 1 : maxValRaw;
+
+  // Nice ticks
+  const tickCount = 5;
+  const step = Math.max(1, Math.ceil(maxVal / tickCount));
+  const yMax = step * tickCount;
+
+  const innerW = (W - padR) - padL;
+  const innerH = (H - padB) - padT;
+
+  // Grid + Y labels
+ );
     ctx.stroke();
 
     values.forEach((v,i)=>{
