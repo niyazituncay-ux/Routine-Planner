@@ -22,29 +22,23 @@ body{
   color:var(--fg);
   font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
   max-width:1200px;
-  margin:22px auto;
+  margin:20px auto;
   padding:0 14px 60px;
 }
 h1{margin:0;font-size:30px;letter-spacing:-.2px}
-h2{margin:4px 0 0;font-size:14px;color:var(--muted);font-weight:600}
+h2{margin:6px 0 0;font-size:14px;color:var(--muted);font-weight:600}
 h3{margin:0 0 10px;font-size:16px}
 .small{font-size:12px;color:var(--muted)}
 .muted{color:var(--muted)}
-
 .card{
   border:1px solid var(--line);
   background:var(--panel);
   border-radius:16px;
   padding:14px;
   margin-top:14px;
-  overflow:hidden; /* verhindert Layout-Overflow */
+  overflow:hidden;
 }
-.row{
-  display:flex;
-  gap:10px;
-  flex-wrap:wrap;
-  align-items:center;
-}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
 .grow{flex:1;min-width:220px}
 
 input,select,textarea{
@@ -99,11 +93,6 @@ button:hover{background:#151515}
 .kpi .v{font-size:22px;font-weight:900;color:var(--accent);line-height:1.1}
 .kpi .l{font-size:12px;color:var(--muted);margin-top:6px}
 
-.dashGrid{
-  display:grid;
-  grid-template-columns:1fr;
-  gap:12px;
-}
 .chartGrid{
   display:grid;
   grid-template-columns:1fr 1fr;
@@ -113,7 +102,6 @@ button:hover{background:#151515}
 @media (max-width:900px){
   .chartGrid{grid-template-columns:1fr}
 }
-
 .chartWrap{
   border:1px solid var(--line);
   border-radius:16px;
@@ -121,62 +109,69 @@ button:hover{background:#151515}
   padding:10px;
   overflow:hidden;
 }
-canvas{
-  width:100%;
-  height:260px;
-  display:block;
-  background:#080808;
-  border-radius:12px;
-}
+canvas{width:100%;height:260px;display:block;background:#080808;border-radius:12px}
 
-/* Session Cards */
-.sessionCard{
-  border:1px solid var(--line);
-  border-radius:16px;
-  padding:12px;
-  background:#0b0b0b;
-  margin-top:10px;
-}
-.sessionHeader{
+/* Kalender */
+.calHead{
   display:flex;
   justify-content:space-between;
   align-items:center;
   gap:10px;
   flex-wrap:wrap;
+  margin-bottom:10px;
 }
-.sessionGrid{
-  display:grid;
-  grid-template-columns:repeat(6,minmax(140px,1fr));
+.calBtnRow{display:flex;gap:8px;flex-wrap:wrap}
+.calendar{
+  width:100%;
+  border-collapse:collapse;
+  border:1px solid var(--line);
+  border-radius:16px;
+  overflow:hidden;
+  background:#080808;
+}
+.calendar th,.calendar td{
+  border-right:1px solid var(--line);
+  border-bottom:1px solid var(--line);
+  padding:10px;
+  vertical-align:top;
+  height:72px;
+}
+.calendar th:last-child,.calendar td:last-child{border-right:none}
+.calendar tr:last-child td{border-bottom:none}
+.calCell{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
   gap:10px;
-  margin-top:10px;
 }
-@media (max-width:900px){
-  .sessionGrid{grid-template-columns:1fr 1fr}
+.calDay{font-weight:900}
+.calDim{color:#444}
+.calCheck{
+  width:22px;height:22px;
+  border-radius:999px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  border:1px solid #1b4f30;
+  background:rgba(0,255,106,.12);
+  color:var(--accent);
+  font-weight:900;
+  font-size:12px;
 }
-
-/* iOS file input fix */
-.fileHidden{
-  position:absolute;
-  left:-9999px;
-  width:1px;
-  height:1px;
-  opacity:0;
-}
+.fileHidden{position:absolute;left:-9999px;width:1px;height:1px;opacity:0}
 </style>
 
-<!-- OCR Engine -->
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 </head>
 
 <body>
 
-<!-- HEADER -->
 <div class="card">
   <div class="row">
     <div class="grow">
       <h1 id="appTitle">Sport Tracker</h1>
-      <h2>Multi-Sessions · OCR · Strichdiagramme · Archiv</h2>
-      <div class="small">Speichert lokal im Browser (bleibt, bis Website-Daten gelöscht werden).</div>
+      <h2>Multi-Sessions · OCR Import · Monatskalender · Strichdiagramme</h2>
+      <div class="small">Alles wird lokal gespeichert (Browser-Archiv).</div>
     </div>
     <div class="grow">
       <div class="small">Profilname</div>
@@ -186,7 +181,6 @@ canvas{
   </div>
 </div>
 
-<!-- DASHBOARD -->
 <div class="card" id="dashboard">
   <h3>📊 Dashboard</h3>
 
@@ -207,7 +201,7 @@ canvas{
 
   <div class="chartGrid">
     <div class="chartWrap">
-      <div class="small muted" style="margin-bottom:6px;">Kalorien pro Tag (Monatsansicht)</div>
+      <div class="small muted" style="margin-bottom:6px;">Kalorien pro Tag (Monat)</div>
       <canvas id="calorieChart"></canvas>
     </div>
     <div class="chartWrap">
@@ -217,10 +211,28 @@ canvas{
   </div>
 </div>
 
+<div class="card" id="calendarCard">
+  <h3>🗓️ Monatskalender</h3>
+  <div class="small muted">✔️ wenn du an dem Tag mindestens 1 Session hast. Klick auf einen Tag setzt Datum oben.</div>
+
+  <div class="calHead">
+    <div class="calBtnRow">
+      <button id="calPrev">◀</button>
+      <button id="calNext">▶</button>
+      <button id="calThis">Dieser Monat</button>
+    </div>
+    <div style="font-weight:900" id="calLabel">—</div>
+  </div>
+
+  <div style="overflow:auto">
+    <table class="calendar" id="monthCal"></table>
+  </div>
+</div>
+
 <script>
-/* ===== BASIS STATE (nur 1x) ===== */
-const KEY_DATA="sport_db_v2";
-const KEY_PROFILE="sport_profile_v2";
+/* ===================== BASIS STATE ===================== */
+const KEY_DATA="sport_db_v3";
+const KEY_PROFILE="sport_profile_v3";
 
 let db = (()=>{ try{return JSON.parse(localStorage.getItem(KEY_DATA)||"{}");}catch{return{};} })();
 let profile = localStorage.getItem(KEY_PROFILE)||"";
@@ -228,10 +240,18 @@ let profile = localStorage.getItem(KEY_PROFILE)||"";
 const $ = (id)=>document.getElementById(id);
 const pad = (n)=>String(n).padStart(2,"0");
 const iso = (d)=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
-
 function saveDB(){ localStorage.setItem(KEY_DATA, JSON.stringify(db)); }
+function safeNum(v){ const n=Number(v); return Number.isFinite(n)?n:0; }
 
-/* ===== Profile Init ===== */
+const SPORTS = ["Krafttraining","Joggen","Stretching","Ringen","Schwimmen","Tennis"];
+const KM_SPORTS = new Set(["Joggen","Schwimmen"]);
+
+function getDay(dateIso){
+  if(!Array.isArray(db[dateIso])) db[dateIso]=[];
+  return db[dateIso];
+}
+
+/* ===================== INIT ===================== */
 $("profileName").value = profile;
 $("appTitle").textContent = profile || "Sport Tracker";
 $("saveProfile").onclick = ()=>{
@@ -240,14 +260,12 @@ $("saveProfile").onclick = ()=>{
   $("appTitle").textContent = profile || "Sport Tracker";
 };
 
-/* ===== Date Init ===== */
 $("focusDate").value = iso(new Date());
 $("todayBtn").onclick = ()=>{
   $("focusDate").value = iso(new Date());
   renderAll();
 };
 
-/* ===== Tabs ===== */
 let activeRange="day";
 document.querySelectorAll(".tab").forEach(t=>{
   t.onclick=()=>{
@@ -257,21 +275,7 @@ document.querySelectorAll(".tab").forEach(t=>{
     renderAll();
   };
 });
-
-/* ===== Placeholder KPI (wird in Teil 3 real) ===== */
-function renderDashboardPlaceholder(){
-  $("kpiGrid").innerHTML=`
-    <div class="kpi"><div class="v">0</div><div class="l">Kalorien</div></div>
-    <div class="kpi"><div class="v">0</div><div class="l">Minuten</div></div>
-    <div class="kpi"><div class="v">0.0</div><div class="l">Kilometer</div></div>
-    <div class="kpi"><div class="v">–</div><div class="l">Ø Pace</div></div>
-    <div class="kpi"><div class="v">–</div><div class="l">Ø HF</div></div>
-    <div class="kpi"><div class="v">0</div><div class="l">Sessions</div></div>
-  `;
-}
-renderDashboardPlaceholder();
 </script>
-<!-- ===================== SPORT SECTION ===================== -->
 <div class="card" id="sportSection">
   <h3>🏋️ Sport Tracker (Multi-Sessions)</h3>
   <div class="small">Mehrere Sessions pro Tag. Kein Rausklicken beim Tippen.</div>
@@ -281,40 +285,24 @@ renderDashboardPlaceholder();
       <div class="small">Datum</div>
       <input id="entryDate" type="date" />
     </div>
-
     <button id="addSessionBtn">+ Session</button>
     <button id="clearDayBtn" class="danger">Tag löschen</button>
   </div>
 
-  <!-- Screenshot Bereich -->
   <div class="row" style="margin-top:10px;">
     <button id="shotBtn">📷 Screenshot / Foto importieren</button>
     <div id="ocrStatus" class="small muted"></div>
     <input id="shotFile" class="fileHidden" type="file" accept="image/*">
   </div>
 
-  <div class="small muted" style="margin-top:8px;">
-    Joggen/Schwimmen: Dauer + KM + Pace + Ø HF. Andere: Dauer + Kalorien + Ø HF.
-  </div>
-
   <div id="sessionList" style="margin-top:12px;"></div>
 </div>
 
 <script>
-/* ===================== SPORT MODEL + UI ===================== */
-const SPORTS = ["Krafttraining","Joggen","Stretching","Ringen","Schwimmen","Tennis"];
-const KM_SPORTS = new Set(["Joggen","Schwimmen"]);
-
-function getDay(dateIso){
-  if(!Array.isArray(db[dateIso])) db[dateIso] = [];
-  return db[dateIso];
-}
-
-// entryDate = focusDate
+/* ===================== SESSIONS UI ===================== */
 const entryDateInput = $("entryDate");
 entryDateInput.value = $("focusDate").value;
 
-// Buttons
 $("addSessionBtn").onclick = ()=>{
   const d = entryDateInput.value;
   getDay(d).push({ time:"", type:"", duration:"", calories:"", km:"", pace:"", hr:"" });
@@ -407,7 +395,7 @@ function attachSessionHandlers(){
   const d = entryDateInput.value;
   const list = $("sessionList");
 
-  // delete
+  // löschen
   list.querySelectorAll("button[data-del]").forEach(btn=>{
     btn.onclick = ()=>{
       const i = Number(btn.dataset.del);
@@ -420,26 +408,25 @@ function attachSessionHandlers(){
     };
   });
 
-  // inputs + selects
+  // inputs/selects
   list.querySelectorAll("input[data-i], select[data-i]").forEach(el=>{
     const i = Number(el.dataset.i);
     const k = el.dataset.k;
 
-    if(el.tagName === "SELECT"){
+    if(el.tagName==="SELECT"){
       el.onchange = ()=>{
         getDay(d)[i][k] = el.value;
         saveDB();
-        // nur bei Sportart rerender (km/pace enable)
-        renderSessions();
+        renderSessions(); // enable/disable km/pace
         renderAll();
       };
       return;
     }
 
-    // wichtig: speichern ohne rerender -> Fokus bleibt
     el.addEventListener("input", ()=>{
       getDay(d)[i][k] = el.value;
       saveDB();
+      renderAll(); // Dashboard/Charts updaten, Fokus bleibt
     });
   });
 }
@@ -447,12 +434,7 @@ function attachSessionHandlers(){
 renderSessions();
 </script>
 <script>
-/* ===================== DASHBOARD + CHARTS + OCR ===================== */
-
-function safeNum(v){
-  const n = Number(v);
-  return Number.isFinite(n) ? n : 0;
-}
+/* ===================== AGGREGATION (Ø Werte robust) ===================== */
 function parsePace(p){
   if(!p || !p.includes(":")) return null;
   const [m,s] = p.split(":").map(Number);
@@ -486,299 +468,312 @@ function inRange(dateIso, range){
 }
 
 function aggregate(range){
-  let cal=0,min=0,km=0,paceSum=0,paceKm=0,hrSum=0,hrMin=0,sess=0;
+  let calSum=0, minSum=0, kmSum=0, sessions=0;
 
-  for(const [d,arr] of Object.entries(db)){
-    if(!inRange(d,range)) continue;
+  // Ø Pace (distanzgewichtet)
+  let paceWeightedSum=0, paceWeightKm=0;
+
+  // Ø HF (dauergewichtet, aber falls Dauer fehlt: Gewicht=1)
+  let hrWeightedSum=0, hrWeight=0;
+
+  for(const [dayIso, arr] of Object.entries(db)){
+    if(!inRange(dayIso, range)) continue;
     if(!Array.isArray(arr)) continue;
 
-    arr.forEach(s=>{
-      sess++;
-      const m=safeNum(s.duration);
-      min+=m;
-      cal+=safeNum(s.calories);
+    for(const s of arr){
+      sessions++;
+
+      const mins = safeNum(s.duration);
+      const kcal = safeNum(s.calories);
+      calSum += kcal;
+      minSum += mins;
 
       if(KM_SPORTS.has(s.type)){
-        const k=safeNum(s.km);
-        const ps=parsePace(s.pace);
-        km+=k;
-        if(ps!=null && k>0){
-          paceSum += ps*k;
-          paceKm += k;
+        const km = safeNum(s.km);
+        kmSum += km;
+
+        const ps = parsePace(s.pace);
+        if(ps!=null && km>0){
+          paceWeightedSum += ps * km;
+          paceWeightKm += km;
         }
       }
 
-      const hr=safeNum(s.hr);
-      if(hr>0 && m>0){
-        hrSum += hr*m;  // dauergewichtet
-        hrMin += m;
+      const hr = safeNum(s.hr);
+      const w = mins > 0 ? mins : (hr > 0 ? 1 : 0);
+      if(hr > 0 && w > 0){
+        hrWeightedSum += hr * w;
+        hrWeight += w;
       }
-    });
+    }
   }
 
   return {
-    calories:cal,
-    minutes:min,
-    km:km,
-    avgPace: paceKm ? paceFromSeconds(paceSum/paceKm) : "–",
-    avgHr: hrMin ? Math.round(hrSum/hrMin) : "–",
-    sessions:sess
+    caloriesTotal: Math.round(calSum),
+    minutesTotal: Math.round(minSum),
+    kmTotal: kmSum,
+    sessionsTotal: sessions,
+    avgCaloriesPerSession: sessions ? Math.round(calSum/sessions) : 0,
+    avgMinutesPerSession: sessions ? Math.round(minSum/sessions) : 0,
+    avgKmPerSession: sessions ? (kmSum/sessions) : 0,
+    avgPace: paceWeightKm ? paceFromSeconds(paceWeightedSum/paceWeightKm) : "–",
+    avgHr: hrWeight ? Math.round(hrWeightedSum/hrWeight) : "–",
   };
 }
 
 function renderDashboard(){
   const a = aggregate(activeRange);
   $("kpiGrid").innerHTML = `
-    <div class="kpi"><div class="v">${a.calories}</div><div class="l">Kalorien</div></div>
-    <div class="kpi"><div class="v">${a.minutes}</div><div class="l">Minuten</div></div>
-    <div class="kpi"><div class="v">${a.km.toFixed(1)}</div><div class="l">Kilometer</div></div>
-    <div class="kpi"><div class="v">${a.avgPace}</div><div class="l">Ø Pace</div></div>
-    <div class="kpi"><div class="v">${a.avgHr}</div><div class="l">Ø HF</div></div>
-    <div class="kpi"><div class="v">${a.sessions}</div><div class="l">Sessions</div></div>
+    <div class="kpi"><div class="v">${a.caloriesTotal}</div><div class="l">Kalorien (Summe)</div></div>
+    <div class="kpi"><div class="v">${a.minutesTotal}</div><div class="l">Minuten (Summe)</div></div>
+    <div class="kpi"><div class="v">${a.kmTotal.toFixed(1)}</div><div class="l">Kilometer (Summe)</div></div>
+
+    <div class="kpi"><div class="v">${a.avgCaloriesPerSession}</div><div class="l">Ø kcal / Session</div></div>
+    <div class="kpi"><div class="v">${a.avgMinutesPerSession}</div><div class="l">Ø Min / Session</div></div>
+    <div class="kpi"><div class="v">${a.avgHr}</div><div class="l">Ø Herzfrequenz</div></div>
   `;
 }
 
-/* ===== High-DPI Line Chart (lesbar) ===== */
+/* ===================== CHARTS (High DPI Line) ===================== */
 function drawLine(canvas, values, title, unit){
-  const ctx = canvas.getContext("2d");
-  const dpr = window.devicePixelRatio || 1;
-
-  const cssW = canvas.clientWidth;
-  const cssH = canvas.clientHeight;
-
-  canvas.width = Math.max(1, Math.floor(cssW * dpr));
-  canvas.height = Math.max(1, Math.floor(cssH * dpr));
+  const ctx=canvas.getContext("2d");
+  const dpr=window.devicePixelRatio||1;
+  const cssW=canvas.clientWidth;
+  const cssH=canvas.clientHeight;
+  canvas.width=Math.max(1,Math.floor(cssW*dpr));
+  canvas.height=Math.max(1,Math.floor(cssH*dpr));
   ctx.setTransform(dpr,0,0,dpr,0,0);
-
-  const w = cssW, h = cssH;
+  const w=cssW,h=cssH;
   ctx.clearRect(0,0,w,h);
 
-  const padL=54, padR=12, padT=26, padB=34;
-  const innerW=w-padL-padR;
-  const innerH=h-padT-padB;
+  const padL=54,padR=12,padT=26,padB=34;
+  const innerW=w-padL-padR, innerH=h-padT-padB;
+  const max=Math.max(1,...values);
 
   ctx.fillStyle="#fff";
   ctx.font="13px system-ui";
-  ctx.fillText(title, 10, 18);
+  ctx.fillText(title,10,18);
 
-  const max = Math.max(1, ...values);
   ctx.strokeStyle="#1f1f1f";
   ctx.fillStyle="#999";
   ctx.font="11px system-ui";
-
   for(let i=0;i<=5;i++){
     const v=max/5*i;
     const y=h-padB-(v/max)*innerH;
-    ctx.beginPath();
-    ctx.moveTo(padL,y); ctx.lineTo(w-padR,y); ctx.stroke();
-    ctx.fillText(`${Math.round(v)} ${unit}`, 8, y+4);
+    ctx.beginPath(); ctx.moveTo(padL,y); ctx.lineTo(w-padR,y); ctx.stroke();
+    ctx.fillText(`${Math.round(v)} ${unit}`,8,y+4);
   }
 
   ctx.strokeStyle="#00ff6a";
   ctx.lineWidth=2;
   ctx.beginPath();
   values.forEach((v,i)=>{
-    const x = padL + (i / Math.max(1, values.length-1)) * innerW;
-    const y = h-padB-(v/max)*innerH;
+    const x=padL + (i/Math.max(1,values.length-1))*innerW;
+    const y=h-padB-(v/max)*innerH;
     if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
   });
   ctx.stroke();
 
-  // Punkte + Werte (nicht zu viele)
+  // wenige Labels für Lesbarkeit
+  const step = values.length>16 ? Math.ceil(values.length/16) : 1;
   ctx.fillStyle="#00ff6a";
-  const step = values.length > 16 ? Math.ceil(values.length/16) : 1;
   values.forEach((v,i)=>{
     if(v<=0) return;
-    if(i % step !== 0 && i !== values.length-1) return;
-
-    const x = padL + (i / Math.max(1, values.length-1)) * innerW;
-    const y = h-padB-(v/max)*innerH;
-    ctx.beginPath();
-    ctx.arc(x,y,3,0,Math.PI*2);
-    ctx.fill();
-
-    ctx.fillStyle="#fff";
-    ctx.fillText(Math.round(v), x-8, y-10);
+    if(i%step!==0 && i!==values.length-1) return;
+    const x=padL + (i/Math.max(1,values.length-1))*innerW;
+    const y=h-padB-(v/max)*innerH;
+    ctx.beginPath(); ctx.arc(x,y,3,0,Math.PI*2); ctx.fill();
+    ctx.fillStyle="#fff"; ctx.fillText(Math.round(v),x-8,y-10);
     ctx.fillStyle="#00ff6a";
   });
 }
 
 function monthSeries(){
-  const f = new Date($("focusDate").value);
-  const days = new Date(f.getFullYear(), f.getMonth()+1, 0).getDate();
+  const f=new Date($("focusDate").value);
+  const days=new Date(f.getFullYear(), f.getMonth()+1, 0).getDate();
   const cal=[], km=[];
-
   for(let d=1; d<=days; d++){
-    const dayIso = `${f.getFullYear()}-${pad(f.getMonth()+1)}-${pad(d)}`;
+    const dayIso=`${f.getFullYear()}-${pad(f.getMonth()+1)}-${pad(d)}`;
     let c=0,k=0;
     (db[dayIso]||[]).forEach(s=>{
       c += safeNum(s.calories);
       if(KM_SPORTS.has(s.type)) k += safeNum(s.km);
     });
-    cal.push(c);
-    km.push(k);
+    cal.push(c); km.push(k);
   }
-  return {cal, km};
+  return {cal, km, year:f.getFullYear(), month:f.getMonth()};
 }
 
 function renderCharts(){
-  const s = monthSeries();
+  const s=monthSeries();
   drawLine($("calorieChart"), s.cal, "Kalorien pro Tag", "kcal");
   drawLine($("kmChart"), s.km, "Kilometer pro Tag", "km");
 }
 
-<script>
-/* ===== OCR Import (DATUM: OCR → EXIF → lastModified → entryDate) ===== */
+/* ===================== MONTH CALENDAR ===================== */
+let calView = (()=>{ const f=new Date($("focusDate").value); return {y:f.getFullYear(), m:f.getMonth()}; })();
 
-async function getExifDate(file){
-  // Minimal-EXIF: Safari liefert manchmal file.lastModified, EXIF nicht immer verfügbar.
-  // Wir versuchen es trotzdem über createImageBitmap (kein externes lib).
-  // Wenn das nicht geht, return null.
-  try{
-    // Browser-API hat keinen direkten EXIF-Reader ohne Library.
-    // Deshalb: "null" zurückgeben → wir nutzen lastModified als Fallback.
-    return null;
-  }catch{
-    return null;
-  }
+function hasTraining(dayIso){
+  const arr=db[dayIso];
+  return Array.isArray(arr) && arr.length>0;
 }
+function renderCalendar(){
+  const y=calView.y, m=calView.m;
+  const first=new Date(y,m,1);
+  const last=new Date(y,m+1,0);
+  const startDow=(first.getDay()+6)%7; // Mo=0
+  const days=last.getDate();
+  $("calLabel").textContent = `${first.toLocaleDateString("de-DE",{month:"long",year:"numeric"})}`;
 
-function parseDateFromText(t){
-  // deutsche Formate: 11.01.2026 / 11-01-2026 / 11/01/2026
-  let m = t.match(/(\d{1,2})[.\-/](\d{1,2})[.\-/](\d{2,4})/);
-  if(m){
-    let dd=Number(m[1]), mm=Number(m[2]), yy=Number(m[3]);
-    if(yy<100) yy += 2000;
-    if(dd>=1&&dd<=31&&mm>=1&&mm<=12) return `${yy}-${String(mm).padStart(2,"0")}-${String(dd).padStart(2,"0")}`;
+  const names=["Mo","Di","Mi","Do","Fr","Sa","So"];
+  let html=`<tr>${names.map(n=>`<th class="small muted">${n}</th>`).join("")}</tr>`;
+
+  let d=1;
+  for(let r=0;r<6;r++){
+    let row="<tr>";
+    for(let c=0;c<7;c++){
+      const idx=r*7+c;
+      if(idx<startDow || d>days){
+        row += `<td><span class="calDim"> </span></td>`;
+      }else{
+        const dayIso=`${y}-${pad(m+1)}-${pad(d)}`;
+        const check = hasTraining(dayIso) ? `<span class="calCheck">✓</span>` : "";
+        row += `
+          <td data-iso="${dayIso}" style="cursor:pointer">
+            <div class="calCell">
+              <div class="calDay">${d}</div>
+              ${check}
+            </div>
+          </td>`;
+        d++;
+      }
+    }
+    row+="</tr>";
+    html+=row;
+    if(d>days) break;
   }
+  $("monthCal").innerHTML=html;
 
-  // ISO: 2026-01-11
-  m = t.match(/(20\d{2})[.\-/](\d{1,2})[.\-/](\d{1,2})/);
-  if(m){
-    const yy=Number(m[1]), mm=Number(m[2]), dd=Number(m[3]);
-    if(dd>=1&&dd<=31&&mm>=1&&mm<=12) return `${yy}-${String(mm).padStart(2,"0")}-${String(dd).padStart(2,"0")}`;
-  }
-
-  return null;
-}
-
-function parseTimeFromText(t){
-  const m = t.match(/([01]?\d|2[0-3])[:. ]([0-5]\d)/);
-  if(!m) return "";
-  return `${String(m[1]).padStart(2,"0")}:${String(m[2]).padStart(2,"0")}`;
-}
-
-function pickBestDate(file, ocrText){
-  // 1) OCR-Datum
-  const d1 = parseDateFromText(ocrText);
-  if(d1) return d1;
-
-  // 2) EXIF (wenn du später library willst, hier einhängen)
-  // (aktuell null)
-  // 3) file.lastModified
-  if(file && file.lastModified){
-    const d = new Date(file.lastModified);
-    if(!isNaN(d)) return iso(d);
-  }
-
-  // 4) entryDate als letzte Rettung
-  return entryDateInput.value || $("focusDate").value || iso(new Date());
-}
-
-const shotBtn = $("shotBtn");
-const shotFile = $("shotFile");
-const ocrStatus = $("ocrStatus");
-
-if(shotBtn && shotFile){
-  shotBtn.onclick = ()=> shotFile.click();
-
-  shotFile.onchange = async ()=>{
-    const file = shotFile.files && shotFile.files[0];
-    if(!file) return;
-
-    ocrStatus.textContent = "OCR läuft…";
-    try{
-      const img = new Image();
-      img.src = URL.createObjectURL(file);
-      await img.decode();
-
-      // schneller, stabiler OCR: skalieren
-      const maxDim = 1800;
-      const scale = Math.min(1, maxDim / Math.max(img.width, img.height));
-      const c = document.createElement("canvas");
-      c.width = Math.round(img.width*scale);
-      c.height = Math.round(img.height*scale);
-      const ctx = c.getContext("2d");
-      ctx.fillStyle="#fff";
-      ctx.fillRect(0,0,c.width,c.height);
-      ctx.drawImage(img,0,0,c.width,c.height);
-
-      const res = await Tesseract.recognize(c, "deu+eng");
-      const t = (res.data.text || "").replace(/\s+/g," ").trim();
-
-      // DATUM + ZEIT
-      const dateIso = pickBestDate(file, t);
-      const time = parseTimeFromText(t);
-
-      // Werte
-      const dur = (t.match(/(\d+)\s*min/i)||[])[1] || "";
-      const cal = (t.match(/(\d+)\s*kcal/i)||[])[1] || "";
-      const kmv = (t.match(/(\d+(?:[.,]\d+)?)\s*km/i)||[])[1] || "";
-      const hr  = (t.match(/(\d+)\s*bpm/i)||[])[1] || "";
-
-      const kmNorm = kmv ? kmv.replace(",",".") : "";
-
-      // Auto-Sportart heuristisch
-      const guessedType = kmNorm ? "Joggen" : "Krafttraining";
-
-      // Speichern
-      getDay(dateIso).push({
-        time,
-        type: guessedType,
-        duration: dur,
-        calories: cal,
-        km: kmNorm,
-        pace: "",
-        hr: hr
-      });
-      saveDB();
-
-      // Wichtig: Datum auch in UI setzen (Entry + Focus)
-      entryDateInput.value = dateIso;
-      $("focusDate").value = dateIso;
-
+  $("monthCal").querySelectorAll("td[data-iso]").forEach(td=>{
+    td.onclick=()=>{
+      const dayIso=td.dataset.iso;
+      $("focusDate").value=dayIso;
+      entryDateInput.value=dayIso;
+      calView={y:new Date(dayIso).getFullYear(), m:new Date(dayIso).getMonth()};
       renderSessions();
       renderAll();
-      ocrStatus.textContent = `Importiert ✅ (${dateIso}${time?(" "+time):""})`;
-    }catch(e){
-      console.error(e);
-      ocrStatus.textContent = "OCR Fehler ❌";
-    }finally{
-      shotFile.value = "";
-    }
-  };
-}
-</script>
-    }catch(e){
-      console.error(e);
-      ocrStatus.textContent = "OCR Fehler ❌";
-    }finally{
-      shotFile.value = "";
-    }
-  };
+    };
+  });
 }
 
-/* ===== MASTER ===== */
+$("calPrev").onclick=()=>{
+  calView.m--;
+  if(calView.m<0){calView.m=11;calView.y--;}
+  renderCalendar();
+};
+$("calNext").onclick=()=>{
+  calView.m++;
+  if(calView.m>11){calView.m=0;calView.y++;}
+  renderCalendar();
+};
+$("calThis").onclick=()=>{
+  const f=new Date($("focusDate").value);
+  calView={y:f.getFullYear(), m:f.getMonth()};
+  renderCalendar();
+};
+
+/* ===================== OCR (Datum Auto: OCR → file.lastModified) ===================== */
+function parseDateFromText(t){
+  let m=t.match(/(\d{1,2})[.\-/](\d{1,2})[.\-/](\d{2,4})/);
+  if(m){
+    let dd=+m[1], mm=+m[2], yy=+m[3];
+    if(yy<100) yy+=2000;
+    if(dd>=1&&dd<=31&&mm>=1&&mm<=12) return `${yy}-${pad(mm)}-${pad(dd)}`;
+  }
+  m=t.match(/(20\d{2})[.\-/](\d{1,2})[.\-/](\d{1,2})/);
+  if(m){
+    const yy=+m[1], mm=+m[2], dd=+m[3];
+    if(dd>=1&&dd<=31&&mm>=1&&mm<=12) return `${yy}-${pad(mm)}-${pad(dd)}`;
+  }
+  return null;
+}
+function parseTimeFromText(t){
+  const m=t.match(/([01]?\d|2[0-3])[:. ]([0-5]\d)/);
+  return m ? `${pad(m[1])}:${pad(m[2])}` : "";
+}
+function bestDateForFile(file, t){
+  return parseDateFromText(t) || (file?.lastModified ? iso(new Date(file.lastModified)) : entryDateInput.value);
+}
+
+$("shotBtn").onclick=()=>$("shotFile").click();
+$("shotFile").onchange=async()=>{
+  const file=$("shotFile").files && $("shotFile").files[0];
+  if(!file) return;
+  $("ocrStatus").textContent="OCR läuft…";
+
+  try{
+    const img=new Image();
+    img.src=URL.createObjectURL(file);
+    await img.decode();
+
+    const maxDim=1800;
+    const scale=Math.min(1, maxDim/Math.max(img.width,img.height));
+    const c=document.createElement("canvas");
+    c.width=Math.round(img.width*scale);
+    c.height=Math.round(img.height*scale);
+    const ctx=c.getContext("2d");
+    ctx.fillStyle="#fff";
+    ctx.fillRect(0,0,c.width,c.height);
+    ctx.drawImage(img,0,0,c.width,c.height);
+
+    const res=await Tesseract.recognize(c,"deu+eng");
+    const t=(res.data.text||"").replace(/\s+/g," ").trim();
+
+    const dayIso = bestDateForFile(file, t);
+    const time = parseTimeFromText(t);
+
+    const dur=(t.match(/(\d+)\s*min/i)||[])[1]||"";
+    const cal=(t.match(/(\d+)\s*kcal/i)||[])[1]||"";
+    const kmv=(t.match(/(\d+(?:[.,]\d+)?)\s*km/i)||[])[1]||"";
+    const hr =(t.match(/(\d+)\s*bpm/i)||[])[1]||"";
+
+    const kmNorm=kmv ? kmv.replace(",",".") : "";
+    const guessedType = kmNorm ? "Joggen" : "Krafttraining";
+
+    getDay(dayIso).push({ time, type:guessedType, duration:dur, calories:cal, km:kmNorm, pace:"", hr });
+    saveDB();
+
+    // UI auf richtigen Tag setzen
+    $("focusDate").value = dayIso;
+    entryDateInput.value = dayIso;
+    calView={y:new Date(dayIso).getFullYear(), m:new Date(dayIso).getMonth()};
+
+    renderSessions();
+    renderAll();
+    $("ocrStatus").textContent = `Importiert ✅ (${dayIso}${time?(" "+time):""})`;
+  }catch(e){
+    console.error(e);
+    $("ocrStatus").textContent="OCR Fehler ❌";
+  }finally{
+    $("shotFile").value="";
+  }
+};
+
+/* ===================== MASTER ===================== */
 function renderAll(){
   renderDashboard();
   renderCharts();
+  renderCalendar();
 }
+
 $("focusDate").addEventListener("change", ()=>{
   entryDateInput.value = $("focusDate").value;
+  calView={y:new Date($("focusDate").value).getFullYear(), m:new Date($("focusDate").value).getMonth()};
   renderSessions();
   renderAll();
 });
 
+// initial render
 renderAll();
 </script>
 
