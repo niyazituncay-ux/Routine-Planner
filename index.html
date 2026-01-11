@@ -627,7 +627,64 @@ function renderCharts(){
   drawLine($("kmChart"), s.km, "Kilometer pro Tag", "km");
 }
 
-/* ===== OCR Import (zeigt Upload, funktioniert) ===== */
+<script>
+/* ===== OCR Import (DATUM: OCR → EXIF → lastModified → entryDate) ===== */
+
+async function getExifDate(file){
+  // Minimal-EXIF: Safari liefert manchmal file.lastModified, EXIF nicht immer verfügbar.
+  // Wir versuchen es trotzdem über createImageBitmap (kein externes lib).
+  // Wenn das nicht geht, return null.
+  try{
+    // Browser-API hat keinen direkten EXIF-Reader ohne Library.
+    // Deshalb: "null" zurückgeben → wir nutzen lastModified als Fallback.
+    return null;
+  }catch{
+    return null;
+  }
+}
+
+function parseDateFromText(t){
+  // deutsche Formate: 11.01.2026 / 11-01-2026 / 11/01/2026
+  let m = t.match(/(\d{1,2})[.\-/](\d{1,2})[.\-/](\d{2,4})/);
+  if(m){
+    let dd=Number(m[1]), mm=Number(m[2]), yy=Number(m[3]);
+    if(yy<100) yy += 2000;
+    if(dd>=1&&dd<=31&&mm>=1&&mm<=12) return `${yy}-${String(mm).padStart(2,"0")}-${String(dd).padStart(2,"0")}`;
+  }
+
+  // ISO: 2026-01-11
+  m = t.match(/(20\d{2})[.\-/](\d{1,2})[.\-/](\d{1,2})/);
+  if(m){
+    const yy=Number(m[1]), mm=Number(m[2]), dd=Number(m[3]);
+    if(dd>=1&&dd<=31&&mm>=1&&mm<=12) return `${yy}-${String(mm).padStart(2,"0")}-${String(dd).padStart(2,"0")}`;
+  }
+
+  return null;
+}
+
+function parseTimeFromText(t){
+  const m = t.match(/([01]?\d|2[0-3])[:. ]([0-5]\d)/);
+  if(!m) return "";
+  return `${String(m[1]).padStart(2,"0")}:${String(m[2]).padStart(2,"0")}`;
+}
+
+function pickBestDate(file, ocrText){
+  // 1) OCR-Datum
+  const d1 = parseDateFromText(ocrText);
+  if(d1) return d1;
+
+  // 2) EXIF (wenn du später library willst, hier einhängen)
+  // (aktuell null)
+  // 3) file.lastModified
+  if(file && file.lastModified){
+    const d = new Date(file.lastModified);
+    if(!isNaN(d)) return iso(d);
+  }
+
+  // 4) entryDate als letzte Rettung
+  return entryDateInput.value || $("focusDate").value || iso(new Date());
+}
+
 const shotBtn = $("shotBtn");
 const shotFile = $("shotFile");
 const ocrStatus = $("ocrStatus");
@@ -645,8 +702,8 @@ if(shotBtn && shotFile){
       img.src = URL.createObjectURL(file);
       await img.decode();
 
-      // Canvas (skaliert, schneller)
-      const maxDim = 1600;
+      // schneller, stabiler OCR: skalieren
+      const maxDim = 1800;
       const scale = Math.min(1, maxDim / Math.max(img.width, img.height));
       const c = document.createElement("canvas");
       c.width = Math.round(img.width*scale);
@@ -659,16 +716,11 @@ if(shotBtn && shotFile){
       const res = await Tesseract.recognize(c, "deu+eng");
       const t = (res.data.text || "").replace(/\s+/g," ").trim();
 
-      // Datum/Uhrzeit: nur wenn im Screenshot vorhanden
-      const dateMatch = t.match(/(\d{1,2})[.\-/](\d{1,2})[.\-/](\d{4})/);
-      const timeMatch = t.match(/([01]?\d|2[0-3]):([0-5]\d)/);
+      // DATUM + ZEIT
+      const dateIso = pickBestDate(file, t);
+      const time = parseTimeFromText(t);
 
-      const dateIso = dateMatch
-        ? `${dateMatch[3]}-${pad(dateMatch[2])}-${pad(dateMatch[1])}`
-        : entryDateInput.value;
-
-      const time = timeMatch ? timeMatch[0] : "";
-
+      // Werte
       const dur = (t.match(/(\d+)\s*min/i)||[])[1] || "";
       const cal = (t.match(/(\d+)\s*kcal/i)||[])[1] || "";
       const kmv = (t.match(/(\d+(?:[.,]\d+)?)\s*km/i)||[])[1] || "";
@@ -676,23 +728,37 @@ if(shotBtn && shotFile){
 
       const kmNorm = kmv ? kmv.replace(",",".") : "";
 
-      // Auto-Type: wenn km erkannt -> Joggen (du kannst danach umstellen)
+      // Auto-Sportart heuristisch
+      const guessedType = kmNorm ? "Joggen" : "Krafttraining";
+
+      // Speichern
       getDay(dateIso).push({
         time,
-        type: kmNorm ? "Joggen" : "Krafttraining",
+        type: guessedType,
         duration: dur,
         calories: cal,
         km: kmNorm,
         pace: "",
         hr: hr
       });
-
       saveDB();
+
+      // Wichtig: Datum auch in UI setzen (Entry + Focus)
       entryDateInput.value = dateIso;
+      $("focusDate").value = dateIso;
 
       renderSessions();
       renderAll();
-      ocrStatus.textContent = "Importiert ✅";
+      ocrStatus.textContent = `Importiert ✅ (${dateIso}${time?(" "+time):""})`;
+    }catch(e){
+      console.error(e);
+      ocrStatus.textContent = "OCR Fehler ❌";
+    }finally{
+      shotFile.value = "";
+    }
+  };
+}
+</script>
     }catch(e){
       console.error(e);
       ocrStatus.textContent = "OCR Fehler ❌";
