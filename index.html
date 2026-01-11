@@ -6,311 +6,117 @@
 <title>Sport Tracker</title>
 
 <style>
-  :root{
-    --bg:#000;
-    --fg:#fff;
-    --muted:#a8a8a8;
-    --line:#262626;
-    --panel:#0c0c0c;
-    --panel2:#101010;
-    --accent:#00ff6a;
-    --bad:#ff5b5b;
-  }
-  *{ box-sizing:border-box; }
-  body{
-    background:var(--bg);
-    color:var(--fg);
-    font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-    max-width: 1250px;
-    margin: 34px auto;
-    padding: 0 16px 44px;
-  }
-  h1{ margin:0; font-size:30px; letter-spacing:-0.3px; }
-  h2{ margin:6px 0 0; font-size:16px; color:var(--muted); font-weight:600; }
-  h3{ margin:0 0 10px; font-size:16px; }
-  .small{ font-size:12px; color:var(--muted); }
-  .muted{ color:var(--muted); }
-  hr{ border:none; border-top:1px solid var(--line); margin: 18px 0; }
+:root{
+  --bg:#000;
+  --fg:#fff;
+  --muted:#9a9a9a;
+  --line:#262626;
+  --panel:#0c0c0c;
+  --panel2:#101010;
+  --accent:#00ff6a;
+}
+*{box-sizing:border-box}
+body{
+  background:var(--bg);
+  color:var(--fg);
+  font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+  max-width:1200px;
+  margin:24px auto;
+  padding:0 16px 60px;
+}
+h1{margin:0;font-size:30px}
+h2{margin:4px 0 0;font-size:14px;color:var(--muted)}
+h3{margin:0 0 10px;font-size:16px}
+.small{font-size:12px;color:var(--muted)}
 
-  .topbar{
-    border:1px solid var(--line);
-    border-radius: 16px;
-    padding: 14px;
-    background: linear-gradient(180deg, #0f0f0f, #080808);
-    display:flex;
-    justify-content:space-between;
-    align-items:flex-end;
-    gap:12px;
-    flex-wrap:wrap;
-    position:relative;
-    overflow:hidden;
-  }
-  .topbar::before{
-    content:"";
-    position:absolute;
-    right:-80px; top:-90px;
-    width:260px; height:260px;
-    border-radius:999px;
-    background: radial-gradient(circle at 30% 30%, rgba(0,255,106,0.22), rgba(0,0,0,0) 60%);
-    pointer-events:none;
-  }
+.card{
+  border:1px solid var(--line);
+  background:var(--panel);
+  border-radius:16px;
+  padding:14px;
+  margin-top:14px;
+}
 
-  .row{ display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
-  .grow{ flex: 1; min-width: 240px; }
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.grow{flex:1;min-width:220px}
 
-  input, select, textarea{
-    width: 100%;
-    box-sizing:border-box;
-    background: var(--panel2);
-    color: var(--fg);
-    border:1px solid var(--line);
-    border-radius: 12px;
-    padding: 8px 10px;
-  }
-  textarea{ min-height:110px; }
+input,select,textarea{
+  width:100%;
+  background:var(--panel2);
+  color:var(--fg);
+  border:1px solid var(--line);
+  border-radius:12px;
+  padding:9px 10px;
+}
 
-  button{
-    border:1px solid var(--line);
-    background: #111;
-    color: var(--fg);
-    border-radius: 12px;
-    padding: 9px 12px;
-    cursor:pointer;
-  }
-  button:hover{ background:#151515; }
-  .danger{ color: var(--bad); border-color:#3a1a1a; }
-  .ghost{ background: transparent; }
+button{
+  border:1px solid var(--line);
+  background:#111;
+  color:var(--fg);
+  border-radius:12px;
+  padding:9px 12px;
+  cursor:pointer;
+}
+button:hover{background:#151515}
 
-  .card{
-    border:1px solid var(--line);
-    border-radius: 16px;
-    padding: 14px;
-    background: var(--panel);
-    margin-top: 12px;
-  }
+.tabs{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+.tab{
+  padding:6px 12px;
+  border-radius:999px;
+  border:1px solid var(--line);
+  color:var(--muted);
+  cursor:pointer;
+}
+.tab.active{
+  background:rgba(0,255,106,.15);
+  color:var(--fg);
+  border-color:#1b4f30;
+}
 
-  /* ===== DASHBOARD ===== */
-  .tabs{
-    display:flex; gap:8px; flex-wrap:wrap;
-    margin-top: 10px;
-  }
-  .tab{
-    padding: 7px 10px;
-    border-radius: 999px;
-    border:1px solid var(--line);
-    background: #0f0f0f;
-    color: var(--muted);
-    cursor:pointer;
-    user-select:none;
-  }
-  .tab.active{
-    background: rgba(0,255,106,0.12);
-    color: var(--fg);
-    border-color:#1b4f30;
-  }
+.kpiGrid{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(140px,1fr));
+  gap:10px;
+}
+.kpi{
+  border:1px solid var(--line);
+  border-radius:16px;
+  padding:12px;
+  background:#0b0b0b;
+}
+.kpi .v{font-size:22px;font-weight:900;color:var(--accent)}
+.kpi .l{font-size:12px;color:var(--muted);margin-top:4px}
 
-  .dashGrid{
-    display:grid;
-    grid-template-columns: 1.05fr 0.95fr;
-    gap:12px;
-    margin-top: 12px;
-  }
-  @media (max-width: 980px){
-    .dashGrid{ grid-template-columns: 1fr; }
-  }
-
-  .kpiGrid{
-    display:grid;
-    grid-template-columns: repeat(3, minmax(140px, 1fr));
-    gap:10px;
-  }
-  @media (max-width: 980px){
-    .kpiGrid{ grid-template-columns: repeat(2, minmax(140px, 1fr)); }
-  }
-  .kpi{
-    border:1px solid var(--line);
-    background: linear-gradient(180deg, #101010, #0a0a0a);
-    border-radius: 16px;
-    padding: 12px;
-  }
-  .kpi .v{
-    font-size: 20px;
-    font-weight: 900;
-    color: var(--accent);
-    line-height: 1.1;
-  }
-  .kpi .l{
-    font-size: 12px;
-    color: var(--muted);
-    margin-top: 6px;
-    line-height: 1.2;
-  }
-
-  .panel{
-    border:1px solid var(--line);
-    background: #0b0b0b;
-    border-radius: 16px;
-    padding: 12px;
-  }
-
-  canvas{
-    width: 100%;
-    height: 220px;
-    border:1px solid var(--line);
-    background:#080808;
-    border-radius: 16px;
-  }
-
-  /* ===== ENTRY ===== */
-  .entryGrid{
-    display:grid;
-    grid-template-columns: 0.9fr 1.1fr;
-    gap:12px;
-    margin-top: 12px;
-  }
-  @media (max-width: 980px){
-    .entryGrid{ grid-template-columns: 1fr; }
-  }
-
-  .sessionList{ display:grid; gap:10px; margin-top:10px; }
-  .session{
-    border:1px solid var(--line);
-    background: #0b0b0b;
-    border-radius: 16px;
-    padding: 12px;
-  }
-  .sessionHead{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    gap:10px;
-    flex-wrap:wrap;
-  }
-
-  .gridSession{
-    display:grid;
-    grid-template-columns: repeat(6, minmax(140px, 1fr)) auto;
-    gap:8px;
-    align-items:start;
-    margin-top: 10px;
-  }
-  @media (max-width: 980px){
-    .gridSession{ grid-template-columns: 1fr 1fr; }
-  }
-
-  .hint{
-    font-size:12px;
-    color: var(--muted);
-    margin-top: 8px;
-  }
-
-  /* ===== WEEK STRIP ===== */
-  .weekStrip{
-    display:grid;
-    grid-template-columns: repeat(7, 1fr);
-    gap:10px;
-    margin-top: 12px;
-  }
-  @media (max-width: 980px){
-    .weekStrip{ grid-template-columns: repeat(2, 1fr); }
-  }
-  .dayCard{
-    border:1px solid var(--line);
-    background: #0b0b0b;
-    border-radius: 16px;
-    padding: 12px;
-  }
-  .dayCard .d{ font-weight: 800; }
-  .dayCard .sub{ margin-top:6px; font-size:12px; color:var(--muted); display:flex; flex-direction:column; gap:4px; }
-
-  /* ===== MONTH CALENDAR ===== */
-  .calHeader{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    gap:10px;
-    flex-wrap:wrap;
-  }
-  .calendar{
-    width:100%;
-    border-collapse: collapse;
-    border:1px solid var(--line);
-    border-radius: 16px;
-    overflow:hidden;
-    background:#080808;
-    margin-top: 10px;
-  }
-  .calendar th, .calendar td{
-    border-bottom:1px solid var(--line);
-    border-right:1px solid var(--line);
-    padding: 10px;
-    vertical-align: top;
-    height: 72px;
-  }
-  .calendar th:last-child, .calendar td:last-child{ border-right:none; }
-  .calendar tr:last-child td{ border-bottom:none; }
-  .calCell{
-    display:flex;
-    justify-content:space-between;
-    gap:10px;
-    align-items:flex-start;
-  }
-  .check{
-    display:inline-flex;
-    align-items:center;
-    justify-content:center;
-    width:22px; height:22px;
-    border-radius: 999px;
-    border:1px solid #1b4f30;
-    background: rgba(0,255,106,0.14);
-    color: var(--accent);
-    font-weight: 900;
-    font-size: 12px;
-  }
-  .dim{ color:#444; }
-
-  /* OCR panel */
-  #ocrModal{ display:none; }
+canvas{
+  width:100%;
+  height:260px;
+  background:#080808;
+  border:1px solid var(--line);
+  border-radius:16px;
+}
 </style>
 </head>
 
 <body>
 
-<div class="topbar">
-  <div>
-    <h1 id="appTitle">Sport Tracker</h1>
-    <h2>Multi-Sessions · Ø Herzfrequenz · Tag/Woche/Monat/Jahr/Gesamt</h2>
-    <div class="small">Speicherung lokal im Browser (Archiv). Bleibt bis Website-Daten gelöscht werden.</div>
-  </div>
-
-  <div class="row" style="min-width:280px;">
+<!-- HEADER -->
+<div class="card">
+  <div class="row">
     <div class="grow">
-      <div class="small muted" style="margin-bottom:6px;">Name / Profil</div>
-      <input id="profileName" placeholder="z.B. Niyazi Tuncay" />
+      <h1 id="appTitle">Sport Tracker</h1>
+      <h2>Multi-Sessions · OCR · Liniendiagramme · Archiv</h2>
     </div>
-    <div style="display:flex; gap:8px; align-items:end;">
-      <button id="saveProfile">Speichern</button>
-      <button id="exportBtn" class="ghost" title="Backup als JSON">Export</button>
-      <button id="importBtn" class="ghost" title="Restore aus JSON">Import</button>
-
-      <!-- iOS Fix: nicht display:none -->
-      <input id="importFile" type="file" accept="application/json"
-             style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0;" />
+    <div class="grow">
+      <div class="small">Profilname</div>
+      <input id="profileName" placeholder="z.B. Niyazi Tuncay">
     </div>
+    <button id="saveProfile">Speichern</button>
   </div>
 </div>
 
+<!-- DASHBOARD -->
 <div class="card">
-  <div class="row" style="justify-content:space-between;">
-    <div>
-      <h3>📊 Übersicht</h3>
-      <div class="small">Wähle Zeitraum – KPI + Diagramme + Kalender.</div>
-    </div>
-    <div class="row">
-      <input id="focusDate" type="date" style="max-width:220px;" />
-      <button id="todayBtn">Heute</button>
-    </div>
-  </div>
+  <h3>📊 Dashboard</h3>
 
   <div class="tabs">
     <div class="tab active" data-range="day">Tag</div>
@@ -320,1373 +126,477 @@
     <div class="tab" data-range="all">Gesamt</div>
   </div>
 
-  <div class="dashGrid">
-    <div class="panel">
-      <div class="small muted" id="rangeLabel">—</div>
-      <div class="kpiGrid" id="kpiGrid"></div>
+  <div class="row" style="margin-top:10px">
+    <input id="focusDate" type="date" style="max-width:220px">
+    <button id="todayBtn">Heute</button>
+  </div>
 
-      <div id="weekStripWrap" style="display:none;">
-        <hr>
-        <h3 style="margin-bottom:8px;">🔥 Tageskalorien (Woche)</h3>
-        <div class="weekStrip" id="weekStrip"></div>
-      </div>
+  <div class="kpiGrid" id="kpiGrid" style="margin-top:12px"></div>
+
+  <div class="row" style="margin-top:14px">
+    <div class="grow">
+      <canvas id="calorieChart"></canvas>
     </div>
-
-    <div class="panel">
-      <h3 style="margin-bottom:10px;">📈 Diagramme</h3>
-      <div class="small muted" style="margin-bottom:8px;">Monat: Kalorien/Tag · Jahr: KM/Woche</div>
-      <canvas id="chartA" width="900" height="260"></canvas>
-      <div style="height:10px;"></div>
-      <canvas id="chartB" width="900" height="260"></canvas>
+    <div class="grow">
+      <canvas id="kmChart"></canvas>
     </div>
   </div>
 </div>
 
-<div class="card">
-  <h3>➕ Sport eintragen (Multi-Sessions)</h3>
-  <div class="small">Joggen & Schwimmen: Dauer + KM + Pace + Ø HF. Andere: Dauer + Kalorien + Ø HF.</div>
+<script>
+/* ===== BASIS STATE ===== */
+const KEY_DATA="sport_db_v1";
+const KEY_PROFILE="sport_profile_v1";
 
-  <div class="entryGrid">
-    <div class="panel">
-      <div class="row" style="justify-content:space-between;">
-        <div style="min-width:220px;">
-          <div class="small muted">Datum</div>
-          <input id="entryDate" type="date" />
-        </div>
-        <div style="display:flex; gap:8px; align-items:end;">
-          <button id="addSessionBtn">+ Session</button>
-          <button id="clearDayBtn" class="danger" title="Löscht alle Sessions an diesem Datum">Tag löschen</button>
-        </div>
-      </div>
+let db = JSON.parse(localStorage.getItem(KEY_DATA)||"{}");
+let profile = localStorage.getItem(KEY_PROFILE)||"";
 
-      <div class="hint">
-        Pace: <b>mm:ss</b> (z.B. <b>5:30</b>). Ø HF: bpm (z.B. 148).
-      </div>
+const $=id=>document.getElementById(id);
+const iso=d=>d.toISOString().slice(0,10);
 
-      <div class="row" style="margin-top:10px;">
-        <button id="shotBtn">📷 Screenshot / Foto importieren</button>
-        <div id="ocrStatus" class="small muted"></div>
+/* ===== INIT ===== */
+$("profileName").value=profile;
+$("appTitle").textContent=profile||"Sport Tracker";
+$("saveProfile").onclick=()=>{
+  profile=$("profileName").value.trim();
+  localStorage.setItem(KEY_PROFILE,profile);
+  $("appTitle").textContent=profile||"Sport Tracker";
+};
 
-        <!-- iOS Fix: nicht display:none -->
-        <input id="shotFile" type="file" accept="image/*"
-               style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0;" />
-      </div>
+$("focusDate").value=iso(new Date());
+$("todayBtn").onclick=()=>{
+  $("focusDate").value=iso(new Date());
+  renderDashboard();
+};
 
-      <div id="ocrModal" class="card">
-        <h3>Screenshot Import – Vorschlag</h3>
-        <div class="small muted" style="margin-bottom:10px;">Prüf kurz und klicke „Übernehmen“.</div>
+let activeRange="day";
+document.querySelectorAll(".tab").forEach(t=>{
+  t.onclick=()=>{
+    document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));
+    t.classList.add("active");
+    activeRange=t.dataset.range;
+    renderDashboard();
+  };
+});
 
-        <div class="row">
-          <div style="min-width:220px;">
-            <div class="small muted">Datum</div>
-            <input id="ocrDate" type="date">
-          </div>
-          <div style="min-width:220px;">
-            <div class="small muted">Uhrzeit (optional)</div>
-            <input id="ocrTime" placeholder="z.B. 18:45">
-          </div>
-          <div class="grow" style="min-width:220px;">
-            <div class="small muted">Sportart</div>
-            <select id="ocrType"></select>
-          </div>
+/* ===== PLACEHOLDER DASHBOARD (kommt voll in Teil 3) ===== */
+function renderDashboard(){
+  $("kpiGrid").innerHTML=`
+    <div class="kpi"><div class="v">0</div><div class="l">Kalorien</div></div>
+    <div class="kpi"><div class="v">0</div><div class="l">Minuten</div></div>
+    <div class="kpi"><div class="v">0</div><div class="l">Kilometer</div></div>
+    <div class="kpi"><div class="v">–</div><div class="l">Ø Pace</div></div>
+    <div class="kpi"><div class="v">–</div><div class="l">Ø HF</div></div>
+    <div class="kpi"><div class="v">0</div><div class="l">Sessions</div></div>
+  `;
+}
+renderDashboard();
+</script>
+<!-- ===================== SECTION 2: SPORT-TRACKER ===================== -->
+<div class="card" id="sportSection">
+  <h3>🏋️ Sport Tracker (Multi-Sessions)</h3>
+  <div class="small">Mehrere Sessions pro Tag. Kein Fokusverlust beim Tippen. Uhrzeit optional.</div>
+
+  <div class="row" style="margin-top:10px;">
+    <div style="min-width:220px;">
+      <div class="small">Datum</div>
+      <input id="entryDate" type="date" />
+    </div>
+
+    <button id="addSessionBtn">+ Session</button>
+    <button id="clearDayBtn" class="danger">Tag löschen</button>
+  </div>
+
+  <div class="small" style="margin-top:10px;">
+    Joggen/Schwimmen: Dauer + KM + Pace + Ø HF. Andere: Dauer + Kalorien + Ø HF.
+  </div>
+
+  <div id="sessionList" style="margin-top:12px;"></div>
+</div>
+
+<script>
+/* ===================== SPORT SECTION LOGIC ===================== */
+const SPORTS = ["Krafttraining","Joggen","Stretching","Ringen","Schwimmen","Tennis"];
+const KM_SPORTS = new Set(["Joggen","Schwimmen"]);
+
+function saveDB(){
+  localStorage.setItem(KEY_DATA, JSON.stringify(db));
+}
+
+function getDay(dateIso){
+  if(!Array.isArray(db[dateIso])) db[dateIso] = [];
+  return db[dateIso];
+}
+
+// init entry date = focus date
+const entryDateInput = document.getElementById("entryDate");
+entryDateInput.value = document.getElementById("focusDate").value;
+
+// Buttons
+document.getElementById("addSessionBtn").onclick = () => {
+  const d = entryDateInput.value;
+  getDay(d).push({
+    time: "",
+    type: "",
+    duration: "",
+    calories: "",
+    km: "",
+    pace: "",
+    hr: ""
+  });
+  saveDB();
+  renderSessions();
+};
+
+document.getElementById("clearDayBtn").onclick = () => {
+  const d = entryDateInput.value;
+  delete db[d];
+  saveDB();
+  renderSessions();
+};
+
+// Wenn Datum geändert wird -> neue Liste laden
+entryDateInput.addEventListener("change", () => renderSessions());
+
+// Session UI (WICHTIG: kein Re-render bei jedem Input -> kein Fokusverlust)
+function renderSessions(){
+  const d = entryDateInput.value;
+  const list = document.getElementById("sessionList");
+  const arr = getDay(d);
+
+  if(!arr.length){
+    list.innerHTML = `<div class="small muted">Noch keine Sessions an diesem Tag.</div>`;
+    return;
+  }
+
+  list.innerHTML = arr.map((s,i)=>{
+    const isKm = KM_SPORTS.has(s.type);
+    return `
+      <div class="card" style="background:#0b0b0b; border-color:#262626; margin-top:10px;">
+        <div class="row" style="justify-content:space-between;">
+          <strong>Session ${i+1}</strong>
+          <button class="danger" data-del="${i}">Löschen</button>
         </div>
 
         <div class="row" style="margin-top:10px;">
-          <div class="grow"><div class="small muted">Dauer (min)</div><input id="ocrDuration" type="number" min="0"></div>
-          <div class="grow"><div class="small muted">Kalorien</div><input id="ocrCalories" type="number" min="0"></div>
-          <div class="grow"><div class="small muted">Kilometer</div><input id="ocrKm" type="number" min="0" step="0.01"></div>
-          <div class="grow"><div class="small muted">Pace (mm:ss/km)</div><input
-           id="ocrPace"></div>
-          <div class="grow"><div class="small muted">Ø HF (bpm)</div><input id="ocrHr" type="number" min="0"></div>
-        </div>
+          <div style="min-width:140px;">
+            <div class="small">Uhrzeit</div>
+            <input data-i="${i}" data-k="time" placeholder="19:31" value="${s.time||""}">
+          </div>
 
-        <div style="margin-top:10px;">
-          <div class="small muted">OCR Text</div>
-          <textarea id="ocrRaw"></textarea>
-        </div>
+          <div class="grow" style="min-width:190px;">
+            <div class="small">Sportart</div>
+            <select data-i="${i}" data-k="type">
+              <option value="">—</option>
+              ${SPORTS.map(x=>`<option value="${x}" ${x===s.type?"selected":""}>${x}</option>`).join("")}
+            </select>
+          </div>
 
-        <div class="row" style="justify-content:space-between; margin-top:10px;">
-          <button id="ocrCancel" class="ghost">Abbrechen</button>
-          <button id="ocrApply">Übernehmen → Session anlegen</button>
+          <div style="min-width:140px;">
+            <div class="small">Dauer (min)</div>
+            <input data-i="${i}" data-k="duration" type="number" min="0" inputmode="numeric" value="${s.duration||""}">
+          </div>
+
+          <div style="min-width:140px;">
+            <div class="small">Kalorien</div>
+            <input data-i="${i}" data-k="calories" type="number" min="0" inputmode="numeric" value="${s.calories||""}">
+          </div>
+
+          <div style="min-width:140px;">
+            <div class="small">Kilometer</div>
+            <input data-i="${i}" data-k="km" type="number" min="0" step="0.01" inputmode="decimal"
+              ${isKm ? "" : "disabled"} value="${s.km||""}">
+          </div>
+
+          <div style="min-width:140px;">
+            <div class="small">Pace (mm:ss)</div>
+            <input data-i="${i}" data-k="pace" placeholder="5:30"
+              ${isKm ? "" : "disabled"} value="${s.pace||""}">
+          </div>
+
+          <div style="min-width:140px;">
+            <div class="small">Ø HF</div>
+            <input data-i="${i}" data-k="hr" type="number" min="0" inputmode="numeric" value="${s.hr||""}">
+          </div>
         </div>
       </div>
+    `;
+  }).join("");
 
-      <div class="sessionList" id="sessionList"></div>
-    </div>
+  attachSessionHandlers();
+}
 
-    <div class="panel">
-      <h3 style="margin-bottom:10px;">🗓️ Monatskalender</h3>
-      <div class="small muted">✔ wenn du an dem Tag mindestens 1 Training hast.</div>
+// Event handling OHNE Fokusverlust:
+// - wir speichern "oninput", aber rendern NICHT neu
+// - nur bei Sportart-Wechsel rendern wir neu (wegen km/pace enable/disable)
+function attachSessionHandlers(){
+  const list = document.getElementById("sessionList");
+  const d = entryDateInput.value;
 
-      <div class="calHeader" style="margin-top:10px;">
-        <div class="row">
-          <button id="calPrev">◀</button>
-          <button id="calNext">▶</button>
-          <button id="calThis">Dieser Monat</button>
-        </div>
-        <div style="font-weight:900;" id="calLabel">—</div>
-      </div>
-
-      <div style="overflow:auto;">
-        <table class="calendar" id="monthCal"></table>
-      </div>
-    </div>
-  </div>
-</div>
-
-<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
-
-<script>
-(() => {
-  /* ===================== STORAGE ===================== */
-  const KEY_DATA = "sport_tracker_data_full_onefile_v1";
-  const KEY_PROFILE = "sport_tracker_profile_full_onefile_v1";
-
-  /* ===================== CONSTANTS ===================== */
-  const SPORTS = ["Krafttraining","Joggen","Stretching","Ringen","Schwimmen","Tennis"];
-  const KM_SPORTS = new Set(["Joggen","Schwimmen"]);
-
-  /* ===================== HELPERS ===================== */
-  const pad = n => String(n).padStart(2,"0");
-  const iso = d => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
-  const $ = id => document.getElementById(id);
-
-  function parsePace(p){
-    if(!p || !p.includes(":")) return null;
-    const [m,s] = p.split(":").map(Number);
-    if(!Number.isFinite(m)||!Number.isFinite(s)||s<0||s>59||m<0) return null;
-    return m*60+s;
-  }
-  function paceFromSeconds(sec){
-    const t = Math.round(sec);
-    return `${Math.floor(t/60)}:${pad(t%60)}`;
-  }
-
-  /* ===================== STATE ===================== */
-  let db = (()=>{ try{return JSON.parse(localStorage.getItem(KEY_DATA)||"{}");}catch{return{};} })();
-  let profile = localStorage.getItem(KEY_PROFILE)||"";
-
-  function saveDB(){ localStorage.setItem(KEY_DATA, JSON.stringify(db)); }
-  function saveProfile(){
-    localStorage.setItem(KEY_PROFILE, profile);
-    $("appTitle").textContent = profile || "Sport Tracker";
-  }
-
-  /* ===================== DOM ===================== */
-  const profileInput=$("profileName");
-  const saveProfileBtn=$("saveProfile");
-  const exportBtn=$("exportBtn");
-  const importBtn=$("importBtn");
-  const importFile=$("importFile");
-
-  const entryDateInput=$("entryDate");
-  const focusDateInput=$("focusDate");
-  const todayBtn=$("todayBtn");
-
-  const sessionList=$("sessionList");
-  const kpiGrid=$("kpiGrid");
-  const rangeLabel=$("rangeLabel");
-
-  const weekStripWrap=$("weekStripWrap");
-  const weekStrip=$("weekStrip");
-
-  const chartA=$("chartA");
-  const chartB=$("chartB");
-
-  const monthCal=$("monthCal");
-  const calLabel=$("calLabel");
-  const calPrev=$("calPrev");
-  const calNext=$("calNext");
-  const calThis=$("calThis");
-
-  // OCR
-  const shotBtn=$("shotBtn");
-  const shotFile=$("shotFile");
-  const ocrStatus=$("ocrStatus");
-  const ocrModal=$("ocrModal");
-  const ocrDate=$("ocrDate");
-  const ocrTime=$("ocrTime");
-  const ocrType=$("ocrType");
-  const ocrDuration=$("ocrDuration");
-  const ocrCalories=$("ocrCalories");
-  const ocrKm=$("ocrKm");
-  const ocrPace=$("ocrPace");
-  const ocrHr=$("ocrHr");
-  const ocrRaw=$("ocrRaw");
-  const ocrCancel=$("ocrCancel");
-  const ocrApply=$("ocrApply");
-
-  /* ===================== INIT ===================== */
-  profileInput.value = profile;
-  saveProfile();
-  saveProfileBtn.onclick = () => { profile = profileInput.value.trim(); saveProfile(); };
-
-  const now = new Date();
-  entryDateInput.value = iso(now);
-  focusDateInput.value = iso(now);
-  todayBtn.onclick = () => { focusDateInput.value = iso(new Date()); renderAll(); };
-
-  /* ===================== MODEL ===================== */
-  function getDay(d){ if(!Array.isArray(db[d])) db[d]=[]; return db[d]; }
-  function addSession(d){ getDay(d).push({type:"",duration:"",calories:"",km:"",pace:"",hr:""}); saveDB(); }
-  function removeSession(d,i){ getDay(d).splice(i,1); if(!db[d].length) delete db[d]; saveDB(); }
-
-  function updateAfterEdit(){
-    renderDashboard();
-    renderCharts();
-    renderCalendar();
-  }
-
-  /* ===================== SESSIONS UI ===================== */
-  $("addSessionBtn").onclick = () => { addSession(entryDateInput.value); renderSessions(); updateAfterEdit(); };
-  $("clearDayBtn").onclick = () => { delete db[entryDateInput.value]; saveDB(); renderAll(); };
-  entryDateInput.onchange = () => renderSessions();
-  focusDateInput.onchange = () => renderAll();
-
-  function renderSessions(){
-    const d = entryDateInput.value;
-    const arr = getDay(d);
-    sessionList.innerHTML = "";
-    if(!arr.length){
-      sessionList.innerHTML = `<div class="small muted">Noch keine Sessions.</div>`;
-      return;
-    }
-
-    arr.forEach((s,i)=>{
-      const isKm = KM_SPORTS.has(s.type);
-      const el = document.createElement("div");
-      el.className="session";
-      el.innerHTML = `
-        <div class="sessionHead">
-          <strong>Session ${i+1}</strong>
-          <button class="danger">Löschen</button>
-        </div>
-        <div class="gridSession">
-          <select aria-label="Sportart"></select>
-          <input type="number" min="0" placeholder="Dauer (min)" value="${s.duration||""}">
-          <input type="number" min="0" placeholder="Kalorien" value="${s.calories||""}">
-          <input type="number" min="0" step="0.01" placeholder="KM" ${isKm?"":"disabled"} value="${s.km||""}">
-          <input placeholder="Pace mm:ss" ${isKm?"":"disabled"} value="${s.pace||""}">
-          <input type="number" min="0" placeholder="Ø HF bpm" value="${s.hr||""}">
-          <div></div>
-        </div>
-      `;
-      const delBtn = el.querySelector("button");
-      const sel = el.querySelector("select");
-      sel.innerHTML = `<option value="">Sportart</option>` + SPORTS.map(x=>`<option value="${x}" ${x===s.type?"selected":""}>${x}</option>`).join("");
-
-      const inputs = el.querySelectorAll("input");
-      const dur=inputs[0], cal=inputs[1], km=inputs[2], pace=inputs[3], hr=inputs[4];
-
-      delBtn.onclick = () => { removeSession(d,i); renderAll(); };
-
-      sel.onchange = () => {
-        s.type = sel.value;
-        saveDB();
-        renderSessions();
-        updateAfterEdit();
-      };
-
-      dur.oninput = () => { s.duration = dur.value; saveDB(); updateAfterEdit(); };
-      cal.oninput = () => { s.calories = cal.value; saveDB(); updateAfterEdit(); };
-      km.oninput  = () => { s.km = km.value; saveDB(); updateAfterEdit(); };
-      pace.oninput= () => { s.pace = pace.value; saveDB(); updateAfterEdit(); };
-      hr.oninput  = () => { s.hr = hr.value; saveDB(); updateAfterEdit(); };
-
-      sessionList.appendChild(el);
-    });
-  }
-
-  /* ===================== RANGE ===================== */
-  let activeRange="day";
-  document.querySelectorAll(".tab").forEach(t=>{
-    t.onclick=()=>{
-      document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));
-      t.classList.add("active");
-      activeRange=t.dataset.range;
-      renderAll();
+  // Delete
+  list.querySelectorAll("button[data-del]").forEach(btn=>{
+    btn.onclick = () => {
+      const i = Number(btn.dataset.del);
+      const arr = getDay(d);
+      arr.splice(i,1);
+      if(!arr.length) delete db[d];
+      saveDB();
+      renderSessions();
     };
   });
 
-  function inRange(d,r){
-    const D=new Date(d);
-    const F=new Date(focusDateInput.value);
-    if(r==="day") return d===focusDateInput.value;
-    if(r==="week"){ const diff=(D-F)/86400000; return diff>=-6&&diff<=0; }
-    if(r==="month") return D.getMonth()===F.getMonth() && D.getFullYear()===F.getFullYear();
-    if(r==="year") return D.getFullYear()===F.getFullYear();
-    return true;
-  }
+  // Inputs
+  list.querySelectorAll("input[data-i], select[data-i]").forEach(el=>{
+    const i = Number(el.dataset.i);
+    const k = el.dataset.k;
 
-  /* ===================== AGGREGATION ===================== */
-  function aggregate(r){
-    let t={cal:0,min:0,km:0,paceSum:0,paceKm:0,hrSum:0,hrMin:0,sess:0};
-
-    for(const [d,arr] of Object.entries(db)){
-      if(!inRange(d,r)) continue;
-      if(!Array.isArray(arr)) continue;
-
-      arr.forEach(s=>{
-        t.sess++;
-        const m = Number(s.duration||0);
-        t.min += m;
-        t.cal += Number(s.calories||0);
-
-        if(KM_SPORTS.has(s.type)){
-          const km = Number(s.km||0);
-          const ps = parsePace(s.pace);
-          if(km>0){
-            t.km += km;
-            if(ps!=null){
-              t.paceSum += ps*km;
-              t.paceKm += km;
-            }
-          }
-        }
-
-        const hr = Number(s.hr||0);
-        if(hr>0 && m>0){
-          t.hrSum += hr*m;
-          t.hrMin += m;
-        }
-      });
+    if(el.tagName === "SELECT"){
+      el.onchange = () => {
+        getDay(d)[i][k] = el.value;
+        saveDB();
+        // Nur bei type neu rendern (enable/disable)
+        renderSessions();
+      };
+      return;
     }
 
-    return {
-      calories: t.cal,
-      minutes: t.min,
-      km: t.km,
-      avgPace: t.paceKm ? paceFromSeconds(t.paceSum/t.paceKm) : "–",
-      avgHr: t.hrMin ? Math.round(t.hrSum/t.hrMin) : "–",
-      sessions: t.sess
-    };
-  }
+    // normal inputs: speichern ohne re-render
+    el.addEventListener("input", () => {
+      getDay(d)[i][k] = el.value;
+      saveDB();
+      // KEIN renderSessions() -> Fokus bleibt stabil
+    });
+  });
+}
 
-  /* ===================== WEEK STRIP + LABEL ===================== */
-  function mondayOf(dateIso){
-    const d=new Date(dateIso);
-    const day=d.getDay();
-    const diff=day===0 ? -6 : 1-day;
-    d.setDate(d.getDate()+diff);
-    return iso(d);
+// Start
+renderSessions();
+<script>
+/* ===================== DASHBOARD + CHARTS ===================== */
+
+/* ---------- Helpers ---------- */
+function safeNum(v){
+  const n = Number(v);
+  return Number.isFinite(n) ? n : 0;
+}
+function parsePace(p){
+  if(!p || !p.includes(":")) return null;
+  const [m,s] = p.split(":").map(Number);
+  if(!Number.isFinite(m)||!Number.isFinite(s)||s>59) return null;
+  return m*60+s;
+}
+function paceFromSeconds(sec){
+  const t=Math.round(sec);
+  return `${Math.floor(t/60)}:${String(t%60).padStart(2,"0")}`;
+}
+
+/* ---------- Range handling ---------- */
+function inRange(dateIso, range){
+  const d = new Date(dateIso);
+  const f = new Date(document.getElementById("focusDate").value);
+
+  if(range==="day") return dateIso === document.getElementById("focusDate").value;
+  if(range==="month") return d.getMonth()===f.getMonth() && d.getFullYear()===f.getFullYear();
+  if(range==="year") return d.getFullYear()===f.getFullYear();
+  if(range==="all") return true;
+
+  if(range==="week"){
+    const fd = new Date(f);
+    const monday = new Date(fd);
+    const day = monday.getDay() || 7;
+    monday.setDate(fd.getDate() - day + 1);
+    const sunday = new Date(monday);
+    sunday.setDate(monday.getDate()+6);
+    return d>=monday && d<=sunday;
   }
-  function addDays(dateIso,n){
-    const d=new Date(dateIso);
-    d.setDate(d.getDate()+n);
-    return iso(d);
-  }
-  function sumForDate(dateIso){
-    const arr=db[dateIso]||[];
-    let cal=0,min=0,sess=0;
+  return false;
+}
+
+/* ---------- Aggregation ---------- */
+function aggregate(range){
+  let cal=0,min=0,km=0,paceSum=0,paceKm=0,hrSum=0,hrMin=0,sess=0;
+
+  for(const [d,arr] of Object.entries(db)){
+    if(!inRange(d,range)) continue;
     arr.forEach(s=>{
       sess++;
-      min+=Number(s.duration||0);
-      cal+=Number(s.calories||0);
-    });
-    return {calories:cal, minutes:min, sessions:sess};
-  }
+      const m=safeNum(s.duration);
+      min+=m;
+      cal+=safeNum(s.calories);
 
-  function renderRangeLabelAndStrip(){
-    const f=new Date(focusDateInput.value);
-
-    if(activeRange==="day"){
-      rangeLabel.textContent = `Tag: ${f.toLocaleDateString("de-DE")}`;
-      weekStripWrap.style.display="none";
-      return;
-    }
-    if(activeRange==="week"){
-      const mon=mondayOf(focusDateInput.value);
-      const sun=addDays(mon,6);
-      rangeLabel.textContent = `Woche: ${new Date(mon).toLocaleDateString("de-DE")} – ${new Date(sun).toLocaleDateString("de-DE")}`;
-      weekStripWrap.style.display="block";
-      weekStrip.innerHTML="";
-      for(let i=0;i<7;i++){
-        const dIso = addDays(mon,i);
-        const s = sumForDate(dIso);
-        const name = new Date(dIso).toLocaleDateString("de-DE",{weekday:"short"});
-
-        const card = document.createElement("div");
-        card.className="dayCard";
-        card.innerHTML = `
-          <div class="d">${name}</div>
-          <div class="sub">
-            <span><b style="color:var(--accent)">${s.calories}</b> kcal</span>
-            <span>${s.minutes} min · ${s.sessions} sessions</span>
-          </div>
-        `;
-        card.style.cursor="pointer";
-        card.onclick=()=>{ focusDateInput.value=dIso; renderAll(); };
-        weekStrip.appendChild(card);
-      }
-      return;
-    }
-    if(activeRange==="month"){
-      rangeLabel.textContent = `Monat: ${f.toLocaleDateString("de-DE",{month:"long",year:"numeric"})}`;
-      weekStripWrap.style.display="none";
-      return;
-    }
-    if(activeRange==="year"){
-      rangeLabel.textContent = `Jahr: ${f.getFullYear()}`;
-      weekStripWrap.style.display="none";
-      return;
-    }
-    rangeLabel.textContent = `Gesamt: alle Daten`;
-    weekStripWrap.style.display="none";
-  }
-
-  /* ===================== DASHBOARD ===================== */
-  function renderDashboard(){
-    const a = aggregate(activeRange);
-    kpiGrid.innerHTML = `
-      <div class="kpi"><div class="v">${a.calories}</div><div class="l">Kalorien</div></div>
-      <div class="kpi"><div class="v">${a.minutes}</div><div class="l">Minuten</div></div>
-      <div class="kpi"><div class="v">${a.sessions}</div><div class="l">Sessions</div></div>
-      <div class="kpi"><div class="v">${a.km.toFixed(1)}</div><div class="l">Kilometer</div></div>
-      <div class="kpi"><div class="v">${a.avgPace}</div><div class="l">Ø Pace</div></div>
-      <div class="kpi"><div class="v">${a.avgHr}</div><div class="l">Ø Herzfrequenz</div></div>
-    `;
-    renderRangeLabelAndStrip();
-  }
-
-  /* ===================== CHARTS ===================== */
-  function clearCanvas(c){
-    const ctx=c.getContext("2d");
-    ctx.clearRect(0,0,c.width,c.height);
-  }
-  function drawAxes(ctx,w,h,padL,padB){
-    ctx.strokeStyle="#202020";
-    ctx.lineWidth=1;
-    ctx.beginPath(); ctx.moveTo(padL,12); ctx.lineTo(padL,h-padB); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(padL,h-padB); ctx.lineTo(w-12,h-padB); ctx.stroke();
-  }
-  function drawBars(ctx,values,labels,title){
-    const w=ctx.canvas.width,h=ctx.canvas.height,padL=44,padB=28;
-    ctx.fillStyle="#fff"; ctx.font="14px system-ui";
-    ctx.fillText(title,12,18);
-    drawAxes(ctx,w,h,padL,padB);
-
-    const maxVal=Math.max(1,...values);
-    const innerW=(w-12)-padL, innerH=(h-padB)-28;
-    const n=values.length, gap=4;
-    const barW=Math.max(2,(innerW-gap*(n-1))/n);
-
-    values.forEach((v,i)=>{
-      const x=padL+i*(barW+gap);
-      const bh=(v/maxVal)*innerH;
-      const y=(h-padB)-bh;
-
-      ctx.fillStyle="rgba(0,255,106,0.55)";
-      ctx.fillRect(x,y,barW,bh);
-
-      ctx.fillStyle="#9a9a9a"; ctx.font="10px system-ui";
-      ctx.fillText(labels[i]??"", x, h-10);
-    });
-     id="ocrPace"></div>
-          <div class="grow"><div class="small muted">Ø HF (bpm)</div><input id="ocrHr" type="number" min="0"></div>
-        </div>
-
-        <div style="margin-top:10px;">
-          <div class="small muted">OCR Text</div>
-          <textarea id="ocrRaw"></textarea>
-        </div>
-
-        <div class="row" style="justify-content:space-between; margin-top:10px;">
-          <button id="ocrCancel" class="ghost">Abbrechen</button>
-          <button id="ocrApply">Übernehmen → Session anlegen</button>
-        </div>
-      </div>
-
-      <div class="sessionList" id="sessionList"></div>
-    </div>
-
-    <div class="panel">
-      <h3 style="margin-bottom:10px;">🗓️ Monatskalender</h3>
-      <div class="small muted">✔ wenn du an dem Tag mindestens 1 Training hast.</div>
-
-      <div class="calHeader" style="margin-top:10px;">
-        <div class="row">
-          <button id="calPrev">◀</button>
-          <button id="calNext">▶</button>
-          <button id="calThis">Dieser Monat</button>
-        </div>
-        <div style="font-weight:900;" id="calLabel">—</div>
-      </div>
-
-      <div style="overflow:auto;">
-        <table class="calendar" id="monthCal"></table>
-      </div>
-    </div>
-  </div>
-</div>
-
-<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
-
-<script>
-(() => {
-  /* ===================== STORAGE ===================== */
-  const KEY_DATA = "sport_tracker_data_full_onefile_v1";
-  const KEY_PROFILE = "sport_tracker_profile_full_onefile_v1";
-
-  /* ===================== CONSTANTS ===================== */
-  const SPORTS = ["Krafttraining","Joggen","Stretching","Ringen","Schwimmen","Tennis"];
-  const KM_SPORTS = new Set(["Joggen","Schwimmen"]);
-
-  /* ===================== HELPERS ===================== */
-  const pad = n => String(n).padStart(2,"0");
-  const iso = d => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
-  const $ = id => document.getElementById(id);
-
-  function parsePace(p){
-    if(!p || !p.includes(":")) return null;
-    const [m,s] = p.split(":").map(Number);
-    if(!Number.isFinite(m)||!Number.isFinite(s)||s<0||s>59||m<0) return null;
-    return m*60+s;
-  }
-  function paceFromSeconds(sec){
-    const t = Math.round(sec);
-    return `${Math.floor(t/60)}:${pad(t%60)}`;
-  }
-
-  /* ===================== STATE ===================== */
-  let db = (()=>{ try{return JSON.parse(localStorage.getItem(KEY_DATA)||"{}");}catch{return{};} })();
-  let profile = localStorage.getItem(KEY_PROFILE)||"";
-
-  function saveDB(){ localStorage.setItem(KEY_DATA, JSON.stringify(db)); }
-  function saveProfile(){
-    localStorage.setItem(KEY_PROFILE, profile);
-    $("appTitle").textContent = profile || "Sport Tracker";
-  }
-
-  /* ===================== DOM ===================== */
-  const profileInput=$("profileName");
-  const saveProfileBtn=$("saveProfile");
-  const exportBtn=$("exportBtn");
-  const importBtn=$("importBtn");
-  const importFile=$("importFile");
-
-  const entryDateInput=$("entryDate");
-  const focusDateInput=$("focusDate");
-  const todayBtn=$("todayBtn");
-
-  const sessionList=$("sessionList");
-  const kpiGrid=$("kpiGrid");
-  const rangeLabel=$("rangeLabel");
-
-  const weekStripWrap=$("weekStripWrap");
-  const weekStrip=$("weekStrip");
-
-  const chartA=$("chartA");
-  const chartB=$("chartB");
-
-  const monthCal=$("monthCal");
-  const calLabel=$("calLabel");
-  const calPrev=$("calPrev");
-  const calNext=$("calNext");
-  const calThis=$("calThis");
-
-  // OCR
-  const shotBtn=$("shotBtn");
-  const shotFile=$("shotFile");
-  const ocrStatus=$("ocrStatus");
-  const ocrModal=$("ocrModal");
-  const ocrDate=$("ocrDate");
-  const ocrTime=$("ocrTime");
-  const ocrType=$("ocrType");
-  const ocrDuration=$("ocrDuration");
-  const ocrCalories=$("ocrCalories");
-  const ocrKm=$("ocrKm");
-  const ocrPace=$("ocrPace");
-  const ocrHr=$("ocrHr");
-  const ocrRaw=$("ocrRaw");
-  const ocrCancel=$("ocrCancel");
-  const ocrApply=$("ocrApply");
-
-  /* ===================== INIT ===================== */
-  profileInput.value = profile;
-  saveProfile();
-  saveProfileBtn.onclick = () => { profile = profileInput.value.trim(); saveProfile(); };
-
-  const now = new Date();
-  entryDateInput.value = iso(now);
-  focusDateInput.value = iso(now);
-  todayBtn.onclick = () => { focusDateInput.value = iso(new Date()); renderAll(); };
-
-  /* ===================== MODEL ===================== */
-  function getDay(d){ if(!Array.isArray(db[d])) db[d]=[]; return db[d]; }
-  function addSession(d){ getDay(d).push({type:"",duration:"",calories:"",km:"",pace:"",hr:""}); saveDB(); }
-  function removeSession(d,i){ getDay(d).splice(i,1); if(!db[d].length) delete db[d]; saveDB(); }
-
-  function updateAfterEdit(){
-    renderDashboard();
-    renderCharts();
-    renderCalendar();
-  }
-
-  /* ===================== SESSIONS UI ===================== */
-  $("addSessionBtn").onclick = () => { addSession(entryDateInput.value); renderSessions(); updateAfterEdit(); };
-  $("clearDayBtn").onclick = () => { delete db[entryDateInput.value]; saveDB(); renderAll(); };
-  entryDateInput.onchange = () => renderSessions();
-  focusDateInput.onchange = () => renderAll();
-
-  function renderSessions(){
-    const d = entryDateInput.value;
-    const arr = getDay(d);
-    sessionList.innerHTML = "";
-    if(!arr.length){
-      sessionList.innerHTML = `<div class="small muted">Noch keine Sessions.</div>`;
-      return;
-    }
-
-    arr.forEach((s,i)=>{
-      const isKm = KM_SPORTS.has(s.type);
-      const el = document.createElement("div");
-      el.className="session";
-      el.innerHTML = `
-        <div class="sessionHead">
-          <strong>Session ${i+1}</strong>
-          <button class="danger">Löschen</button>
-        </div>
-        <div class="gridSession">
-          <select aria-label="Sportart"></select>
-          <input type="number" min="0" placeholder="Dauer (min)" value="${s.duration||""}">
-          <input type="number" min="0" placeholder="Kalorien" value="${s.calories||""}">
-          <input type="number" min="0" step="0.01" placeholder="KM" ${isKm?"":"disabled"} value="${s.km||""}">
-          <input placeholder="Pace mm:ss" ${isKm?"":"disabled"} value="${s.pace||""}">
-          <input type="number" min="0" placeholder="Ø HF bpm" value="${s.hr||""}">
-          <div></div>
-        </div>
-      `;
-      const delBtn = el.querySelector("button");
-      const sel = el.querySelector("select");
-      sel.innerHTML = `<option value="">Sportart</option>` + SPORTS.map(x=>`<option value="${x}" ${x===s.type?"selected":""}>${x}</option>`).join("");
-
-      const inputs = el.querySelectorAll("input");
-      const dur=inputs[0], cal=inputs[1], km=inputs[2], pace=inputs[3], hr=inputs[4];
-
-      delBtn.onclick = () => { removeSession(d,i); renderAll(); };
-
-      sel.onchange = () => {
-        s.type = sel.value;
-        saveDB();
-        renderSessions();
-        updateAfterEdit();
-      };
-
-      dur.oninput = () => { s.duration = dur.value; saveDB(); updateAfterEdit(); };
-      cal.oninput = () => { s.calories = cal.value; saveDB(); updateAfterEdit(); };
-      km.oninput  = () => { s.km = km.value; saveDB(); updateAfterEdit(); };
-      pace.oninput= () => { s.pace = pace.value; saveDB(); updateAfterEdit(); };
-      hr.oninput  = () => { s.hr = hr.value; saveDB(); updateAfterEdit(); };
-
-      sessionList.appendChild(el);
-    });
-  }
-
-  /* ===================== RANGE ===================== */
-  let activeRange="day";
-  document.querySelectorAll(".tab").forEach(t=>{
-    t.onclick=()=>{
-      document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));
-      t.classList.add("active");
-      activeRange=t.dataset.range;
-      renderAll();
-    };
-  });
-
-  function inRange(d,r){
-    const D=new Date(d);
-    const F=new Date(focusDateInput.value);
-    if(r==="day") return d===focusDateInput.value;
-    if(r==="week"){ const diff=(D-F)/86400000; return diff>=-6&&diff<=0; }
-    if(r==="month") return D.getMonth()===F.getMonth() && D.getFullYear()===F.getFullYear();
-    if(r==="year") return D.getFullYear()===F.getFullYear();
-    return true;
-  }
-
-  /* ===================== AGGREGATION ===================== */
-  function aggregate(r){
-    let t={cal:0,min:0,km:0,paceSum:0,paceKm:0,hrSum:0,hrMin:0,sess:0};
-
-    for(const [d,arr] of Object.entries(db)){
-      if(!inRange(d,r)) continue;
-      if(!Array.isArray(arr)) continue;
-
-      arr.forEach(s=>{
-        t.sess++;
-        const m = Number(s.duration||0);
-        t.min += m;
-        t.cal += Number(s.calories||0);
-
-        if(KM_SPORTS.has(s.type)){
-          const km = Number(s.km||0);
-          const ps = parsePace(s.pace);
-          if(km>0){
-            t.km += km;
-            if(ps!=null){
-              t.paceSum += ps*km;
-              t.paceKm += km;
-            }
-          }
+      if(KM_SPORTS.has(s.type)){
+        const k=safeNum(s.km);
+        const ps=parsePace(s.pace);
+        km+=k;
+        if(ps && k){
+          paceSum+=ps*k;
+          paceKm+=k;
         }
-
-        const hr = Number(s.hr||0);
-        if(hr>0 && m>0){
-          t.hrSum += hr*m;
-          t.hrMin += m;
-        }
-      });
-    }
-
-    return {
-      calories: t.cal,
-      minutes: t.min,
-      km: t.km,
-      avgPace: t.paceKm ? paceFromSeconds(t.paceSum/t.paceKm) : "–",
-      avgHr: t.hrMin ? Math.round(t.hrSum/t.hrMin) : "–",
-      sessions: t.sess
-    };
-  }
-
-  /* ===================== WEEK STRIP + LABEL ===================== */
-  function mondayOf(dateIso){
-    const d=new Date(dateIso);
-    const day=d.getDay();
-    const diff=day===0 ? -6 : 1-day;
-    d.setDate(d.getDate()+diff);
-    return iso(d);
-  }
-  function addDays(dateIso,n){
-    const d=new Date(dateIso);
-    d.setDate(d.getDate()+n);
-    return iso(d);
-  }
-  function sumForDate(dateIso){
-    const arr=db[dateIso]||[];
-    let cal=0,min=0,sess=0;
-    arr.forEach(s=>{
-      sess++;
-      min+=Number(s.duration||0);
-      cal+=Number(s.calories||0);
-    });
-    return {calories:cal, minutes:min, sessions:sess};
-  }
-
-  function renderRangeLabelAndStrip(){
-    const f=new Date(focusDateInput.value);
-
-    if(activeRange==="day"){
-      rangeLabel.textContent = `Tag: ${f.toLocaleDateString("de-DE")}`;
-      weekStripWrap.style.display="none";
-      return;
-    }
-    if(activeRange==="week"){
-      const mon=mondayOf(focusDateInput.value);
-      const sun=addDays(mon,6);
-      rangeLabel.textContent = `Woche: ${new Date(mon).toLocaleDateString("de-DE")} – ${new Date(sun).toLocaleDateString("de-DE")}`;
-      weekStripWrap.style.display="block";
-      weekStrip.innerHTML="";
-      for(let i=0;i<7;i++){
-        const dIso = addDays(mon,i);
-        const s = sumForDate(dIso);
-        const name = new Date(dIso).toLocaleDateString("de-DE",{weekday:"short"});
-
-        const card = document.createElement("div");
-        card.className="dayCard";
-        card.innerHTML = `
-          <div class="d">${name}</div>
-          <div class="sub">
-            <span><b style="color:var(--accent)">${s.calories}</b> kcal</span>
-            <span>${s.minutes} min · ${s.sessions} sessions</span>
-          </div>
-        `;
-        card.style.cursor="pointer";
-        card.onclick=()=>{ focusDateInput.value=dIso; renderAll(); };
-        weekStrip.appendChild(card);
       }
-      return;
-    }
-    if(activeRange==="month"){
-      rangeLabel.textContent = `Monat: ${f.toLocaleDateString("de-DE",{month:"long",year:"numeric"})}`;
-      weekStripWrap.style.display="none";
-      return;
-    }
-    if(activeRange==="year"){
-      rangeLabel.textContent = `Jahr: ${f.getFullYear()}`;
-      weekStripWrap.style.display="none";
-      return;
-    }
-    rangeLabel.textContent = `Gesamt: alle Daten`;
-    weekStripWrap.style.display="none";
-  }
 
-  /* ===================== DASHBOARD ===================== */
-  function renderDashboard(){
-    const a = aggregate(activeRange);
-    kpiGrid.innerHTML = `
-      <div class="kpi"><div class="v">${a.calories}</div><div class="l">Kalorien</div></div>
-      <div class="kpi"><div class="v">${a.minutes}</div><div class="l">Minuten</div></div>
-      <div class="kpi"><div class="v">${a.sessions}</div><div class="l">Sessions</div></div>
-      <div class="kpi"><div class="v">${a.km.toFixed(1)}</div><div class="l">Kilometer</div></div>
-      <div class="kpi"><div class="v">${a.avgPace}</div><div class="l">Ø Pace</div></div>
-      <div class="kpi"><div class="v">${a.avgHr}</div><div class="l">Ø Herzfrequenz</div></div>
-    `;
-    renderRangeLabelAndStrip();
-  }
-
-  /* ===================== CHARTS ===================== */
-  function clearCanvas(c){
-    const ctx=c.getContext("2d");
-    ctx.clearRect(0,0,c.width,c.height);
-  }
-  function drawAxes(ctx,w,h,padL,padB){
-    ctx.strokeStyle="#202020";
-    ctx.lineWidth=1;
-    ctx.beginPath(); ctx.moveTo(padL,12); ctx.lineTo(padL,h-padB); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(padL,h-padB); ctx.lineTo(w-12,h-padB); ctx.stroke();
-  }
-  function drawBars(ctx,values,labels,title){
-    const w=ctx.canvas.width,h=ctx.canvas.height,padL=44,padB=28;
-    ctx.fillStyle="#fff"; ctx.font="14px system-ui";
-    ctx.fillText(title,12,18);
-    drawAxes(ctx,w,h,padL,padB);
-
-    const maxVal=Math.max(1,...values);
-    const innerW=(w-12)-padL, innerH=(h-padB)-28;
-    const n=values.length, gap=4;
-    const barW=Math.max(2,(innerW-gap*(n-1))/n);
-
-    values.forEach((v,i)=>{
-      const x=padL+i*(barW+gap);
-      const bh=(v/maxVal)*innerH;
-      const y=(h-padB)-bh;
-
-      ctx.fillStyle="rgba(0,255,106,0.55)";
-      ctx.fillRect(x,y,barW,bh);
-
-      ctx.fillStyle="#9a9a9a"; ctx.font="10px system-ui";
-      ctx.fillText(labels[i]??"", x, h-10);
-    });
-function drawLine(ctx, values, labels, title, yUnit){
-  const c = ctx.canvas;
-
-  // Retina / HiDPI (scharf auf iPhone & Mac)
-  const dpr = Math.max(1, window.devicePixelRatio || 1);
-  const cssW = c.clientWidth || 900;
-  const cssH = c.clientHeight || 260;
-
-  // set canvas internal size based on css size
-  c.width  = Math.round(cssW * dpr);
-  c.height = Math.round(cssH * dpr);
-  ctx.setTransform(dpr, 0, 0, dpr, 0, 0); // draw in CSS pixels
-  ctx.clearRect(0,0,cssW,cssH);
-
-  // Layout
-  const padL = 52;
-  const padR = 14;
-  const padT = 28;
-  const padB = 34;
-  const W = cssW, H = cssH;
-
-  // Title
-  ctx.fillStyle = "#fff";
-  ctx.font = "14px system-ui";
-  ctx.fillText(title, 12, 18);
-
-  // Range
-  const maxValRaw = Math.max(0, ...values);
-  const maxVal = maxValRaw <= 0 ? 1 : maxValRaw;
-
-  // Nice ticks
-  const tickCount = 5;
-  const step = Math.max(1, Math.ceil(maxVal / tickCount));
-  const yMax = step * tickCount;
-
-  const innerW = (W - padR) - padL;
-  const innerH = (H - padB) - padT;
-
-  // Grid + Y labels
- );
-    ctx.stroke();
-
-    values.forEach((v,i)=>{
-      const x=padL+i*stepX;
-      const y=(h-padB)-(v/maxVal)*innerH;
-      ctx.fillStyle="rgba(0,255,106,1)";
-      ctx.beginPath(); ctx.arc(x,y,3,0,Math.PI*2); ctx.fill();
-
-      ctx.fillStyle="#9a9a9a"; ctx.font="10px system-ui";
-      ctx.fillText(labels[i]??"", x-6, h-10);
-    });
-  }
-
-  function getMonthDays(focusIso){
-    const d=new Date(focusIso);
-    const y=d.getFullYear(), m=d.getMonth();
-    const days=new Date(y,m+1,0).getDate();
-    const out=[];
-    for(let i=1;i<=days;i++) out.push(iso(new Date(y,m,i)));
-    return out;
-  }
-
-  function weekNumberISO(dateIso){
-    const d=new Date(dateIso);
-    d.setHours(0,0,0,0);
-    d.setDate(d.getDate() + 3 - ((d.getDay() + 6) % 7));
-    const week1=new Date(d.getFullYear(),0,4);
-    return 1 + Math.round(((d-week1)/86400000 - 3 + ((week1.getDay()+6)%7)) / 7);
-  }
-
-  function getYearWeeks(focusIso){
-    const y=new Date(focusIso).getFullYear();
-    const buckets=new Map();
-    const start=new Date(y,0,1), end=new Date(y,11,31);
-
-    for(let cur=new Date(start); cur<=end; cur.setDate(cur.getDate()+1)){
-      const key=iso(cur);
-      const wn=weekNumberISO(key);
-      const arr=db[key]||[];
-
-      let km=0;
-      arr.forEach(s=>{
-        if(KM_SPORTS.has(s.type)) km += Number(s.km||0);
-      });
-
-      buckets.set(wn,(buckets.get(wn)||0)+km);
-    }
-
-    const weeks=[], kms=[];
-    for(let w=1; w<=53; w++){
-      if(!buckets.has(w) && w>52) break;
-      weeks.push(w);
-      kms.push(Number((buckets.get(w)||0).toFixed(2)));
-    }
-    return {weeks,kms};
-  }
-
-  function renderCharts(){
-    const fIso=focusDateInput.value;
-
-    clearCanvas(chartA);
-    const ctxA=chartA.getContext("2d");
-    const days=getMonthDays(fIso);
-    const valsA=days.map(d=>sumForDate(d).calories);
-    const labelsA=days.map(d=>String(Number(d.slice(-2))));
-    const monthName=new Date(fIso).toLocaleString("de-DE",{month:"long",year:"numeric"});
-    drawBars(ctxA, valsA, labelsA, `Kalorien pro Tag (${monthName})`);
-
-    clearCanvas(chartB);
-    const ctxB=chartB.getContext("2d");
-    const {weeks,kms}=getYearWeeks(fIso);
-    const labelsB=weeks.map(w=>w%4===0?String(w):"");
-    const year=new Date(fIso).getFullYear();
-    drawLine(ctxB, kms, labelsB, `Kilometer pro Woche (${year})`);
-  }
-
-  /* ===================== MONTH CALENDAR ===================== */
-  let calMonth=new Date(new Date().getFullYear(), new Date().getMonth(), 1);
-
-  calPrev.onclick=()=>{ calMonth=new Date(calMonth.getFullYear(),calMonth.getMonth()-1,1); renderCalendar(); };
-  calNext.onclick=()=>{ calMonth=new Date(calMonth.getFullYear(),calMonth.getMonth()+1,1); renderCalendar(); };
-  calThis.onclick=()=>{ calMonth=new Date(new Date().getFullYear(),new Date().getMonth(),1); renderCalendar(); };
-
-  function renderCalendar(){
-    const y=calMonth.getFullYear(), m=calMonth.getMonth();
-    calLabel.textContent=calMonth.toLocaleString("de-DE",{month:"long",year:"numeric"});
-
-    const first=new Date(y,m,1);
-    const daysInMonth=new Date(y,m+1,0).getDate();
-    const jsDay=first.getDay();
-    const offset=(jsDay===0?6:jsDay-1);
-
-    const headers=["Mo","Di","Mi","Do","Fr","Sa","So"];
-    let html="<thead><tr>"+headers.map(h=>`<th class="small muted">${h}</th>`).join("")+"</tr></thead><tbody>";
-
-    let dayNum=1-offset;
-    for(let row=0; row<6; row++){
-      html+="<tr>";
-      for(let col=0; col<7; col++){
-        if(dayNum<1 || dayNum>daysInMonth){
-          html+=`<td class="dim">&nbsp;</td>`;
-        } else {
-          const key=iso(new Date(y,m,dayNum));
-          const trained=Array.isArray(db[key]) && db[key].length>0;
-          const sum=trained ? sumForDate(key) : null;
-
-          html+=`<td>
-            <div class="calCell">
-              <div style="font-weight:800;">${dayNum}</div>
-              ${trained ? `<div class="check">✓</div>` : ""}
-            </div>
-            <div class="small muted" style="margin-top:6px;">
-              ${trained ? `${sum.calories} kcal · ${sum.minutes} min` : ""}
-            </div>
-          </td>`;
-        }
-        dayNum++;
+      const hr=safeNum(s.hr);
+      if(hr && m){
+        hrSum+=hr*m;
+        hrMin+=m;
       }
-      html+="</tr>";
-    }
-    html+="</tbody>";
-    monthCal.innerHTML=html;
+    });
   }
 
-  /* ===================== IMPORT / EXPORT ===================== */
-  exportBtn.onclick=()=>{
-    const payload={version:1, exportedAt:new Date().toISOString(), profile, db};
-    const blob=new Blob([JSON.stringify(payload,null,2)],{type:"application/json"});
-    const url=URL.createObjectURL(blob);
-    const a=document.createElement("a");
-    a.href=url;
-    a.download=`sport-backup-${iso(new Date())}.json`;
-    document.body.appendChild(a); a.click(); a.remove();
-    URL.revokeObjectURL(url);
+  return {
+    calories:cal,
+    minutes:min,
+    km:km,
+    avgPace: paceKm ? paceFromSeconds(paceSum/paceKm) : "–",
+    avgHr: hrMin ? Math.round(hrSum/hrMin) : "–",
+    sessions:sess
   };
+}
 
-  importBtn.onclick=()=>{ importFile.value=""; importFile.click(); };
-  importFile.onchange=async()=>{
-    const file=importFile.files?.[0];
-    if(!file) return;
-    try{
-      const text=await file.text();
-      const payload=JSON.parse(text);
-      if(payload && payload.db && typeof payload.db==="object"){
-        db=payload.db;
-        if(typeof payload.profile==="string"){
-          profile=payload.profile;
-          profileInput.value=profile;
-          saveProfile();
-        }
-        saveDB();
-        renderAll();
-        alert("Import erfolgreich ✅");
-      } else {
-        alert("Import: falsches Format.");
-      }
-    } catch {
-      alert("Import fehlgeschlagen.");
-    } finally {
-      importFile.value="";
-    }
-  };
+/* ---------- Render Dashboard ---------- */
+function renderDashboard(){
+  const a = aggregate(activeRange);
+  document.getElementById("kpiGrid").innerHTML = `
+    <div class="kpi"><div class="v">${a.calories}</div><div class="l">Kalorien</div></div>
+    <div class="kpi"><div class="v">${a.minutes}</div><div class="l">Minuten</div></div>
+    <div class="kpi"><div class="v">${a.km.toFixed(1)}</div><div class="l">Kilometer</div></div>
+    <div class="kpi"><div class="v">${a.avgPace}</div><div class="l">Ø Pace</div></div>
+    <div class="kpi"><div class="v">${a.avgHr}</div><div class="l">Ø HF</div></div>
+    <div class="kpi"><div class="v">${a.sessions}</div><div class="l">Sessions</div></div>
+  `;
+}
 
-  /* ===================== OCR (ROBUST) ===================== */
-    /* ===================== OCR (ROBUST + AUTO-IMPORT) ===================== */
-  function fillOcrTypes(){
-    ocrType.innerHTML =
-      `<option value="">Auto</option>` +
-      SPORTS.map(x=>`<option value="${x}">${x}</option>`).join("");
+/* ---------- Chart Drawing (Line) ---------- */
+function drawLine(canvas, values, labels, title, unit){
+  const ctx=canvas.getContext("2d");
+  const dpr=window.devicePixelRatio||1;
+  const w=canvas.clientWidth;
+  const h=canvas.clientHeight;
+  canvas.width=w*dpr; canvas.height=h*dpr;
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  ctx.clearRect(0,0,w,h);
+
+  const padL=46,padR=10,padT=26,padB=30;
+  const max=Math.max(1,...values);
+  const innerW=w-padL-padR;
+  const innerH=h-padT-padB;
+
+  ctx.fillStyle="#fff";
+  ctx.font="13px system-ui";
+  ctx.fillText(title,10,18);
+
+  ctx.strokeStyle="#1f1f1f";
+  ctx.font="11px system-ui";
+  ctx.fillStyle="#999";
+
+  for(let i=0;i<=5;i++){
+    const v=max/5*i;
+    const y=h-padB-(v/max)*innerH;
+    ctx.beginPath();
+    ctx.moveTo(padL,y); ctx.lineTo(w-padR,y); ctx.stroke();
+    ctx.fillText(Math.round(v)+" "+unit,6,y+4);
   }
-  fillOcrTypes();
 
-  shotBtn.addEventListener("click", () => {
-    shotFile.value = "";
-    shotFile.click();
+  ctx.strokeStyle="#00ff6a";
+  ctx.lineWidth=2;
+  ctx.beginPath();
+  values.forEach((v,i)=>{
+    const x=padL + (i/(values.length-1||1))*innerW;
+    const y=h-padB-(v/max)*innerH;
+    if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
   });
+  ctx.stroke();
 
-  async function fileToCanvasScaled(file, maxDim = 1800){
-    const dataUrl = await new Promise((resolve, reject) => {
-      const r = new FileReader();
-      r.onload = () => resolve(r.result);
-      r.onerror = reject;
-      r.readAsDataURL(file);
-    });
-
-    const img = await new Promise((resolve, reject) => {
-      const im = new Image();
-      im.onload = () => resolve(im);
-      im.onerror = reject;
-      im.src = dataUrl;
-    });
-
-    const w = img.naturalWidth || img.width;
-    const h = img.naturalHeight || img.height;
-    const biggest = Math.max(w,h);
-    const scale = biggest > maxDim ? (maxDim / biggest) : 1;
-
-    const cw = Math.max(1, Math.round(w*scale));
-    const ch = Math.max(1, Math.round(h*scale));
-
-    const canvas = document.createElement("canvas");
-    canvas.width = cw;
-    canvas.height = ch;
-    const ctx = canvas.getContext("2d", { willReadFrequently: true });
-
-    // weißer Hintergrund hilft OCR auf dunklen Screenshots
-    ctx.fillStyle = "#fff";
-    ctx.fillRect(0, 0, cw, ch);
-    ctx.drawImage(img, 0, 0, cw, ch);
-
-    return canvas;
-  }
-
-  function normalizeText(t){
-    return (t||"")
-      .replace(/\u00A0/g," ")
-      .replace(/[|]/g,"I")
-      .replace(/\s+/g," ")
-      .trim();
-  }
-
-  function numFrom(str){
-    if(!str) return "";
-    return String(str).replace(",", ".").replace(/[^0-9.]/g,"");
-  }
-
-  function extractTime(txt){
-    // 19:31
-    const m = txt.match(/\b([01]?\d|2[0-3]):([0-5]\d)\b/);
-    return m ? m[0] : "";
-  }
-
-  function extractDateIso(txt){
-    // 23.12.2025 oder 23/12/2025
-    const m = txt.match(/\b([0-3]?\d)[.\-/]([01]?\d)[.\-/]((?:19|20)\d{2})\b/);
-    if(m){
-      const dd = String(m[1]).padStart(2,"0");
-      const mm = String(m[2]).padStart(2,"0");
-      const yyyy = m[3];
-      return `${yyyy}-${mm}-${dd}`;
-    }
-    // Wenn kein Datum im Screenshot: nichts zurückgeben
-    return "";
-  }
-
-  function extractKm(txt){
-    // Distanz 3,21 km / 3.21km / 800 m
-    const km1 = txt.match(/\b(\d+(?:[.,]\d+)?)\s*km\b/i);
-    if(km1) return numFrom(km1[1]);
-
-    const km2 = txt.match(/\b(\d+(?:[.,]\d+)?)\s*K M\b/i);
-    if(km2) return numFrom(km2[1]);
-
-    const km3 = txt.match(/\b(?:distanz|distance)\s*[:\-]?\s*(\d+(?:[.,]\d+)?)\s*km\b/i);
-    if(km3) return numFrom(km3[1]);
-
-    const m = txt.match(/\b(\d{2,5})\s*m\b/i);
-    if(m){
-      const meters = Number(m[1]);
-      if(Number.isFinite(meters) && meters > 0){
-        return String((meters/1000).toFixed(2));
-      }
-    }
-    return "";
-  }
-
-  function extractCalories(txt){
-    const m1 = txt.match(/\b(\d{2,5})\s*kcal\b/i);
-    if(m1) return m1[1];
-    const m2 = txt.match(/\b(\d{2,5})\s*cal\b/i);
-    if(m2) return m2[1];
-    const m3 = txt.match(/\b(?:kalorien|calories)\s*[:\-]?\s*(\d{2,5})\b/i);
-    if(m3) return m3[1];
-    return "";
-  }
-
-  function extractHr(txt){
-    // Ø HF 148 bpm / Durchschnitt 148 bpm / Avg 148 bpm
-    const m1 = txt.match(/\b(?:ø|Ø)\s*(?:hf|hr|herzfrequenz)\s*[:\-]?\s*(\d{2,3})\s*bpm\b/i);
-    if(m1) return m1[1];
-
-    const m2 = txt.match(/\b(?:durchschnitt|average|avg)\s*(?:hf|hr|herzfrequenz)?\s*[:\-]?\s*(\d{2,3})\s*bpm\b/i);
-    if(m2) return m2[1];
-
-    const m3 = txt.match(/\b(\d{2,3})\s*bpm\b/i);
-    if(m3) return m3[1];
-
-    // manchmal ohne bpm: "Ø HF 148"
-    const m4 = txt.match(/\b(?:ø|Ø)\s*(?:hf|hr|herzfrequenz)\s*[:\-]?\s*(\d{2,3})\b/i);
-    if(m4) return m4[1];
-
-    return "";
-  }
-
-  function extractPace(txt){
-    // 5:30 /km, 05:30 min/km, Pace 5:30
-    const m1 = txt.match(/\b(\d{1,2}:\d{2})\s*(?:\/\s*km|\/km|min\/km)\b/i);
-    if(m1) return m1[1];
-
-    const m2 = txt.match(/\bpace\s*[:\-]?\s*(\d{1,2}:\d{2})\b/i);
-    if(m2) return m2[1];
-
-    // fallback: irgendein mm:ss (kann aber auch "Zeit" sein)
-    const m3 = txt.match(/\b(\d{1,2}:\d{2})\b/);
-    return m3 ? m3[1] : "";
-  }
-
-  function extractDurationMin(txt){
-    // 32 min / 32 minuten
-    const m1 = txt.match(/\b(\d{1,3})\s*(?:min|minute|minuten)\b/i);
-    if(m1) return m1[1];
-
-    // 00:32:15 oder 1:05:00
-    const hms = txt.match(/\b(\d{1,2}):([0-5]\d):([0-5]\d)\b/);
-    if(hms){
-      const h = Number(hms[1]), m = Number(hms[2]), s = Number(hms[3]);
-      const totalMin = Math.round((h*3600 + m*60 + s)/60);
-      return String(totalMin);
-    }
-
-    // 32:15 (mm:ss)
-    const ms = txt.match(/\b(\d{1,3}):([0-5]\d)\b/);
-    if(ms){
-      const m = Number(ms[1]), s = Number(ms[2]);
-      const totalMin = Math.round((m*60 + s)/60);
-      return String(totalMin);
-    }
-
-    // manchmal "Dauer 00:32:15"
-    const m2 = txt.match(/\b(?:dauer|duration)\s*[:\-]?\s*(\d{1,2}:\d{2}:\d{2}|\d{1,3}:\d{2})\b/i);
-    if(m2){
-      const v = m2[1];
-      if(v.split(":").length === 3){
-        const [hh,mm,ss] = v.split(":").map(Number);
-        return String(Math.round((hh*3600+mm*60+ss)/60));
-      } else {
-        const [mm,ss] = v.split(":").map(Number);
-        return String(Math.round((mm*60+ss)/60));
-      }
-    }
-
-    return "";
-  }
-
-  function guessType({km, pace, raw}){
-    if(km && pace) return "Joggen";
-    if(km && !pace) return "Schwimmen";
-    // wenn Wörter drin stehen:
-    if(/\b(swim|schwimm)\b/i.test(raw)) return "Schwimmen";
-    if(/\b(run|jogg|laufen)\b/i.test(raw)) return "Joggen";
-    if(/\b(tennis)\b/i.test(raw)) return "Tennis";
-    if(/\b(ringen)\b/i.test(raw)) return "Ringen";
-    if(/\b(stretch)\b/i.test(raw)) return "Stretching";
-    if(/\b(kraft|strength|gym)\b/i.test(raw)) return "Krafttraining";
-    return "Krafttraining";
-  }
-
-  function autoCreateSessionFromOCR(fields){
-    const d = fields.dateIso || entryDateInput.value;
-    const session = {
-      type: fields.type || "Krafttraining",
-      duration: String(fields.duration || ""),
-      calories: String(fields.calories || ""),
-      km: String(fields.km || ""),
-      pace: String(fields.pace || ""),
-      hr: String(fields.hr || ""),
-      time: String(fields.time || "")
-    };
-    getDay(d).push(session);
-    saveDB();
-
-    entryDateInput.value = d;
-    focusDateInput.value = d;
-    renderSessions();
-    updateAfterEdit();
-  }
-
-  shotFile.addEventListener("change", async () => {
-    const file = shotFile.files?.[0];
-    if(!file) return;
-    shotFile.value = "";
-
-    try{
-      if(!window.Tesseract){
-        ocrStatus.textContent = "Tesseract nicht geladen ❌";
-        return;
-      }
-
-      ocrStatus.textContent = "Bild wird vorbereitet…";
-      const canvas = await fileToCanvasScaled(file, 1800);
-
-      ocrStatus.textContent = "OCR läuft…";
-      const result = await Tesseract.recognize(canvas, "deu+eng", {
-        logger: m => {
-          if(m.progress != null){
-            ocrStatus.textContent = `OCR ${Math.round(m.progress*100)}%`;
-          }
-        }
-      });
-
-      const raw = normalizeText(result?.data?.text || "");
-      ocrRaw.value = raw;
-
-      const dateIso = extractDateIso(raw);       // kann leer sein
-      const time = extractTime(raw);             // kann leer sein
-      const duration = extractDurationMin(raw);
-      const calories = extractCalories(raw);
-      const km = extractKm(raw);
-      const pace = extractPace(raw);
-      const hr = extractHr(raw);
-      const typeGuess = guessType({km, pace, raw});
-
-      // Felder füllen (für Debug / falls Modal gebraucht)
-      ocrDate.value = dateIso || entryDateInput.value;
-      ocrTime.value = time;
-      ocrDuration.value = duration;
-      ocrCalories.value = calories;
-      ocrKm.value = km;
-      ocrPace.value = pace;
-      ocrHr.value = hr;
-      ocrType.value = typeGuess;
-
-      // AUTO: Wenn wir wenigstens Dauer ODER Kalorien ODER KM erkannt haben -> direkt eintragen
-      const hasAny = !!(duration || calories || km || hr || pace);
-
-      if(hasAny){
-        // ohne klicken: direkt speichern
-        autoCreateSessionFromOCR({
-          dateIso: dateIso || entryDateInput.value,
-          time,
-          duration,
-          calories,
-          km,
-          pace,
-          hr,
-          type: typeGuess
-        });
-
-        ocrStatus.textContent = "Import ✅ (automatisch gespeichert)";
-        ocrModal.style.display = "none";
-        return;
-      }
-
-      // sonst Modal zum manuellen Check
-      ocrModal.style.display = "block";
-      ocrStatus.textContent = "OCR fertig (bitte prüfen)";
-
-    } catch(e){
-      console.error(e);
-      ocrStatus.textContent = "OCR Fehler ❌";
-    }
+  ctx.fillStyle="#00ff6a";
+  values.forEach((v,i)=>{
+    if(v<=0) return;
+    const x=padL + (i/(values.length-1||1))*innerW;
+    const y=h-padB-(v/max)*innerH;
+    ctx.beginPath();
+    ctx.arc(x,y,3,0,Math.PI*2);
+    ctx.fill();
+    ctx.fillStyle="#fff";
+    ctx.fillText(Math.round(v),x-6,y-8);
+    ctx.fillStyle="#00ff6a";
   });
+}
 
-  // Falls du doch mal manuell übernehmen willst (bleibt als Fallback)
-  ocrCancel.onclick = () => { ocrModal.style.display="none"; };
-  ocrApply.onclick = () => {
-    autoCreateSessionFromOCR({
-      dateIso: ocrDate.value || entryDateInput.value,
-      time: ocrTime.value || "",
-      duration: ocrDuration.value || "",
-      calories: ocrCalories.value || "",
-      km: ocrKm.value || "",
-      pace: ocrPace.value || "",
-      hr: ocrHr.value || "",
-      type: ocrType.value || "Krafttraining"
+/* ---------- Render Charts ---------- */
+function renderCharts(){
+  const f = new Date(document.getElementById("focusDate").value);
+  const days = new Date(f.getFullYear(), f.getMonth()+1, 0).getDate();
+  const labels=[], cal=[], km=[];
+
+  for(let d=1;d<=days;d++){
+    const isoDay = `${f.getFullYear()}-${String(f.getMonth()+1).padStart(2,"0")}-${String(d).padStart(2,"0")}`;
+    labels.push(String(d));
+    let c=0,k=0;
+    (db[isoDay]||[]).forEach(s=>{
+      c+=safeNum(s.calories);
+      if(KM_SPORTS.has(s.type)) k+=safeNum(s.km);
     });
-    ocrModal.style.display="none";
-    ocrStatus.textContent = "Import ✅ (manuell gespeichert)";
-  };
-  /* ===================== MASTER ===================== */
-  function renderAll(){
-    renderSessions();
-    renderDashboard();
-    renderCharts();
-    renderCalendar();
+    cal.push(c);
+    km.push(k);
   }
 
+  drawLine(document.getElementById("calorieChart"), cal, labels, "Kalorien pro Tag", "kcal");
+  drawLine(document.getElementById("kmChart"), km, labels, "Kilometer pro Tag", "km");
+}
+
+/* ---------- OCR IMPORT (Datum + Uhrzeit, best effort) ---------- */
+const shotBtn=document.getElementById("shotBtn");
+const shotFile=document.getElementById("shotFile");
+const ocrStatus=document.getElementById("ocrStatus");
+
+shotBtn.onclick=()=>shotFile.click();
+
+shotFile.onchange=async()=>{
+  const file=shotFile.files[0];
+  if(!file) return;
+  ocrStatus.textContent="OCR läuft…";
+
+  const img=new Image();
+  img.src=URL.createObjectURL(file);
+  await img.decode();
+
+  const c=document.createElement("canvas");
+  c.width=img.width; c.height=img.height;
+  c.getContext("2d").drawImage(img,0,0);
+
+  const res=await Tesseract.recognize(c,"deu+eng");
+  const t=res.data.text.replace(/\s+/g," ");
+
+  const dateMatch=t.match(/(\d{1,2})[.\-/](\d{1,2})[.\-/](\d{4})/);
+  const timeMatch=t.match(/([01]?\d|2[0-3]):([0-5]\d)/);
+
+  const dateIso = dateMatch
+    ? `${dateMatch[3]}-${String(dateMatch[2]).padStart(2,"0")}-${String(dateMatch[1]).padStart(2,"0")}`
+    : document.getElementById("entryDate").value;
+
+  const time = timeMatch ? timeMatch[0] : "";
+
+  const cal = (t.match(/(\d+)\s*kcal/i)||[])[1]||"";
+  const kmv = (t.match(/(\d+[.,]\d+)\s*km/i)||[])[1]?.replace(",","")||"";
+  const dur = (t.match(/(\d+)\s*min/i)||[])[1]||"";
+  const hr  = (t.match(/(\d+)\s*bpm/i)||[])[1]||"";
+
+  getDay(dateIso).push({
+    time, type: kmv?"Joggen":"Krafttraining",
+    duration:dur, calories:cal, km:kmv, pace:"", hr
+  });
+  saveDB();
+  document.getElementById("entryDate").value=dateIso;
+  renderSessions();
   renderAll();
-})();
-</script>
+  ocrStatus.textContent="Importiert ✅";
+};
 
+/* ---------- MASTER ---------- */
+function renderAll(){
+  renderDashboard();
+  renderCharts();
+}
+renderAll();
+</script>
+</script>
 </body>
 </html>
- 
